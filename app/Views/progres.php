@@ -11,7 +11,7 @@
                 <h1 class="h2 fw-bold text-indosat mb-3">
                     <i class="bi bi-search me-2"></i>Cek Progres Pendaftaran
                 </h1>
-                <p class="text-muted">Pantau status pendaftaran magang Anda di IOH Semarang</p>
+                <p class="text-muted">Pantau status pendaftaran Anda di IOH</p>
             </div>
         </div>
     </div>

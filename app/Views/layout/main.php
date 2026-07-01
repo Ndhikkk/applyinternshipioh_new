@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $this->renderSection('title') ?> - IOH Internship Semarang</title>
+    <!-- <title><?= $this->renderSection('title') ?> - IOH </title> -->
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="<?= $this->renderSection('meta_description') ?: 'Bergabunglah dengan Program Magang Resmi Indosat Ooredoo Hutchison (IOH) Semarang. Kesempatan emas bagi mahasiswa untuk mendapatkan pengalaman kerja nyata di industri telekomunikasi digital.' ?>">
+    <meta name="description" content="<?= $this->renderSection('meta_description') ?: 'Bergabunglah dengan Program Resmi Indosat Ooredoo Hutchison (IOH) Semarang. Kesempatan emas bagi mahasiswa untuk mendapatkan pengalaman kerja nyata di industri telekomunikasi digital.' ?>">
     <meta name="keywords" content="magang indosat, ioh semarang, internship semarang, magang telekomunikasi, magang IT, lowongan magang semarang, program magang mahasiswa, kampus merdeka">
     <meta name="author" content="Indosat Ooredoo Hutchison Semarang">
     <meta name="robots" content="index, follow">
@@ -17,7 +17,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="<?= current_url() ?>">
     <meta property="og:title" content="<?= $this->renderSection('title') ?> - IOH Internship Semarang">
-    <meta property="og:description" content="<?= $this->renderSection('meta_description') ?: 'Gabung Program Magang IOH Semarang. Kembangkan skill IT, Marketing, Finance, dan Teknikal bersama para expert industri.' ?>">
+    <meta property="og:description" content="<?= $this->renderSection('meta_description') ?: 'Gabung Program IOH. Kembangkan skill IT, Marketing, Finance, dan Teknikal bersama para expert industri.' ?>">
     <meta property="og:image" content="<?= base_url('assets/img/logo-ioh.svg') ?>">
     <meta property="og:site_name" content="IOH Internship Semarang">
 
@@ -25,7 +25,7 @@
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="<?= current_url() ?>">
     <meta property="twitter:title" content="<?= $this->renderSection('title') ?> - IOH Internship Semarang">
-    <meta property="twitter:description" content="<?= $this->renderSection('meta_description') ?: 'Program Magang Resmi Indosat Ooredoo Hutchison Semarang.' ?>">
+    <meta property="twitter:description" content="<?= $this->renderSection('meta_description') ?: 'Program Resmi Indosat Ooredoo Hutchison.' ?>">
     <meta property="twitter:image" content="<?= base_url('assets/img/logo-ioh.svg') ?>">
 
     <!-- Favicon -->
@@ -527,7 +527,7 @@
                 <!-- Hapus filter: brightness(0) invert(1) untuk logo berwarna asli -->
                 <img src="<?= base_url('assets/img/tone-indosat.png') ?>" alt="Indosat Ooredoo Hutchison"
                     class="brand-logo" style="filter: none !important;">
-                <span class="fw-bold d-none d-lg-block" style="font-size: 1.1rem;">Indosat Ooredoo Hutchison<br><small style="font-size: 0.8rem; font-weight: 500;">Internship Semarang</small></span>
+                <span class="fw-bold d-none d-lg-block" style="font-size: 1.1rem;">Indosat Ooredoo Hutchison<br><small style="font-size: 0.8rem; font-weight: 500;">Future Talent Program</small></span>
                 <span class="fw-bold d-lg-none" style="font-size: 1rem;">IOH Internship</span>
             </a>
 
@@ -545,7 +545,7 @@
                     <li class="nav-item">
                         <a class="nav-link <?= current_url() == base_url('pendaftaran') ? 'active' : '' ?>"
                             href="<?= base_url('pendaftaran') ?>">
-                            <i class="bi bi-pencil-square me-1"></i>Pendaftaran Magang
+                            <i class="bi bi-pencil-square me-1"></i>Pendaftaran
                         </a>
                     </li>
                     <li class="nav-item">

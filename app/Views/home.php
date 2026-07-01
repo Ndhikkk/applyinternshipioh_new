@@ -1,6 +1,6 @@
 <?= $this->extend('layout/main') ?>
 
-<?= $this->section('title') ?>Home - Program Magang IOH Semarang<?= $this->endSection() ?>
+<?= $this->section('title') ?>Home - Program IOH<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <!-- Hero Section -->
@@ -9,12 +9,12 @@
         <div class="row align-items-center min-vh-100">
             <div class="col-12 col-lg-6">
                 <div class="hero-content text-center text-lg-start">
-                    <h1 class="hero-title fw-bold mb-4" aria-label="Program Magang Indosat Ooredoo Hutchison Semarang">
-                        Program Magang<br>Indosat Ooredoo Hutchison Semarang
+                    <h1 class="hero-title fw-bold mb-4" aria-label="Program Magang Indosat Ooredoo Hutchison ">
+                        Indosat Ooredoo Hutchison <br> Future Talent Program 
                     </h1>
                     <p class="hero-description mb-5">
                         Siap melangkah ke dunia industri?<br>
-                        Program Magang IOH Semarang membuka kesempatan bagi mahasiswa untuk mengasah keterampilan di bidang telekomunikasi dan teknologi digital melalui pengalaman kerja nyata bersama para profesional industri.
+                        Program IOH membuka kesempatan bagi mahasiswa untuk mengasah keterampilan di bidang telekomunikasi dan teknologi digital melalui pengalaman kerja nyata bersama para profesional industri.
                     </p>
                     <div class="hero-buttons">
                         <a href="<?= base_url('pendaftaran') ?>" class="btn btn-primary-hero"
@@ -42,8 +42,8 @@
 <section class="benefits-section clean-section" aria-label="Keunggulan program magang">
     <div class="container">
         <div class="section-header text-center mb-5">
-            <h2 class="fw-bold mb-3 section-main-title">Keunggulan Program Magang</h2>
-            <p class="section-subtitle">Manfaat yang akan Anda dapatkan selama program magang</p>
+            <h2 class="fw-bold mb-3 section-main-title">Keunggulan Program IOH</h2>
+            <p class="section-subtitle">Manfaat yang akan Anda dapatkan selama program </p>
         </div>
         <div class="row g-4">
             <!-- Benefit 1 -->
@@ -81,7 +81,7 @@
                         <i class="bi bi-award"></i>
                     </div>
                     <div class="benefit-content">
-                        <h3 class="benefit-title-clean">Sertifikat Magang</h3>
+                        <h3 class="benefit-title-clean">Sertifikat </h3>
                         <p class="benefit-description-clean">Dapatkan sertifikat resmi yang diakui industri untuk
                             meningkatkan nilai CV dan portofolio profesional Anda.</p>
                     </div>
@@ -97,7 +97,7 @@
                     <div class="benefit-content">
                         <h3 class="benefit-title-clean">Jaringan Profesional</h3>
                         <p class="benefit-description-clean">Bangun koneksi dengan profesional industri dan sesama
-                            magang untuk masa depan karir yang lebih luas.</p>
+                            patner untuk masa depan karir yang lebih luas.</p>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                     </div>
                     <div class="benefit-content">
                         <h3 class="benefit-title-clean">Peluang Karir</h3>
-                        <p class="benefit-description-clean">Akses peluang karir lebih besar dengan pengalaman magang di
+                        <p class="benefit-description-clean">Akses peluang karir lebih besar dengan pengalaman di
                             perusahaan telekomunikasi terdepan.</p>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
     <div class="container">
         <div class="row mb-5">
             <div class="col-12 text-center" data-aos="fade-up">
-                <h2 class="fw-bold mb-3 divisi-main-title">Divisi Magang IOH Semarang</h2>
+                <h2 class="fw-bold mb-3 divisi-main-title">Divisi Program IOH </h2>
                 <p class="divisi-subtitle mb-0">Bergabunglah dengan divisi yang sesuai dengan minat dan keahlian Anda
                 </p>
             </div>
@@ -274,7 +274,7 @@
                     <div class="cta-content text-center">
                         <h2 class="cta-title">Tertarik Bergabung?</h2>
                         <p class="cta-description">Pilih divisi yang sesuai dengan passion dan keahlian Anda. Kami akan
-                            membantu mengembangkan potensi terbaik Anda bersama tim profesional di IOH Semarang.</p>
+                            membantu mengembangkan potensi terbaik Anda bersama tim profesional di IOH.</p>
 
                         <div class="cta-checklist">
                             <div class="check-item">
@@ -287,7 +287,7 @@
                             </div>
                             <div class="check-item">
                                 <i class="bi bi-check-circle-fill"></i>
-                                <span>Sertifikat Magang</span>
+                                <span>Sertifikat </span>
                             </div>
                             <div class="check-item">
                                 <i class="bi bi-check-circle-fill"></i>
@@ -303,7 +303,7 @@
                         <div class="cta-statistics">
                             <div class="stat-item">
                                 <div class="stat-number">100+</div>
-                                <div class="stat-label">Magang Terima</div>
+                                <div class="stat-label">Pendaftar</div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-number">93%</div>

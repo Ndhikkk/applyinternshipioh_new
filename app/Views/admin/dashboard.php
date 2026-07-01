@@ -30,6 +30,10 @@
             <a href="<?= base_url('admin/export') ?>" class="btn btn-success btn-sm">
                 <i class="bi bi-file-earmark-excel"></i> Export Excel
             </a>
+             <a href="<?= base_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm">
+                <i class="bi bi-file-earmark-pdf"></i> genrate CV
+            </a>
+
             <a href="<?= base_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </a>

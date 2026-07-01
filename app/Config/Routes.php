@@ -22,6 +22,8 @@ $routes->post('daftar/submit', 'Pendaftaran::submit');
 $routes->get('pendaftaran', 'Pendaftaran::index');
 $routes->post('pendaftaran', 'Pendaftaran::store');
 $routes->get('pendaftaran/success', 'Pendaftaran::success');
+$routes->post('pendaftaran/import_cv', 'Pendaftaran::import_cv');
+
 
 // Progres/Peserta routes
 $routes->get('peserta', 'Progres::index');
@@ -30,6 +32,8 @@ $routes->post('progres/cek', 'Progres::cekStatus');
 $routes->post('/progres/cek', 'Progres::cek'); // ✅ Method 'cek'
 $routes->get('/progres/cek', 'Progres::index'); // ✅ Fallback untuk GET
 $routes->get('admin/download/(:num)/(:any)', 'Admin::download/$1/$2');
+$routes->view('admin/parsing-cv', 'admin/parsing_cv');
+
 
 // HAPUS INI - biarkan /admin tidak dihandle, atau tangani dengan benar
 // $routes->get('admin', 'Admin::login');

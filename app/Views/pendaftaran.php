@@ -1,6 +1,6 @@
 <?= $this->extend('layout/main') ?>
 
-<?= $this->section('title') ?>Pendaftaran Magang - IOH Semarang<?= $this->endSection() ?>
+<?= $this->section('title') ?>Pendaftaran Program - IOH <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <div class="container py-5 mt-5">
@@ -8,8 +8,8 @@
         <div class="col-md-10">
             <div class="form-card" data-aos="fade-up">
                 <div class="card-header text-white">
-                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Form Pendaftaran Magang</h4>
-                    <p class="mb-0 mt-2">IOH Semarang</p>
+                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Form Pendaftaran</h4>
+                    <span class="mb-0 mt-2">Tumbuh Bersama IOH</span>
                 </div>
                 <div class="card-body p-4">
                 <!-- ... rest of the form ... -->
@@ -20,7 +20,7 @@
                             <i class="bi bi-clock-history display-1 text-warning mb-3"></i>
                             <h4 class="alert-heading fw-bold mb-3">Pendaftaran Ditutup</h4>
                             <p class="mb-0 fs-5">
-                                Terima kasih atas ketertarikan Anda. Saat ini kami belum membuka penerimaan magang.<br>
+                                Terima kasih atas ketertarikan Anda. Saat ini kami belum membuka Program.<br>
                                 Informasi pembukaan berikutnya akan kami umumkan di halaman ini.
                             </p>
                         </div>
@@ -28,7 +28,7 @@
                         <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                             <i class="bi bi-megaphone-fill me-2"></i>
                             <strong>Pendaftaran Dibuka!</strong>
-                            Pendaftaran program magang telah dibuka. Silakan lengkapi data diri Anda dan unggah dokumen yang diperlukan sebelum batas waktu pendaftaran.
+                            Pendaftaran program telah dibuka. Silakan lengkapi data diri Anda dan unggah dokumen yang diperlukan sebelum batas waktu pendaftaran.
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     
