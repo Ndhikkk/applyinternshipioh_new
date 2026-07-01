@@ -1,0 +1,20 @@
+# Disable directory browsing
+Options -Indexes
+# ----------------------------------------------------------------------
+# Rewrite Rules for CodeIgniter 4
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Redirect / to /public
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+# ----------------------------------------------------------------------
+# Security: Block access to dotfiles and sensitive files
+# ----------------------------------------------------------------------
+<FilesMatch "^\.(env|git|idea|vscode)">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(composer\.json|composer\.lock|spark)">
+    Require all denied
+</FilesMatch>

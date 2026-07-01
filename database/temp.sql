@@ -1,0 +1,28 @@
+CREATE TABLE IF NOT EXISTS `pendaftaran_magang` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nama_lengkap` VARCHAR(255) NOT NULL,
+  `nomor_whatsapp` VARCHAR(20) NOT NULL,
+  `asal_kampus` VARCHAR(255) NOT NULL,
+  `program_studi` VARCHAR(255) NOT NULL,
+  `semester` INT NOT NULL,
+  `cv` VARCHAR(255) NOT NULL,
+  `surat_pengantar` VARCHAR(255) NOT NULL,
+  `ktm` VARCHAR(255) NOT NULL,
+  `status` ENUM('Menunggu','Diterima','Ditolak') NOT NULL DEFAULT 'Menunggu',
+  `catatan` TEXT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `admin_users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(100) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO admin_users (username, password) 
+VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
