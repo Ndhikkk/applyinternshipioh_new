@@ -33,10 +33,9 @@ $routes->post('/progres/cek', 'Progres::cek'); // ✅ Method 'cek'
 $routes->get('/progres/cek', 'Progres::index'); // ✅ Fallback untuk GET
 $routes->get('admin/download/(:num)/(:any)', 'Admin::download/$1/$2');
 $routes->view('admin/parsing-cv', 'admin/parsing_cv');
+$routes->post('progres/kirimEmail', 'Progres::kirimEmail');
+$routes->get('progres/cetak-pdf/(:any)', 'Progres::cetakPdf/$1');
 
-
-// HAPUS INI - biarkan /admin tidak dihandle, atau tangani dengan benar
-// $routes->get('admin', 'Admin::login');
 
 // Group admin routes dengan filter
 $routes->group('admin', function ($routes) {
@@ -55,7 +54,7 @@ $routes->group('admin', function ($routes) {
         $routes->get('analyze-cv/(:num)', 'Admin::analyzeCv/$1');
         $routes->get('toggle-registration', 'Admin::toggleRegistration');
         $routes->get('download/(:num)/(:any)', 'Admin::download/$1/$2');
-        $routes->get('process-interview/(:num)/(lolos|tolak)', 'Admin::processInterview/$1/$2');
+        $routes->get('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
         $routes->get('hapus/(:num)', 'Admin::delete/$1');
         $routes->get('testform', 'Testform::index');
     });

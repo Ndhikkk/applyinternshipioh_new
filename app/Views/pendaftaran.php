@@ -12,8 +12,6 @@
                     <span class="mb-0 mt-2">Tumbuh Bersama IOH</span>
                 </div>
                 <div class="card-body p-4">
-                <!-- ... rest of the form ... -->
-                <div class="card-body p-4">
                     <!-- Status Notification -->
                     <?php if (isset($registration_open) && $registration_open == '0'): ?>
                         <div class="alert alert-warning text-center py-5 mb-0">
@@ -106,6 +104,25 @@
                                     <strong>Magang Mandiri:</strong> Magang yang dilakukan secara sukarela untuk pengembangan skill
                                 </div>
                             </div>
+
+                           <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-secondary">Divisi Pilihan *</label>
+                                <select name="divisi_pilihan" id="form_divisi" class="form-control form-control-sm" style="border-radius: 6px;" required>
+                                    <option value="">Pilih Divisi </option>
+                                    <option value="Markom" <?= old('divisi_pilihan') == 'Markom' ? 'selected' : '' ?>>Markom</option>
+                                    <option value="IT / Elang IT" <?= old('divisi_pilihan') == 'IT / Elang IT' ? 'selected' : '' ?>>IT / Elang IT</option>
+                                    <option value="Technical" <?= old('divisi_pilihan') == 'Technical' ? 'selected' : '' ?>>Technical</option>
+                                    <option value="Finance" <?= old('divisi_pilihan') == 'Finance' ? 'selected' : '' ?>>Finance</option>
+                                    <option value="B2B" <?= old('divisi_pilihan') == 'B2B' ? 'selected' : '' ?>>B2B</option>
+                                    <option value="Social Media 3ID & IM3" <?= old('divisi_pilihan') == 'Social Media 3ID & IM3' ? 'selected' : '' ?>>Social Media 3ID & IM3</option>
+                                    <option value="Daily Project" <?= old('divisi_pilihan') == 'Daily Project' ? 'selected' : '' ?>>Daily Project</option>
+                                    <option value="Project Post Paid" <?= old('divisi_pilihan') == 'Project Post Paid' ? 'selected' : '' ?>>Project Post Paid</option>
+                                    <option value="Capability Building" <?= old('divisi_pilihan') == 'Capability Building' ? 'selected' : '' ?>>Capability Building</option>
+                                </select>
+                                <div class="form-text">
+                                    Pilihlah salah satu spesifikasi divisi kerja yang paling sesuai dengan minat dan fokus keahlian akademik Anda.
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -174,4 +191,42 @@
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 Library CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if (session()->getFlashdata('errors')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Validasi Gagal',
+                html: `<div style="text-align: left;">
+                        <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach; ?>
+                       </div>`,
+                confirmButtonColor: '#3085d6'
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan',
+                text: '<?= esc(session()->getFlashdata("error")) ?>',
+                confirmButtonColor: '#d33'
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Pendaftaran Berhasil',
+                text: '<?= esc(session()->getFlashdata("success")) ?>',
+                confirmButtonColor: '#3085d6'
+            });
+        <?php endif; ?>
+    });
+</script>
 <?= $this->endSection() ?>

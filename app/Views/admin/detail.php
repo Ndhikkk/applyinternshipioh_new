@@ -70,7 +70,7 @@
             <tr>
                 <th>CV</th>
                 <td>
-                    <a href="<?= base_url('admin/download/' . $item['id'] . '/cv') ?>" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Lihat</a>
+                    <a href="<?= site_url('admin/download/' . $item['id'] . '/cv') ?>" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Lihat</a>
                     <button type="button" class="btn btn-sm btn-info text-white" onclick="analyzeCv(<?= $item['id'] ?>)">
                         <i class="bi bi-robot"></i> Analys CV
                     </button>
@@ -78,18 +78,49 @@
             </tr>
             <tr>
                 <th>Surat Pengantar</th>
-                <td><a href="<?= base_url('admin/download/' . $item['id'] . '/surat') ?>" target="_blank">Lihat</a></td>
+                <td><a href="<?= site_url('admin/download/' . $item['id'] . '/surat') ?>" target="_blank">Lihat</a></td>
             </tr>
             <tr>
                 <th>KTM</th>
-                <td><a href="<?= base_url('admin/download/' . $item['id'] . '/ktm') ?>" target="_blank">Lihat</a></td>
+                <td><a href="<?= site_url('admin/download/' . $item['id'] . '/ktm') ?>" target="_blank">Lihat</a></td>
+            </tr>
+            <tr>
+                <th>Riwayat Interview</th>
+                <td>
+                    <?php $ada = false; ?>
+                    <?php for ($i = 1; $i <= 3; $i++): ?>
+                        <?php $jadwal = $item['jadwal_interview_' . $i] ?? null; $zoom = $item['link_zoom_' . $i] ?? null; $catatan = $item['catatan_interview_' . $i] ?? null; ?>
+                        <?php if ($jadwal || $zoom || $catatan): $ada = true; ?>
+                            <div class="border rounded p-2 mb-2">
+                                <strong>Interview Tahap <?= $i ?></strong><br>
+                                <?php if ($jadwal): ?>
+                                    <small><i class="bi bi-calendar-event"></i> <?= date('d/m/Y H:i', strtotime($jadwal)) ?> WIB</small><br>
+                                <?php endif; ?>
+                                <?php if ($zoom): ?>
+                                    <small><i class="bi bi-camera-video"></i> <a href="<?= esc($zoom) ?>" target="_blank"><?= esc($zoom) ?></a></small><br>
+                                <?php endif; ?>
+                                <?php if ($catatan): ?>
+                                    <small class="text-muted"><i class="bi bi-chat-left-text"></i> <?= esc($catatan) ?></small>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                    <?php if (!$ada): ?>
+                        <span class="text-muted small">Belum ada riwayat interview. Atur jadwal lewat tombol Lolos/Tidak Lolos di halaman Dashboard.</span>
+                    <?php endif; ?>
+                    <br>
+                    <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="kirimWaPengingat(<?= $item['id'] ?>)">
+                        <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
+                    </button>
+                </td>
             </tr>
             <tr>
                 <th>Status & Catatan</th>
                 <td>
-                    <form action="/admin/update-status/<?= $item['id'] ?>" method="post">
+                    <form action="<?= site_url('admin/update-status/' . $item['id']) ?>" method="post">
                         <?= csrf_field() ?>
                         <div class="mb-3">
+                            <label class="form-label small text-muted">Ubah status manual (di luar alur interview bertahap)</label>
                             <select name="status" class="form-select">
                                 <option value="Menunggu" <?= $item['status'] === 'Menunggu' ? 'selected' : '' ?>>Menunggu
                                 </option>
@@ -181,11 +212,26 @@
     <script>
         let divisionChart = null;
 
+        function kirimWaPengingat(id) {
+            fetch(`<?= site_url('admin/process-interview/') ?>${id}/wa`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (!json.success || !json.url) {
+                        Swal.fire('Info', json.message || 'Nomor WhatsApp tidak valid / tidak tersedia.', 'info');
+                        return;
+                    }
+                    window.open(json.url, '_blank');
+                })
+                .catch(() => Swal.fire('Gagal', 'Tidak dapat menghubungi server.', 'error'));
+        }
+
         function analyzeCv(id) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.style.display = 'flex';
 
-            fetch(`<?= base_url('admin/analyze-cv/') ?>${id}`)
+            fetch(`<?= site_url('admin/analyze-cv/') ?>${id}`)
                 .then(async response => {
                     const text = await response.text();
                     try {

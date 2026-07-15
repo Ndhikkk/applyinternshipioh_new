@@ -1,6 +1,6 @@
 <!-- Partial view: edit_status.php -->
 <div class="card p-3 mb-3">
-    <form action="/admin/update-status/<?= $item['id'] ?>" method="post">
+    <form action="<?= base_url('admin/update-status/' . $item['id']) ?>" method="post">
         <?= csrf_field() ?>
         <div class="row g-2">
             <div class="col-md-4">
@@ -11,8 +11,8 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <input type="text" name="catatan" class="form-control" placeholder="Catatan (opsional)"
-                    value="<?= esc($item['catatan']) ?>">
+                <input type="text" name="catatan_admin" class="form-control" placeholder="Catatan (opsional)"
+                    value="<?= esc($item['catatan_admin'] ?? '') ?>">
             </div>
             <div class="col-md-2">
                 <button class="btn btn-primary w-100">Simpan</button>
