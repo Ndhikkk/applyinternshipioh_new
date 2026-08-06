@@ -34,6 +34,7 @@ class Pendaftaran extends Controller
             'nama_lengkap'   => 'required',
             'email'          => 'required|valid_email',
             'nomor_whatsapp' => 'required',
+            'nomor_darurat'  => 'required|differs[nomor_whatsapp]',
             'asal_kampus'    => 'required',
             'program_studi'  => 'required',
             'divisi_pilihan' => 'required',
@@ -43,6 +44,7 @@ class Pendaftaran extends Controller
             'periode_selesai'=> 'required',
             'cv'             => 'uploaded[cv]|max_size[cv,2048]|ext_in[cv,pdf]|mime_in[cv,application/pdf]',
             'surat_pengantar'=> 'permit_empty|max_size[surat_pengantar,2048]|ext_in[surat_pengantar,pdf]|mime_in[surat_pengantar,application/pdf]',
+            'proposal_magang'=> 'permit_empty|max_size[proposal_magang,2048]|ext_in[proposal_magang,pdf]|mime_in[proposal_magang,application/pdf]',
             'ktm'            => 'permit_empty|max_size[ktm,4096]|ext_in[ktm,pdf,jpg,jpeg,png]|mime_in[ktm,application/pdf,image/jpg,image/jpeg,image/png]',
         ];
 
@@ -65,6 +67,13 @@ class Pendaftaran extends Controller
             $surat_pengantar->move(WRITEPATH . 'uploads/surat', $suratName);
         }
 
+        $proposal_magang = $this->request->getFile('proposal_magang');
+        $proposalName = '';
+        if ($proposal_magang && $proposal_magang->isValid() && !$proposal_magang->hasMoved()) {
+            $proposalName = $proposal_magang->getRandomName();
+            $proposal_magang->move(WRITEPATH . 'uploads/proposal', $proposalName);
+        }
+
         $ktm = $this->request->getFile('ktm');
         $ktmName = '';
         if ($ktm && $ktm->isValid() && !$ktm->hasMoved()) {
@@ -80,6 +89,7 @@ class Pendaftaran extends Controller
             'nama_lengkap'    => $this->request->getPost('nama_lengkap'),
             'email'           => $this->request->getPost('email'),
             'nomor_whatsapp'  => $this->request->getPost('nomor_whatsapp'),
+            'nomor_darurat'   => $this->request->getPost('nomor_darurat'),
             'asal_kampus'     => $this->request->getPost('asal_kampus'),
             'program_studi'   => $this->request->getPost('program_studi'),
             'divisi_pilihan'  => $this->request->getPost('divisi_pilihan'),
@@ -89,6 +99,7 @@ class Pendaftaran extends Controller
             'periode_selesai' => $this->request->getPost('periode_selesai'),
             'cv'              => $cvName, 
             'surat_pengantar' => $suratName,
+            'proposal_magang' => $proposalName,
             'ktm'             => $ktmName,
             'status'          => 'Menunggu',
             'catatan'         => '',

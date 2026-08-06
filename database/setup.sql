@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `pendaftaran_magang` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `nama_lengkap` VARCHAR(255) NOT NULL,
   `nomor_whatsapp` VARCHAR(20) NOT NULL,
+  `nomor_darurat` VARCHAR(20) NULL,
   `asal_kampus` VARCHAR(255) NOT NULL,
   `program_studi` VARCHAR(255) NOT NULL,
   `semester` INT NOT NULL,
@@ -31,10 +32,10 @@ CREATE TABLE IF NOT EXISTS `admin_users` (
 
 -- Insert sample data
 INSERT INTO pendaftaran_magang 
-(nama_lengkap, nomor_whatsapp, asal_kampus, program_studi, semester, cv, surat_pengantar, ktm, status, catatan)
+(nama_lengkap, nomor_whatsapp, nomor_darurat, asal_kampus, program_studi, semester, cv, surat_pengantar, ktm, status, catatan)
 VALUES 
-('John Doe', '081234567890', 'Universitas Indonesia', 'Teknik Informatika', 5, 'uploads/dummy_cv.pdf', 'uploads/dummy_surat.pdf', 'uploads/dummy_ktm.jpg', 'Menunggu', NULL),
-('Jane Smith', '081234567891', 'Institut Teknologi Bandung', 'Sistem Informasi', 6, 'uploads/dummy_cv.pdf', 'uploads/dummy_surat.pdf', 'uploads/dummy_ktm.jpg', 'Menunggu', NULL);
+('John Doe', '081234567890', '085812345678', 'Universitas Indonesia', 'Teknik Informatika', 5, 'uploads/dummy_cv.pdf', 'uploads/dummy_surat.pdf', 'uploads/dummy_ktm.jpg', 'Menunggu', NULL),
+('Jane Smith', '081234567891', '085887654321', 'Institut Teknologi Bandung', 'Sistem Informasi', 6, 'uploads/dummy_cv.pdf', 'uploads/dummy_surat.pdf', 'uploads/dummy_ktm.jpg', 'Menunggu', NULL);
 
 -- Insert admin user (password: admin123)
 INSERT INTO admin_users (username, password) 

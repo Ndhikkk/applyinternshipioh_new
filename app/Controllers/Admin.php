@@ -130,6 +130,10 @@ class Admin extends BaseController
         $data['is_arsip'] = $isArsip;
         $data['registration_open'] = $this->settingsModel->getValue('registration_open') ?? '1';
 
+        if ($this->request->isAJAX()) {
+            return view('admin/_table_data', $data);
+        }
+
         return view('admin/dashboard', $data);
     }
 
@@ -257,6 +261,7 @@ class Admin extends BaseController
         $config = [
             'cv' => ['field' => 'cv', 'folder' => 'cv', 'prefix' => 'CV_'],
             'surat' => ['field' => 'surat_pengantar', 'folder' => 'surat', 'prefix' => 'Surat_Pengantar_'],
+            'proposal' => ['field' => 'proposal_magang', 'folder' => 'proposal', 'prefix' => 'Proposal_'],
             'ktm' => ['field' => 'ktm', 'folder' => 'ktm', 'prefix' => 'KTM_']
         ];
 
@@ -442,6 +447,7 @@ class Admin extends BaseController
         $map = [
             'cv'              => 'cv',
             'surat_pengantar' => 'surat',
+            'proposal_magang' => 'proposal',
             'ktm'             => 'ktm',
         ];
 

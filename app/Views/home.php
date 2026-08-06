@@ -341,18 +341,7 @@
 
 <style>
     /* ===== VARIABLES ===== */
-    :root {
-        --indosat-red: #E31837;
-        --indosat-dark-red: #8B1A3A;
-        --indosat-blue: #0056B3;
-        --indosat-gradient: linear-gradient(135deg, #E31837 0%, #8B1A3A 100%);
-        --text-light: #ffffff;
-        --text-gray: rgba(255, 255, 255, 0.85);
-        --light-bg: #f8f9fa;
-        --dark-bg: #2C3E50;
-        --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.08);
-        --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
+    /* Variables inherited from main.php */
 
     /* ===== GLOBAL STYLES ===== */
     body {
@@ -360,28 +349,15 @@
         background: #f8f9fa;
     }
 
-    /* ===== HERO SECTION ===== */
+    /* ===== HERO SECTION (LMS Style) ===== */
     .hero-section {
-        background: var(--indosat-gradient);
-        color: var(--text-light);
+        background: var(--indosat-soft-gradient);
+        color: var(--text-dark);
         min-height: 100vh;
         display: flex;
         align-items: center;
         padding: 2rem 0;
         position: relative;
-    }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-        pointer-events: none;
     }
 
     .hero-content {
@@ -390,6 +366,7 @@
     }
 
     .hero-title {
+        color: var(--text-dark);
         font-size: 2.5rem;
         line-height: 1.2;
         margin-bottom: 1.5rem;
@@ -397,9 +374,9 @@
     }
 
     .hero-description {
+        color: var(--text-muted);
         font-size: 1.2rem;
         line-height: 1.6;
-        color: var(--text-gray);
         margin-bottom: 2rem;
     }
 
@@ -410,32 +387,32 @@
     }
 
     .btn-primary-hero {
-        background: var(--text-light);
-        color: var(--indosat-red);
+        background: var(--indosat-gradient);
+        color: white;
         border: none;
         padding: 1rem 2rem;
-        border-radius: 50px;
+        border-radius: 999px;
         font-weight: 600;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         transition: all 0.3s ease;
         font-size: 1.1rem;
+        box-shadow: 0 10px 25px rgba(230, 0, 126, 0.15);
     }
 
     .btn-primary-hero:hover {
-        background: #f8f9fa;
-        transform: translateY(-2px);
-        color: var(--indosat-red);
-        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px) scale(1.03);
+        color: white;
+        box-shadow: 0 15px 30px rgba(230, 0, 126, 0.25);
     }
 
     .btn-secondary-hero {
-        background: transparent;
-        color: var(--text-light);
-        border: 2px solid var(--text-light);
+        background: white;
+        color: var(--indosat-primary);
+        border: 2px solid var(--indosat-primary);
         padding: 1rem 2rem;
-        border-radius: 50px;
+        border-radius: 999px;
         font-weight: 600;
         text-decoration: none;
         display: inline-flex;
@@ -445,10 +422,11 @@
     }
 
     .btn-secondary-hero:hover {
-        background: var(--text-light);
-        color: var(--indosat-red);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
+        background: var(--indosat-gradient);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 10px 25px rgba(230, 0, 126, 0.25);
     }
 
     .tech-visual {
@@ -537,51 +515,35 @@
         margin: 0 auto;
     }
 
-    /* ===== CLEAN BENEFITS SECTION ===== */
+    /* ===== CLEAN BENEFITS SECTION (LMS Style) ===== */
     .clean-section {
-        background: #ffffff;
+        background: var(--indosat-bg);
         padding: 5rem 0;
         position: relative;
     }
 
     .benefit-card-clean {
-        background: #ffffff;
-        border: 1px solid rgba(227, 24, 55, 0.1);
-        border-radius: 16px;
+        background: var(--indosat-bg);
+        border: 1px solid var(--indosat-border);
+        border-radius: 24px;
         padding: 30px 25px;
         height: 100%;
         transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
         position: relative;
         overflow: hidden;
     }
 
-    .benefit-card-clean::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #E31837 0%, #8B1A3A 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
     .benefit-card-clean:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(227, 24, 55, 0.08);
-        border-color: rgba(227, 24, 55, 0.2);
-    }
-
-    .benefit-card-clean:hover::before {
-        opacity: 1;
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(230,0,126,0.15);
     }
 
     .benefit-icon-clean {
         width: 70px;
         height: 70px;
-        background: linear-gradient(135deg, rgba(227, 24, 55, 0.1) 0%, rgba(139, 26, 58, 0.05) 100%);
-        border-radius: 16px;
+        background: var(--indosat-accent);
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -589,23 +551,14 @@
         transition: all 0.3s ease;
     }
 
-    .benefit-card-clean:hover .benefit-icon-clean {
-        background: linear-gradient(135deg, #E31837 0%, #8B1A3A 100%);
-        transform: scale(1.05);
-    }
-
     .benefit-icon-clean i {
         font-size: 1.8rem;
-        color: #E31837;
+        color: var(--indosat-primary);
         transition: all 0.3s ease;
     }
 
-    .benefit-card-clean:hover .benefit-icon-clean i {
-        color: white;
-    }
-
     .benefit-title-clean {
-        color: #2C3E50;
+        color: var(--text-dark);
         font-size: 1.3rem;
         font-weight: 700;
         margin-bottom: 12px;
@@ -742,66 +695,52 @@
 
     /* ===== DIVISI GRID ===== */
     .divisi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 25px;
         margin-bottom: 40px;
     }
 
     .divisi-card {
+        flex: 0 0 calc(33.333% - 17px); /* Desktop: 3 columns */
         background: white;
-        border-radius: 15px;
+        border-radius: 24px;
         padding: 25px;
-        box-shadow: var(--shadow-light);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
         transition: all 0.3s ease;
-        border: 1px solid rgba(227, 24, 55, 0.1);
+        border: 1px solid var(--indosat-border);
         position: relative;
         overflow: hidden;
     }
 
-    .divisi-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--indosat-gradient);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .divisi-card:hover::before {
-        opacity: 1;
-    }
-
     .divisi-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-hover);
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(230,0,126,0.15);
     }
 
     .divisi-icon {
         width: 60px;
         height: 60px;
-        background: var(--indosat-gradient);
-        border-radius: 12px;
+        background: var(--indosat-accent);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
-        color: white;
+        color: var(--indosat-primary);
         font-size: 1.5rem;
     }
 
     .divisi-title {
         font-weight: 700;
-        color: #E31837;
+        color: var(--text-dark);
         margin-bottom: 10px;
         font-size: 1.2rem;
     }
 
     .divisi-desc {
-        color: #5a6c7d;
+        color: var(--text-muted);
         font-size: 0.9rem;
         line-height: 1.6;
         margin-bottom: 15px;
@@ -815,36 +754,24 @@
     }
 
     .divisi-tag {
-        background: rgba(227, 24, 55, 0.1);
-        color: #E31837;
+        background: var(--indosat-accent);
+        color: var(--indosat-primary);
         padding: 4px 12px;
-        border-radius: 20px;
+        border-radius: 999px;
         font-size: 0.8rem;
         font-weight: 500;
     }
 
-    /* ===== CTA SECTION ===== */
+    /* ===== CTA SECTION (LMS Style) ===== */
     .cta-section {
-        background: linear-gradient(135deg, rgba(227, 24, 55, 0.1) 0%, rgba(139, 26, 58, 0.05) 100%);
-        border-radius: 25px;
-        border: 1px solid rgba(227, 24, 55, 0.2);
+        background: var(--indosat-soft-gradient);
+        border-radius: 24px;
+        border: 1px solid var(--indosat-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         position: relative;
         overflow: hidden;
         padding: 50px;
         margin-top: 40px;
-    }
-
-    .cta-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-            radial-gradient(circle at 20% 30%, rgba(227, 24, 55, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(139, 26, 58, 0.05) 0%, transparent 50%);
-        z-index: 1;
     }
 
     .cta-content {
@@ -894,11 +821,11 @@
         color: white;
         border: none;
         padding: 16px 45px;
-        border-radius: 50px;
+        border-radius: 999px;
         font-weight: 600;
         font-size: 1.1rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 25px rgba(227, 24, 55, 0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(230, 0, 126, 0.25);
         position: relative;
         overflow: hidden;
         display: inline-flex;
@@ -907,27 +834,11 @@
         gap: 10px;
         text-decoration: none;
     }
-
-    .btn-cta::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.7s;
-    }
-
-    .btn-cta:hover::before {
-        left: 100%;
-    }
-
+    
     .btn-cta:hover {
-        transform: translateY(-5px) scale(1.05);
-        box-shadow: 0 20px 40px rgba(227, 24, 55, 0.4);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 15px 30px rgba(230, 0, 126, 0.3);
         color: white;
-        text-decoration: none;
     }
 
     .btn-cta i {
@@ -1004,7 +915,7 @@
     .cta-statistics .stat-number {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #E31837;
+        color: var(--indosat-primary);
         line-height: 1;
         margin-bottom: 5px;
     }
@@ -1032,6 +943,10 @@
     @media (max-width: 992px) {
         .tech-logo {
             max-width: 350px;
+        }
+        
+        .divisi-card {
+            flex: 0 0 calc(50% - 12.5px); /* Tablet: 2 columns */
         }
     }
 
@@ -1090,11 +1005,11 @@
         }
 
         .divisi-grid {
-            grid-template-columns: 1fr;
             gap: 20px;
         }
 
         .divisi-card {
+            flex: 0 0 100%; /* Mobile: 1 column */
             padding: 20px;
         }
 

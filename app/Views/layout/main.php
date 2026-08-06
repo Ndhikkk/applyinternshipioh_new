@@ -34,13 +34,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
 
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --indosat-red: #E31837;
-            --indosat-dark-red: #8B1A3A;
-            --indosat-blue: #0056B3;
-            --indosat-gradient: linear-gradient(135deg, #E31837 0%, #8B1A3A 100%);
-            --indosat-light: #FFF5F6;
+            /* LMS Style Palette */
+            --indosat-primary: #E6007E;
+            --indosat-secondary: #FF4FA3;
+            --indosat-accent: #FCE7F3;
+            --indosat-bg: #FFFFFF;
+            --indosat-section-bg: #FFF9FC;
+            --indosat-border: #F3D7E6;
+            --indosat-success: #22C55E;
+            
+            --text-dark: #111827;
+            --text-muted: #6B7280;
+            
+            --indosat-gradient: linear-gradient(90deg, #E6007E, #FF4FA3);
+            --indosat-soft-gradient: linear-gradient(135deg, #ffffff, #fff6fb, #fdf2f8);
         }
 
         /* Smooth Scroll & Base Styles */
@@ -49,8 +63,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            background: var(--indosat-bg);
+            color: var(--text-dark);
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            color: var(--text-dark);
         }
 
         /* Brand Logo */
@@ -66,20 +86,26 @@
             filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
         }
 
-        /* Enhanced Navbar */
+        /* Enhanced Navbar (LMS Style) */
         .navbar {
-            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%) !important;
+            background: #ffffff !important;
             backdrop-filter: blur(15px);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 18px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            min-height: 80px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid var(--indosat-border);
         }
 
         .navbar.scrolled {
             padding: 12px 0;
-            background: rgba(44, 62, 80, 0.98) !important;
+            background: rgba(255, 255, 255, 0.98) !important;
             backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .navbar-brand span {
+            color: var(--text-dark);
         }
 
         .nav-link {
@@ -87,14 +113,14 @@
             margin: 0 12px;
             font-weight: 500;
             transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: var(--text-muted) !important;
             padding: 8px 16px !important;
-            border-radius: 25px;
+            border-radius: 999px;
         }
 
         .nav-link:hover {
-            color: white !important;
-            background: rgba(227, 24, 55, 0.1);
+            color: var(--indosat-primary) !important;
+            background: var(--indosat-accent);
             transform: translateY(-1px);
         }
 
@@ -103,21 +129,21 @@
             position: absolute;
             width: 0;
             height: 2px;
-            bottom: 0;
+            bottom: 2px;
             left: 50%;
-            background: var(--indosat-red);
+            background: var(--indosat-primary);
             transition: all 0.3s ease;
             transform: translateX(-50%);
         }
 
         .nav-link:hover::after,
         .nav-link.active::after {
-            width: 80%;
+            width: 60%;
         }
 
         .nav-link.active {
-            color: white !important;
-            background: rgba(227, 24, 55, 0.15);
+            color: var(--indosat-primary) !important;
+            font-weight: 600;
         }
 
         /* Enhanced Hero Section */
@@ -167,73 +193,44 @@
             z-index: 2;
         }
 
-        /* Enhanced Buttons */
+        /* Enhanced Buttons (LMS Style) */
         .btn-indosat {
             background: var(--indosat-gradient);
             border: none;
             color: white;
             padding: 14px 35px;
-            border-radius: 50px;
+            border-radius: 999px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(227, 24, 55, 0.4);
+            box-shadow: 0 6px 15px rgba(230, 0, 126, 0.15);
             position: relative;
             overflow: hidden;
-        }
-
-        .btn-indosat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-indosat:hover::before {
-            left: 100%;
         }
 
         .btn-indosat:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(227, 24, 55, 0.5);
+            transform: translateY(-2px) scale(1.03);
+            color: white;
+            box-shadow: 0 10px 25px rgba(230, 0, 126, 0.25);
         }
 
         .btn-outline-indosat {
-            border: 2px solid var(--indosat-red);
-            color: var(--indosat-red);
-            background: transparent;
+            border: 2px solid var(--indosat-primary);
+            color: var(--indosat-primary);
+            background: white;
             padding: 14px 35px;
-            border-radius: 50px;
+            border-radius: 999px;
             font-weight: 600;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-        }
-
-        .btn-outline-indosat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--indosat-gradient);
-            transition: left 0.3s;
-            z-index: -1;
-        }
-
-        .btn-outline-indosat:hover::before {
-            left: 0;
         }
 
         .btn-outline-indosat:hover {
             color: white;
+            background: var(--indosat-gradient);
             border-color: transparent;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(227, 24, 55, 0.3);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(230, 0, 126, 0.25);
         }
 
         /* Enhanced Cards */
@@ -342,14 +339,14 @@
         }
 
         .form-control:focus {
-            border-color: var(--indosat-red);
-            box-shadow: 0 0 0 0.3rem rgba(227, 24, 55, 0.15);
+            border-color: var(--indosat-primary);
+            box-shadow: 0 0 0 0.3rem rgba(230, 0, 126, 0.15);
             transform: translateY(-2px);
         }
 
-        /* Enhanced Footer */
+        /* Enhanced Footer (LMS Style) */
         .footer {
-            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            background: #111827;
             color: white;
             padding: 60px 0 25px;
             position: relative;
@@ -367,13 +364,13 @@
         }
 
         .footer h5 {
-            color: var(--indosat-red);
+            color: var(--indosat-secondary);
             margin-bottom: 20px;
             font-weight: 700;
         }
 
         .footer a {
-            color: #bdc3c7;
+            color: #D1D5DB;
             text-decoration: none;
             transition: all 0.3s ease;
             position: relative;
@@ -386,12 +383,12 @@
             height: 1px;
             bottom: -2px;
             left: 0;
-            background: var(--indosat-red);
+            background: var(--indosat-secondary);
             transition: width 0.3s ease;
         }
 
         .footer a:hover {
-            color: var(--indosat-red);
+            color: var(--indosat-secondary);
             padding-left: 5px;
         }
 
@@ -435,10 +432,10 @@
             width: 22px;
             height: 22px;
             border: 3px solid rgba(243, 243, 243, 0.3);
-            border-top: 3px solid var(--indosat-red);
+            border-top: 3px solid var(--indosat-primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            box-shadow: 0 0 10px rgba(227, 24, 55, 0.3);
+            box-shadow: 0 0 10px rgba(230, 0, 126, 0.3);
         }
 
         @keyframes spin {
@@ -465,10 +462,10 @@
         }
 
         .social-links a:hover {
-            background: var(--indosat-red);
+            background: var(--indosat-primary);
             transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 8px 20px rgba(227, 24, 55, 0.4);
-            border-color: var(--indosat-red);
+            box-shadow: 0 8px 20px rgba(230, 0, 126, 0.25);
+            border-color: var(--indosat-primary);
         }
 
         /* Responsive Enhancements */
@@ -502,6 +499,7 @@
         /* Scrollbar Styling */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
@@ -521,7 +519,7 @@
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="<?= base_url() ?>">
                 <!-- Hapus filter: brightness(0) invert(1) untuk logo berwarna asli -->
@@ -575,7 +573,7 @@
     <script>
         // Initialize AOS (Animate On Scroll)
         AOS.init({
-            duration: 1000,
+            duration: 300,
             once: true,
             offset: 100,
             easing: 'ease-out-cubic'

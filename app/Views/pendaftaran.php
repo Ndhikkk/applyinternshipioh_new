@@ -67,10 +67,19 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nomor WhatsApp *</label>
                                 <input type="text" name="nomor_whatsapp" class="form-control"
-                                    value="<?= old('nomor_whatsapp') ?>" placeholder="081234567890" required>
+                                    value="<?= old('nomor_whatsapp') ?>" placeholder="Contoh: 0857xxxx" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Nomor Darurat *</label>
+                                <input type="text" name="nomor_darurat" class="form-control"
+                                    value="<?= old('nomor_darurat') ?>" placeholder="Contoh: 0857xxxx (Orang Tua)" required>
+                                <div class="form-text">Nomor keluarga/kerabat yang bisa dihubungi. Pastikan nomor ini berbeda dari nomor telepon utama Anda.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label">Asal Kampus *</label>
                                 <input type="text" name="asal_kampus" class="form-control"
                                     value="<?= old('asal_kampus') ?>" placeholder="Nama kampus" required>
@@ -145,19 +154,25 @@
                         <h5 class="mb-3"><i class="bi bi-cloud-upload"></i> Upload Berkas</h5>
 
                         <div class="row">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Curriculum Vitae (CV) *</label>
                                 <input type="file" name="cv" class="form-control" accept=".pdf" required>
                                 <div class="form-text">Format: PDF, Maksimal: 2MB</div>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Surat Pengantar</label>
                                 <input type="file" name="surat_pengantar" class="form-control" accept=".pdf">
                                 <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk magang mandiri</em></div>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Proposal Magang</label>
+                                <input type="file" name="proposal_magang" class="form-control" accept=".pdf">
+                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk magang mandiri</em></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Kartu Tanda Mahasiswa (KTM)</label>
                                 <input type="file" name="ktm" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
                                 <div class="form-text">Format: PDF/JPG/PNG, Maksimal: 4MB<br><em>Opsional</em></div>
@@ -168,11 +183,11 @@
                             <h6><i class="bi bi-info-circle"></i> Informasi Upload Berkas:</h6>
                             <ul class="mb-0">
                                 <li><strong>CV:</strong> Wajib diupload oleh semua pendaftar</li>
-                                <li><strong>Surat Pengantar:</strong> Wajib untuk magang wajib, opsional untuk magang mandiri</li>
+                                <li><strong>Surat Pengantar & Proposal:</strong> Wajib untuk magang wajib, opsional untuk magang mandiri</li>
                                 <li><strong>KTM:</strong> Opsional untuk semua jenis magang</li>
-                                <li>File CV dan Surat Pengantar harus dalam format PDF</li>
+                                <li>File CV, Surat Pengantar, dan Proposal harus dalam format PDF</li>
                                 <li>File KTM dapat berupa PDF, JPG, atau PNG</li>
-                                <li>Total maksimal semua file: 8MB</li>
+                                <li>Total maksimal semua file: 10MB</li>
                             </ul>
                         </div>
 
@@ -197,6 +212,28 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const waInput = document.querySelector('input[name="nomor_whatsapp"]');
+                const daruratInput = document.querySelector('input[name="nomor_darurat"]');
+                
+                if (waInput && daruratInput) {
+                    const waVal = waInput.value.trim();
+                    const daruratVal = daruratInput.value.trim();
+                    
+                    if (waVal !== '' && daruratVal !== '' && waVal === daruratVal) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Nomor Tidak Valid',
+                            text: 'Nomor Darurat tidak boleh sama dengan Nomor WhatsApp utama Anda!',
+                            confirmButtonColor: '#E6007E'
+                        });
+                    }
+                }
+            });
+        }
         <?php if (session()->getFlashdata('errors')): ?>
             Swal.fire({
                 icon: 'error',

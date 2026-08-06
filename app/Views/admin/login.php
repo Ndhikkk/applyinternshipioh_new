@@ -42,6 +42,9 @@
                                 </span>
                                 <input type="password" class="form-control" id="password" name="password"
                                     placeholder="Masukkan password" required>
+                                <button class="btn btn-outline-secondary bg-light border" type="button" id="togglePassword">
+                                    <i class="bi bi-eye text-muted"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -62,4 +65,25 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const icon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    });
+});
+</script>
 <?= $this->endSection() ?>

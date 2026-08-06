@@ -52,6 +52,10 @@
                 <td><?= esc($item['nomor_whatsapp']) ?></td>
             </tr>
             <tr>
+                <th>Nomor Darurat</th>
+                <td><?= esc($item['nomor_darurat'] ?? '-') ?></td>
+            </tr>
+            <tr>
                 <th>Email</th>
                 <td><a href="mailto:<?= esc($item['email'] ?? '') ?>" class="text-decoration-none"><?= esc($item['email'] ?? '-') ?></a></td>
             </tr>

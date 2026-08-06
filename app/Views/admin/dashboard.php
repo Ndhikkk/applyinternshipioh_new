@@ -5,41 +5,46 @@
 <?= $this->section('content') ?>
 <div class="container-fluid py-4">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-down">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3" data-aos="fade-down">
+        <div class="me-lg-3">
+            <h1 class="h3 mb-1 text-gray-800 fw-bold text-nowrap">
                 <i class="bi bi-speedometer2 text-indosat"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
             </h1>
-            <p class="text-muted mb-0"><?= $is_arsip ? 'Data yang menunggu dihapus permanen (7 hari sejak diarsipkan, bisa dipulihkan)' : 'Kelola pendaftaran magang IOH Semarang' ?></p>
+            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang menunggu dihapus permanen (7 hari sejak diarsipkan)' : 'Kelola pendaftaran magang IOH Semarang' ?></p>
         </div>
-        <div class="d-flex gap-2 align-items-center">
-            <div class="me-3">
-                <span class="fw-bold me-2">Status Pendaftaran:</span>
+        
+        <div class="d-flex flex-wrap flex-lg-nowrap gap-2 align-items-center w-100 w-lg-auto justify-content-start justify-content-lg-end">
+            
+            <div class="d-flex align-items-center w-100 w-lg-auto mb-2 mb-lg-0 me-lg-2 justify-content-between justify-content-lg-start">
+                <span class="fw-bold me-2 text-nowrap">Status Pendaftaran:</span>
                 <?php if ($registration_open == '1'): ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 js-toggle-registration" data-confirm-text="Tutup pendaftaran magang?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran magang?">
                         <i class="bi bi-unlock-fill me-1"></i> DIBUKA
                     </a>
                 <?php else: ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 js-toggle-registration" data-confirm-text="Buka pendaftaran magang?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Buka pendaftaran magang?">
                         <i class="bi bi-lock-fill me-1"></i> DITUTUP
                     </a>
                 <?php endif; ?>
             </div>
 
-            <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
-                <i class="bi bi-archive"></i> <?= $is_arsip ? 'Kembali ke Data Aktif' : 'Arsip (' . $total_arsip . ')' ?>
-            </a>
+            <div class="d-flex flex-wrap flex-lg-nowrap gap-2 w-100 w-lg-auto flex-grow-1 flex-lg-grow-0">
+                <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm text-nowrap flex-grow-1 flex-lg-grow-0 <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    <i class="bi bi-archive"></i> <?= $is_arsip ? 'Kembali' : 'Arsip (' . $total_arsip . ')' ?>
+                </a>
 
-            <a href="<?= site_url('admin/export') ?>" class="btn btn-success btn-sm">
-                <i class="bi bi-file-earmark-excel"></i> Export Excel
-            </a>
-             <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm">
-                <i class="bi bi-file-earmark-pdf"></i> genrate CV
-            </a>
+                <a href="<?= site_url('admin/export') ?>" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-lg-grow-0">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                </a>
+                
+                <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0">
+                    <i class="bi bi-file-earmark-pdf"></i> genrate CV
+                </a>
 
-            <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
+                <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0" title="Logout">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
         </div>
     </div>
 
@@ -127,194 +132,121 @@
     </div>
 
    <!-- Data Table -->
+<style>
+/* CSS khusus untuk memberi jarak pada tombol pagination */
+.ajax-pagination .pagination {
+    gap: 8px; /* Memberi jarak antar tombol */
+    margin-bottom: 0;
+}
+.ajax-pagination .page-item .page-link {
+    border-radius: 8px; /* Membuat tombol membulat */
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    transition: all 0.2s ease-in-out;
+}
+.ajax-pagination .page-item.active .page-link {
+    background-color: var(--indosat-red, #E31837);
+    border-color: var(--indosat-red, #E31837);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(227, 24, 55, 0.3);
+}
+.ajax-pagination .page-item:not(.active) .page-link:hover {
+    background-color: #f8f9fa;
+    color: var(--indosat-dark-red, #8B1A3A);
+    border-color: #cdd3d8;
+}
+
+/* CSS Responsif Khusus Tabel di Mobile (Card Layout) */
+@media (max-width: 768px) {
+    .table-mobile-cards thead {
+        display: none;
+    }
+    .table-mobile-cards, .table-mobile-cards tbody, .table-mobile-cards tr, .table-mobile-cards td {
+        display: block;
+        width: 100%;
+    }
+    .table-mobile-cards tr {
+        margin-bottom: 1.5rem;
+        background-color: #fff;
+        border: 1px solid #e3e6f0;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08);
+        padding: 0;
+        overflow: hidden;
+    }
+    .table-mobile-cards td {
+        position: relative;
+        text-align: right;
+        padding: 0.75rem 1rem 0.75rem 40%; /* 40% padding kiri untuk tempat label */
+        border: none;
+        border-bottom: 1px solid #f8f9fc;
+        min-height: 2.5rem;
+    }
+    .table-mobile-cards td:last-child {
+        border-bottom: none;
+        background-color: #f8f9fc; /* Sedikit beda warna untuk kolom aksi */
+    }
+    .table-mobile-cards td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #4e73df;
+        font-size: 0.85rem;
+        position: absolute;
+        left: 1rem;
+        top: 0.75rem;
+        text-align: left;
+        width: 35%;
+        line-height: 1.4;
+    }
+    /* Memastikan elemen div/p di dalam td tersusun vertikal di kanan */
+    .table-mobile-cards td > div {
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    .table-mobile-cards td > div:last-child {
+        margin-bottom: 0;
+    }
+    /* Pengecualian untuk kolom aksi agar tombolnya sejajar atau terpusat dengan rapi */
+    .table-mobile-cards td.mobile-col-flex {
+        padding-left: 1rem;
+        text-align: center;
+    }
+    .table-mobile-cards td.mobile-col-flex::before {
+        position: static;
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.75rem;
+    }
+    .table-mobile-cards td.mobile-col-flex .d-flex {
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+    }
+}
+</style>
+
 <div class="card border-0 shadow-sm" data-aos="fade-up">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">
             <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : 'Data Pendaftar Magang' ?>
         </h6>
         <div class="d-flex gap-2">
-            <form method="get" action="<?= site_url('admin/dashboard') ?>" class="input-group input-group-sm" id="searchForm" style="width: 280px;">
-                <?php if ($is_arsip): ?><input type="hidden" name="arsip" value="1"><?php endif; ?>
-                <input type="text" name="keyword" id="searchInput" class="form-control" placeholder="Cari nama, Email, kampus, token..." value="<?= esc($keyword ?? '') ?>" autocomplete="off">
-                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
-                <?php if (!empty($keyword)): ?>
-                    <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '?arsip=1' : '')) ?>" class="btn btn-outline-danger" title="Reset pencarian"><i class="bi bi-x"></i></a>
-                <?php endif; ?>
-            </form>
+            <!-- Diubah dari form menjadi div untuk menjamin tidak ada reload -->
+            <div class="input-group input-group-sm" id="searchContainer" style="width: 280px;">
+                <?php if ($is_arsip): ?><input type="hidden" name="arsip" id="arsipParam" value="1"><?php endif; ?>
+                <input type="text" id="searchInput" class="form-control" placeholder="Cari nama, email, kampus..." value="<?= esc($keyword ?? '') ?>" autocomplete="off">
+                <button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="bi bi-search"></i></button>
+                <button class="btn btn-outline-danger" type="button" id="resetBtn" style="display: <?= !empty($keyword) ? 'block' : 'none' ?>;" title="Reset pencarian"><i class="bi bi-x"></i></button>
+            </div>
             <button class="btn btn-outline-primary btn-sm" onclick="location.reload()" title="Refresh">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle" id="dataTable" width="100%" cellspacing="0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="fw-bold" style="min-width:220px;">Kandidat</th>
-                        <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
-                        <th class="fw-bold text-nowrap">Divisi / Jenis</th>
-                        <th class="fw-bold text-center" style="min-width:140px;">Status</th>
-                        <th class="fw-bold text-nowrap">Periode Magang</th>
-                        <th class="fw-bold text-nowrap">Tanggal Daftar</th>
-                        <th class="fw-bold text-center">Berkas</th>
-                        <th class="fw-bold text-center text-nowrap">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($pendaftaran)): ?>
-                        <?php foreach ($pendaftaran as $data): ?>
-                            <?php
-                                $currentStatus = $data['status'];
-                                $isFinalStage = in_array($currentStatus, ['Diterima', 'Lolos_Final']);
-                                $isRejected = in_array($currentStatus, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3']);
-                                $badgeClass = match (true) {
-                                    $isFinalStage => 'bg-success',
-                                    $isRejected => 'bg-danger',
-                                    $currentStatus === 'Lolos_Interview_1' => 'bg-primary',
-                                    $currentStatus === 'Lolos_Interview_2' => 'bg-info',
-                                    $currentStatus === 'Lolos_Interview_3' => 'bg-purple',
-                                    default => 'bg-warning',
-                                };
-                                $step = 0;
-                                if (preg_match('/Interview_(\d)/', $currentStatus, $m)) { $step = (int) $m[1]; }
-                                $jadwalKey = 'jadwal_interview_' . $step;
-                            ?>
-                            <tr data-aos="fade-in" id="row-<?= $data['id'] ?>">
-                                <td>
-                                    <div class="small text-muted font-monospace"><?= esc($data['token_pendaftaran'] ?? '-') ?></div>
-                                    <div class="fw-semibold"><?= esc($data['nama_lengkap']) ?></div>
-                                    <div class="small">
-                                        <a href="mailto:<?= esc($data['email'] ?? '') ?>" class="text-decoration-none" title="Kirim Email">
-                                            <i class="bi bi-envelope"></i> <?= esc($data['email'] ?? 'Tidak ada Email') ?>
-                                        </a>
-                                    </div>
-                                    <div class="small text-muted"><i class="bi bi-whatsapp"></i> <?= esc($data['nomor_whatsapp']) ?></div>
-                                </td>
-                                <td class="text-nowrap">
-                                    <div><?= esc($data['asal_kampus']) ?></div>
-                                    <div class="small text-muted"><?= esc($data['program_studi']) ?></div>
-                                    <span class="badge bg-light text-dark">Smt <?= esc($data['semester']) ?></span>
-                                </td>
-                                <td class="text-nowrap">
-                                    <div><?= esc($data['divisi_pilihan'] ?? '-') ?></div>
-                                    <span class="badge <?= $data['jenis_magang'] == 'Wajib' ? 'bg-info' : 'bg-secondary' ?>">
-                                        <?= esc($data['jenis_magang']) ?>
-                                    </span>
-                                </td>
-                                <td class="text-center" id="status-cell-<?= $data['id'] ?>">
-                                    <span class="badge <?= $badgeClass ?>"><?= str_replace('_', ' ', esc($currentStatus)) ?></span>
-                                    <?php if ($step > 0 && !empty($data[$jadwalKey])): ?>
-                                        <div class="small text-muted mt-1">
-                                            <i class="bi bi-calendar-event"></i> <?= date('d/m/Y H:i', strtotime($data[$jadwalKey])) ?> WIB
-                                        </div>
-                                    <?php endif; ?>
-                                    <?php if ($is_arsip && !empty($data['archived_at'])):
-                                        $deleteAt = strtotime($data['archived_at']) + (7 * 86400);
-                                        $daysLeft = max(0, ceil(($deleteAt - time()) / 86400));
-                                    ?>
-                                        <div class="small text-danger mt-1">
-                                            <i class="bi bi-hourglass-split"></i> Hapus permanen <?= $daysLeft ?> hari lagi
-                                        </div>
-                                        <div class="small text-muted"><?= esc($data['archived_reason'] ?? '') ?></div>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-nowrap">
-                                    <small>
-                                        <?= !empty($data['periode_mulai']) ? date('d/m/Y', strtotime($data['periode_mulai'])) : '-' ?> -<br>
-                                        <?= !empty($data['periode_selesai']) ? date('d/m/Y', strtotime($data['periode_selesai'])) : '-' ?>
-                                    </small>
-                                </td>
-                                <td class="text-nowrap">
-                                    <small>
-                                        <i class="bi bi-calendar3"></i><br>
-                                        <?php
-                                        $tanggalDaftar = $data['created_at'] ?? '';
-                                        if ($tanggalDaftar && trim($tanggalDaftar) !== ''):
-                                            $date = new DateTime($tanggalDaftar, new DateTimeZone('UTC'));
-                                            $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
-                                        ?>
-                                            <?= $date->format('d/m/Y H:i') ?>
-                                        <?php else: ?>
-                                            <span class="text-muted">-</span>
-                                        <?php endif; ?>
-                                    </small>
-                                </td>
-                                <td class="text-nowrap">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="<?= site_url('admin/download/' . $data['id'] . '/cv') ?>"
-                                        class="btn btn-outline-primary <?= empty($data['cv']) ? 'disabled' : '' ?>"
-                                        title="<?= empty($data['cv']) ? 'CV tidak tersedia' : 'Download CV' ?>"
-                                        <?= empty($data['cv']) ? 'onclick="return false;"' : '' ?>>
-                                            <i class="bi bi-file-earmark-pdf"></i>
-                                        </a>
-                                        <a href="<?= site_url('admin/download/' . $data['id'] . '/surat') ?>"
-                                        class="btn btn-outline-success <?= empty($data['surat_pengantar']) ? 'disabled' : '' ?>"
-                                        title="<?= empty($data['surat_pengantar']) ? 'Surat tidak tersedia' : 'Download Surat Pengantar' ?>"
-                                        <?= empty($data['surat_pengantar']) ? 'onclick="return false;"' : '' ?>>
-                                            <i class="bi bi-file-earmark-text"></i>
-                                        </a>
-                                        <a href="<?= site_url('admin/download/' . $data['id'] . '/ktm') ?>"
-                                        class="btn btn-outline-info <?= empty($data['ktm']) ? 'disabled' : '' ?>"
-                                        title="<?= empty($data['ktm']) ? 'KTM tidak tersedia' : 'Download KTM' ?>"
-                                        <?= empty($data['ktm']) ? 'onclick="return false;"' : '' ?>>
-                                            <i class="bi bi-card-image"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                                <td class="text-nowrap text-center" id="aksi-cell-<?= $data['id'] ?>">
-                                    <div class="d-flex gap-1 justify-content-center flex-nowrap">
-                                        <?php if ($is_arsip): ?>
-                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="restoreData(<?= $data['id'] ?>)" title="Pulihkan ke Data Aktif">
-                                                <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="hapusData(<?= $data['id'] ?>)" title="Hapus Permanen Sekarang">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php else: ?>
-                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openActionModal(<?= $data['id'] ?>, '<?= esc($data['nama_lengkap'], 'js') ?>')" title="Lihat Detail & Kelola Status">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openWaLink(<?= $data['id'] ?>)" title="Ingatkan via WhatsApp">
-                                                <i class="bi bi-whatsapp"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="hapusData(<?= $data['id'] ?>)" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
-                                    <?php if ($is_arsip): ?>
-                                        <h5>Arsip kosong</h5>
-                                        <p>Tidak ada data yang sedang menunggu hapus permanen.</p>
-                                    <?php else: ?>
-                                        <h5>Belum ada data pendaftaran</h5>
-                                        <p>Data pendaftaran akan muncul di sini setelah ada yang mendaftar.</p>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-
-        <?php if (!empty($pager)): ?>
-            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                <small class="text-muted">
-                    Halaman <?= $pager->getCurrentPage('pendaftaran') ?> dari <?= max($pager->getPageCount('pendaftaran'), 1) ?>
-                    (Total <?= $total_pendaftar ?> data, 15/halaman)
-                </small>
-                <?= $pager->links('pendaftaran', 'default_full') ?>
-            </div>
-        <?php endif; ?>
+    <div class="card-body" id="tableContainer" style="position: relative; min-height: 400px;">
+        <?= $this->include('admin/_table_data') ?>
     </div>
 </div>
 
@@ -434,8 +366,8 @@
 <style>
 .stats-card { border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
 .stats-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
-.table th { border-top: none; font-weight: 600; color: #2C3E50; background-color: #f8f9fa; }
-.table td { vertical-align: middle; padding: 12px 8px; }
+.table th { border-top: none; font-weight: 600; color: #2C3E50; background-color: #f8f9fa; padding: 14px 12px; }
+.table td { vertical-align: middle; padding: 16px 12px; }
 .badge { font-size: 0.75em; padding: 6px 10px; }
 .bg-purple { background-color: #8b5cf6 !important; color: #fff; }
 .card { border: none; border-radius: 15px; }
@@ -455,6 +387,28 @@
 }
 #dataTable thead th:last-child { background-color: #f8f9fa; z-index: 3; }
 #dataTable tbody tr:hover td:last-child { background-color: #f1f5fb; }
+
+/* Menghilangkan kesan mepet pada Pagination (Pages) */
+.ajax-pagination .pagination {
+    gap: 8px; /* Memberi jarak antar tombol halaman */
+    margin: 0;
+}
+.ajax-pagination .page-item .page-link {
+    border-radius: 8px !important;
+    padding: 8px 16px;
+    border: 1px solid #e3e6f0;
+    color: #4e73df;
+    font-weight: 500;
+}
+.ajax-pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+    color: white;
+}
+.ajax-pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa;
+    color: #858796;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -710,18 +664,87 @@
         });
     }
 
-    // ===================== PENCARIAN LANGSUNG (DEBOUNCE) =====================
-    // Ketik -> otomatis submit form pencarian setelah jeda singkat, tidak perlu
-    // menekan tombol/Enter dulu.
+    // ===================== PENCARIAN LANGSUNG & PAGINATION (AJAX) =====================
     (function () {
         const searchInput = document.getElementById('searchInput');
-        const searchForm = document.getElementById('searchForm');
-        if (!searchInput || !searchForm) return;
+        const searchBtn = document.getElementById('searchBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const tableContainer = document.getElementById('tableContainer');
+        const arsipParam = document.getElementById('arsipParam');
+        
+        if (!searchInput || !tableContainer) return;
 
         let debounceTimer = null;
+        const baseUrl = '<?= site_url('admin/dashboard') ?>';
+
+        function buildSearchUrl(keyword) {
+            const url = new URL(baseUrl);
+            if (keyword) url.searchParams.set('keyword', keyword);
+            if (arsipParam) url.searchParams.set('arsip', '1');
+            return url.toString();
+        }
+
+        function loadData(url) {
+            tableContainer.style.opacity = '0.5';
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.text())
+            .then(html => {
+                tableContainer.innerHTML = html;
+                tableContainer.style.opacity = '1';
+                window.history.pushState({}, '', url);
+            })
+            .catch(err => {
+                console.error(err);
+                tableContainer.style.opacity = '1';
+                Swal.fire('Error', 'Gagal memuat data pencarian.', 'error');
+            });
+        }
+
+        function handleSearch() {
+            const val = searchInput.value.trim();
+            resetBtn.style.display = val ? 'block' : 'none';
+            loadData(buildSearchUrl(val));
+        }
+
+        // Handle typing (debounce)
         searchInput.addEventListener('input', function () {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => searchForm.submit(), 600);
+            resetBtn.style.display = this.value.trim() ? 'block' : 'none';
+            debounceTimer = setTimeout(handleSearch, 600);
+        });
+
+        // Handle search button click
+        searchBtn.addEventListener('click', handleSearch);
+
+        // Handle Enter key inside input
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(debounceTimer);
+                handleSearch();
+            }
+        });
+
+        // Handle reset button
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                this.style.display = 'none';
+                loadData(buildSearchUrl(''));
+            });
+        }
+
+        // Handle pagination links clicks via event delegation
+        tableContainer.addEventListener('click', function(e) {
+            const paginationLink = e.target.closest('.ajax-pagination a');
+            if (paginationLink) {
+                e.preventDefault();
+                loadData(paginationLink.href);
+            }
         });
     })();
 

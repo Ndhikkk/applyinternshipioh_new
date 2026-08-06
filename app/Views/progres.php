@@ -176,15 +176,15 @@
 </div>
 
 <style>
-    .bg-indosat { background: linear-gradient(135deg, #E00034 0%, #8B1A3A 100%) !important; }
-    .text-indosat { color: #E00034 !important; }
-    .search-card, .result-card { border-radius: 15px; border: none; }
-    .btn-indosat { background: linear-gradient(135deg, #E00034 0%, #8B1A3A 100%); border: none; color: white; font-weight: 600; border-radius: 10px; transition: all 0.3s ease; }
-    .btn-indosat:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(224, 0, 52, 0.3); color: white; }
-    .btn-outline-indosat { border: 2px solid #E00034; color: #E00034; background: transparent; font-weight: 600; border-radius: 10px; transition: all 0.3s ease; }
-    .btn-outline-indosat:hover { background: #E00034; color: white; transform: translateY(-2px); }
-    .form-control { border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem 1rem; transition: all 0.3s ease; }
-    .form-control:focus { border-color: #E00034; box-shadow: 0 0 0 0.2rem rgba(224, 0, 52, 0.15); }
+    .bg-indosat { background: var(--indosat-gradient) !important; }
+    .text-indosat { color: var(--indosat-primary) !important; }
+    .search-card, .result-card { border-radius: 24px; border: 1px solid var(--indosat-border); box-shadow: 0 10px 30px rgba(0,0,0,0.06) !important; }
+    .btn-indosat { background: var(--indosat-gradient); border: none; color: white; font-weight: 600; border-radius: 999px; transition: all 0.3s ease; }
+    .btn-indosat:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(230, 0, 126, 0.25); color: white; }
+    .btn-outline-indosat { border: 2px solid var(--indosat-primary); color: var(--indosat-primary); background: transparent; font-weight: 600; border-radius: 999px; transition: all 0.3s ease; }
+    .btn-outline-indosat:hover { background: var(--indosat-gradient); color: white; transform: translateY(-2px); }
+    .form-control { border-radius: 12px; border: 2px solid #e9ecef; padding: 0.75rem 1rem; transition: all 0.3s ease; }
+    .form-control:focus { border-color: var(--indosat-primary); box-shadow: 0 0 0 0.2rem rgba(230, 0, 126, 0.15); }
 </style>
 
 <script>

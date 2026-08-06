@@ -15,7 +15,7 @@ use App\Models\PendaftaranModel;
  *   php C:\path\ke\project\spark cleanup:pendaftaran
  *
  */
-class CleanupPendaftaran extends BaseCommand
+class Cleanuppendaftaran extends BaseCommand
 {
     protected $group       = 'App';
     protected $name        = 'cleanup:pendaftaran';
