@@ -324,11 +324,14 @@
                         </div>
                     </div>
 
-                    <!-- ==== Override manual (tampil untuk semua status, opsional) ==== -->
+                    <!-- ==== Ubah Manual (Status, Divisi, Periode) ==== -->
                     <div id="amManualActions">
-                        <p class="fw-bold mb-2 mt-2"><i class="bi bi-pencil-square"></i> Ubah Status Manual</p>
-                        <div class="row g-2 align-items-end">
-                            <div class="col-md-4">
+                        <p class="fw-bold mb-2 mt-2"><i class="bi bi-pencil-square"></i> Ubah Data Manual</p>
+                        
+                        <!-- Baris 1: Status & Divisi -->
+                        <div class="row g-2 mb-2 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Status</label>
                                 <select id="manualStatus" class="form-select form-select-sm">
                                     <option value="Menunggu">Menunggu</option>
                                     <option value="Diterima">Diterima</option>
@@ -336,11 +339,41 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label small mb-1">Divisi Pilihan</label>
+                                <select id="editDivisi" class="form-select form-select-sm">
+                                    <option value="">Pilih Divisi</option>
+                                    <option value="Markom">Markom</option>
+                                    <option value="IT / Elang IT">IT / Elang IT</option>
+                                    <option value="Technical">Technical</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="B2B">B2B</option>
+                                    <option value="Social Media 3ID & IM3">Social Media 3ID & IM3</option>
+                                    <option value="Daily Project">Daily Project</option>
+                                    <option value="Project Post Paid">Project Post Paid</option>
+                                    <option value="Capability Building">Capability Building</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Baris 2: Periode & Catatan -->
+                        <div class="row g-2 mb-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Periode Magang</label>
+                                <div class="d-flex gap-1">
+                                    <input type="date" id="editPeriodeMulai" class="form-control form-control-sm" title="Mulai">
+                                    <span class="align-self-center">-</span>
+                                    <input type="date" id="editPeriodeSelesai" class="form-control form-control-sm" title="Selesai">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Catatan Tambahan</label>
                                 <input type="text" id="manualCatatan" class="form-control form-control-sm" placeholder="Catatan (opsional)">
                             </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-primary btn-sm w-100" onclick="submitManual()">Simpan</button>
-                            </div>
+                        </div>
+                        
+                        <!-- Baris 3: Button Simpan -->
+                        <div class="text-end">
+                            <button type="button" class="btn btn-primary btn-sm px-4" onclick="submitManual()">Simpan Perubahan</button>
                         </div>
                     </div>
 
@@ -449,6 +482,18 @@
         Swal.fire({ icon, text, toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
     }
 
+    function formatStatusLabel(status) {
+        const m1 = status.match(/^Lolos_Interview_(\d)$/);
+        if (m1) return 'INTERVIEW TAHAP ' + m1[1];
+        
+        const m2 = status.match(/^Tidak_Lolos_Interview_(\d)$/);
+        if (m2) return 'TIDAK LOLOS TAHAP ' + m2[1];
+        
+        if (status === 'Lolos_Final') return 'LOLOS FINAL';
+        
+        return status.replace(/_/g, ' ');
+    }
+
     function statusBadgeMarkupFromLabel(status) {
         const isFinal = ['Diterima', 'Lolos_Final'].includes(status);
         const isRejected = ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'].includes(status);
@@ -458,7 +503,7 @@
         else if (status === 'Lolos_Interview_1') cls = 'bg-primary';
         else if (status === 'Lolos_Interview_2') cls = 'bg-info';
         else if (status === 'Lolos_Interview_3') cls = 'bg-purple';
-        return `<span class="badge ${cls}">${status.replace(/_/g, ' ')}</span>`;
+        return `<span class="badge ${cls}">${formatStatusLabel(status)}</span>`;
     }
 
     // ===================== MODAL AKSI =====================
@@ -510,6 +555,10 @@
         document.getElementById('manualStatus').value = ['Menunggu', 'Diterima', 'Ditolak'].includes(item.status) ? item.status : 'Menunggu';
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
+        document.getElementById('editDivisi').value = item.divisi_pilihan || '';
+        document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
+        document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
+
         hideSubForms();
     }
 
@@ -547,7 +596,12 @@
 
     function submitManual() {
         const targetStatus = document.getElementById('manualStatus').value;
-        submitStatusChange(targetStatus, { catatan: document.getElementById('manualCatatan').value });
+        submitStatusChange(targetStatus, { 
+            catatan: document.getElementById('manualCatatan').value,
+            divisi_pilihan: document.getElementById('editDivisi').value,
+            periode_mulai: document.getElementById('editPeriodeMulai').value,
+            periode_selesai: document.getElementById('editPeriodeSelesai').value
+        });
     }
 
     function submitStatusChange(targetStatus, params) {

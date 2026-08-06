@@ -351,6 +351,21 @@ class Admin extends BaseController
             return $this->response->setJSON(['success' => true, 'id' => (int) $id, 'message' => 'Data berhasil dipulihkan dari arsip.']);
         }
 
+        if ($action === 'edit_divisi_periode') {
+            $divisi = $this->request->getPost('divisi_pilihan') ?? '';
+            $mulai = $this->request->getPost('periode_mulai') ?? '';
+            $selesai = $this->request->getPost('periode_selesai') ?? '';
+
+            if (!$this->pendaftaranModel->update($id, [
+                'divisi_pilihan' => $divisi,
+                'periode_mulai' => $mulai,
+                'periode_selesai' => $selesai
+            ])) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Gagal menyimpan perubahan divisi/periode.']);
+            }
+            return $this->response->setJSON(['success' => true, 'message' => 'Divisi dan Periode Magang berhasil diperbarui.']);
+        }
+
         // Selain itu: $action adalah target status baru
         return $this->handleSetStatus($id, $pendaftaran, $action);
     }
@@ -404,7 +419,7 @@ class Admin extends BaseController
             'id'           => (int) $id,
             'has_email'    => !empty($updated['email']),
             'status'       => $updated['status'],
-            'status_label' => str_replace('_', ' ', $updated['status']),
+            'status_label' => $this->formatStatusLabel($updated['status']),
             'badge_html'   => $this->renderStatusBadge($updated),
             'aksi_html'    => $this->renderAksiCell($updated),
         ], $this->itemPayload($updated));
@@ -581,6 +596,7 @@ class Admin extends BaseController
             'catatan_interview_1', 'catatan_interview_2', 'catatan_interview_3',
             'catatan_admin', 'email_terkirim',
             'is_archived', 'archived_at', 'archived_reason',
+            'divisi_pilihan', 'periode_mulai', 'periode_selesai'
         ];
         foreach ($fields as $f) {
             $out['item'][$f] = $item[$f] ?? null;
@@ -600,12 +616,26 @@ class Admin extends BaseController
         };
     }
 
+    private function formatStatusLabel(string $status): string
+    {
+        if (preg_match('/^Lolos_Interview_(\d)$/', $status, $m)) {
+            return 'INTERVIEW TAHAP ' . $m[1];
+        }
+        if (preg_match('/^Tidak_Lolos_Interview_(\d)$/', $status, $m)) {
+            return 'TIDAK LOLOS TAHAP ' . $m[1];
+        }
+        if ($status === 'Lolos_Final') {
+            return 'LOLOS FINAL';
+        }
+        return str_replace('_', ' ', $status);
+    }
+
     private function renderStatusBadge(array $item): string
     {
         $status = $item['status'];
         $class = $this->statusBadgeClass($status);
 
-        $html = '<span class="badge ' . $class . '">' . esc(str_replace('_', ' ', $status)) . '</span>';
+        $html = '<span class="badge ' . $class . '">' . esc($this->formatStatusLabel($status)) . '</span>';
 
         $step = $this->getInterviewStep($status);
         if ($step > 0 && !empty($item['jadwal_interview_' . $step])) {
