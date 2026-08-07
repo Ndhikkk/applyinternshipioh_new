@@ -617,6 +617,7 @@ class Admin extends BaseController
         return match (true) {
             in_array($status, ['Diterima', 'Lolos_Final'], true) => 'bg-success',
             in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true) => 'bg-danger',
+            $status === 'Progress Diterima' => 'bg-info',
             $status === 'Lolos_Interview_1' => 'bg-primary',   // biru
             $status === 'Lolos_Interview_2' => 'bg-info',      // cyan
             $status === 'Lolos_Interview_3' => 'bg-purple',    // ungu (custom, lihat CSS di dashboard.php)

@@ -22,6 +22,7 @@
                         $badgeClass = match (true) {
                             $isFinalStage => 'bg-success',
                             $isRejected => 'bg-danger',
+                            $currentStatus === 'Progress Diterima' => 'bg-info',
                             $currentStatus === 'Lolos_Interview_1' => 'bg-primary',
                             $currentStatus === 'Lolos_Interview_2' => 'bg-info',
                             $currentStatus === 'Lolos_Interview_3' => 'bg-purple',

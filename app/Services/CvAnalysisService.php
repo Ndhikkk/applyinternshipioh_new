@@ -175,6 +175,12 @@ class CvAnalysisService
         $text = strtolower($text);
         
         $divisions = [
+            'Direct Sales Executive' => [
+                'keywords' => ['sales', 'penjualan', 'direct sales', 'target', 'marketing', 'retail', 'promosi', 'closing', 'prospek', 'pelanggan', 'customer', 'distribusi', 'lapangan', 'b2c', 'telemarketing', 'sales force', 'acquisition', 'retention'],
+                'study_programs' => ['manajemen', 'marketing', 'bisnis', 'administrasi bisnis', 'ilmu komunikasi', 'semua jurusan'],
+                'category' => 'Sales',
+                'description' => 'Penjualan produk secara langsung ke pelanggan'
+            ],
             'Markom' => [
                 'keywords' => ['marketing', 'communication', 'branding', 'public relations', 'media', 'campaign', 'brand awareness', 'citra perusahaan', 'media relations', 'strategy', 'market research', 'social media', 'content creator', 'copywriting', 'advertising', 'ads', 'seo', 'sem', 'digital marketing', 'event management'],
                 'study_programs' => ['ilmu komunikasi', 'marketing', 'manajemen', 'public relations', 'desain komunikasi visual', 'dkv', 'jurnalistik', 'broadcasting', 'periklanan'],

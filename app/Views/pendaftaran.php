@@ -66,14 +66,18 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nomor WhatsApp *</label>
-                                <input type="text" name="nomor_whatsapp" class="form-control"
-                                    value="<?= old('nomor_whatsapp') ?>" placeholder="Contoh: 0857xxxx" required>
+                                <input type="text" inputmode="numeric" name="nomor_whatsapp" class="form-control"
+                                    value="<?= old('nomor_whatsapp') ?>" placeholder="Contoh: 085712345678" minlength="11" maxlength="15"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('wa_alert').style.display = (this.value.length > 0 && this.value.length < 11) ? 'block' : 'none';" required>
+                                <small id="wa_alert" class="text-danger mt-1" style="display:none; font-size: 0.85em;"><i class="bi bi-exclamation-circle"></i> Nomor belum valid.</small>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nomor Darurat *</label>
-                                <input type="text" name="nomor_darurat" class="form-control"
-                                    value="<?= old('nomor_darurat') ?>" placeholder="Contoh: 0857xxxx (Orang Tua)" required>
+                                <input type="text" inputmode="numeric" name="nomor_darurat" class="form-control"
+                                    value="<?= old('nomor_darurat') ?>" placeholder="Contoh: 08123456789 (Orang Tua)" minlength="11" maxlength="15"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('darurat_alert').style.display = (this.value.length > 0 && this.value.length < 11) ? 'block' : 'none';" required>
+                                <small id="darurat_alert" class="text-danger mt-1" style="display:none; font-size: 0.85em;"><i class="bi bi-exclamation-circle"></i> Nomor belum valid.</small>
                                 <div class="form-text">Nomor keluarga/kerabat yang bisa dihubungi. Pastikan nomor ini berbeda dari nomor telepon utama Anda.</div>
                             </div>
                         </div>
@@ -118,6 +122,7 @@
                                 <label class="small fw-bold text-secondary">Divisi Pilihan *</label>
                                 <select name="divisi_pilihan" id="form_divisi" class="form-control form-control-sm" style="border-radius: 6px;" required>
                                     <option value="">Pilih Divisi </option>
+                                    <option value="Direct Sales Executive" <?= old('divisi_pilihan') == 'Direct Sales Executive' ? 'selected' : '' ?>>Direct Sales Executive</option>
                                     <option value="Markom" <?= old('divisi_pilihan') == 'Markom' ? 'selected' : '' ?>>Markom</option>
                                     <option value="IT / Elang IT" <?= old('divisi_pilihan') == 'IT / Elang IT' ? 'selected' : '' ?>>IT / Elang IT</option>
                                     <option value="Technical" <?= old('divisi_pilihan') == 'Technical' ? 'selected' : '' ?>>Technical</option>

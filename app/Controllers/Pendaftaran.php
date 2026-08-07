@@ -39,12 +39,21 @@ class Pendaftaran extends Controller
                 ]
             ],
             'nomor_whatsapp' => [
-                'rules' => 'required|is_unique[pendaftaran_magang.nomor_whatsapp]',
+                'rules' => 'required|numeric|min_length[11]|is_unique[pendaftaran_magang.nomor_whatsapp]',
                 'errors' => [
-                    'is_unique' => 'Nomor WhatsApp ini sudah pernah didaftarkan sebelumnya.'
+                    'is_unique' => 'Nomor WhatsApp ini sudah pernah didaftarkan sebelumnya.',
+                    'numeric'   => 'Nomor WhatsApp hanya boleh berisi angka tanpa spasi atau simbol.',
+                    'min_length'=> 'Nomor WhatsApp harus terdiri dari minimal 11 digit angka.'
                 ]
             ],
-            'nomor_darurat'  => 'required|differs[nomor_whatsapp]',
+            'nomor_darurat'  => [
+                'rules' => 'required|numeric|min_length[11]|differs[nomor_whatsapp]',
+                'errors' => [
+                    'numeric'    => 'Nomor Darurat hanya boleh berisi angka tanpa spasi atau simbol.',
+                    'min_length' => 'Nomor Darurat harus terdiri dari minimal 11 digit angka.',
+                    'differs'    => 'Nomor Darurat harus berbeda dengan Nomor WhatsApp Anda.'
+                ]
+            ],
             'asal_kampus'    => 'required',
             'program_studi'  => 'required',
             'divisi_pilihan' => 'required',

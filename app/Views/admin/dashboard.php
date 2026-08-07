@@ -334,6 +334,7 @@
                                 <label class="form-label small mb-1">Status</label>
                                 <select id="manualStatus" class="form-select form-select-sm">
                                     <option value="Menunggu">Menunggu</option>
+                                    <option value="Progress Diterima">Progress Diterima</option>
                                     <option value="Diterima">Diterima</option>
                                     <option value="Ditolak">Ditolak</option>
                                 </select>
@@ -342,6 +343,7 @@
                                 <label class="form-label small mb-1">Divisi Pilihan</label>
                                 <select id="editDivisi" class="form-select form-select-sm">
                                     <option value="">Pilih Divisi</option>
+                                    <option value="Direct Sales Executive">Direct Sales Executive</option>
                                     <option value="Markom">Markom</option>
                                     <option value="IT / Elang IT">IT / Elang IT</option>
                                     <option value="Technical">Technical</option>
@@ -500,6 +502,7 @@
         let cls = 'bg-warning';
         if (isFinal) cls = 'bg-success';
         else if (isRejected) cls = 'bg-danger';
+        else if (status === 'Progress Diterima') cls = 'bg-info';
         else if (status === 'Lolos_Interview_1') cls = 'bg-primary';
         else if (status === 'Lolos_Interview_2') cls = 'bg-info';
         else if (status === 'Lolos_Interview_3') cls = 'bg-purple';

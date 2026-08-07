@@ -179,6 +179,7 @@
                 <div class="col-6 mb-2">
                   <label class="small fw-bold text-secondary">Divisi Pilihan</label>
                   <select name="divisi_pilihan" id="form_divisi" class="form-control form-control-sm" style="border-radius: 6px;">
+                    <option value="Direct Sales Executive">Direct Sales Executive</option>
                     <option value="Markom">Markom</option>
                     <option value="IT / Elang IT">IT / Elang IT</option>
                     <option value="Technical">Technical</option>

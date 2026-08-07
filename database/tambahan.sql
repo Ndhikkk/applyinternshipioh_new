@@ -23,6 +23,7 @@ ADD COLUMN `batch_id` INT NULL DEFAULT NULL AFTER `referral_token`;
 ALTER TABLE `pendaftaran_magang`
 MODIFY COLUMN `status` ENUM(
     'Menunggu',
+    'Progress Diterima',
     'Lolos_Interview_1', 'Tidak_Lolos_Interview_1',
     'Lolos_Interview_2', 'Tidak_Lolos_Interview_2',
     'Lolos_Interview_3', 'Tidak_Lolos_Interview_3',
