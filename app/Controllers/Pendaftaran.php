@@ -32,8 +32,18 @@ class Pendaftaran extends Controller
 
         $rules = [
             'nama_lengkap'   => 'required',
-            'email'          => 'required|valid_email',
-            'nomor_whatsapp' => 'required',
+            'email'          => [
+                'rules' => 'required|valid_email|is_unique[pendaftaran_magang.email]',
+                'errors' => [
+                    'is_unique' => 'Email ini sudah pernah didaftarkan sebelumnya.'
+                ]
+            ],
+            'nomor_whatsapp' => [
+                'rules' => 'required|is_unique[pendaftaran_magang.nomor_whatsapp]',
+                'errors' => [
+                    'is_unique' => 'Nomor WhatsApp ini sudah pernah didaftarkan sebelumnya.'
+                ]
+            ],
             'nomor_darurat'  => 'required|differs[nomor_whatsapp]',
             'asal_kampus'    => 'required',
             'program_studi'  => 'required',
@@ -131,6 +141,19 @@ class Pendaftaran extends Controller
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Gagal menyimpan! Nama pelamar tidak boleh kosong.'
+            ]);
+        }
+
+        // Cek duplikasi email & whatsapp
+        $existing = $this->pendaftaranModel
+            ->where('email', strip_tags(trim($email)))
+            ->orWhere('nomor_whatsapp', strip_tags(trim($nomor_whatsapp)))
+            ->first();
+
+        if ($existing) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal! Email atau Nomor WhatsApp pelamar ini sudah pernah terdaftar sebelumnya.'
             ]);
         }
 

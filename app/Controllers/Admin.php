@@ -289,7 +289,15 @@ class Admin extends BaseController
         }
 
         $downloadName = $prefix . $pendaftaran['nama_lengkap'] . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
-        return $this->response->download($filePath, null)->setFileName($downloadName);
+        
+        // Gunakan inline disposition agar file (PDF/Gambar) terbuka di browser untuk di-review
+        $fileInfo = new \CodeIgniter\Files\File($filePath);
+        $mime = $fileInfo->getMimeType();
+        
+        return $this->response
+            ->setContentType($mime)
+            ->setHeader('Content-Disposition', 'inline; filename="' . $downloadName . '"')
+            ->setBody(file_get_contents($filePath));
     }
 
     /**
