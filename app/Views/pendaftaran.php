@@ -197,7 +197,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" id="submitBtn" class="btn btn-primary btn-lg">
                                 <i class="bi bi-send"></i> Kirim Pendaftaran
                             </button>
                             <a href="<?= base_url() ?>" class="btn btn-outline-secondary">
@@ -218,6 +218,8 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submitBtn');
+
         if (form) {
             form.addEventListener('submit', function(e) {
                 const waInput = document.querySelector('input[name="nomor_whatsapp"]');
@@ -235,7 +237,14 @@
                             text: 'Nomor Darurat tidak boleh sama dengan Nomor WhatsApp utama Anda!',
                             confirmButtonColor: '#E6007E'
                         });
+                        return;
                     }
+                }
+
+                // Prevent double submit
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mengirim Pendaftaran...';
                 }
             });
         }

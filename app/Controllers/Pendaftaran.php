@@ -31,15 +31,15 @@ class Pendaftaran extends Controller
         $validation = \Config\Services::validation();
 
         $rules = [
-            'nama_lengkap'   => 'required',
+            'nama_lengkap'   => 'required|trim',
             'email'          => [
-                'rules' => 'required|valid_email|is_unique[pendaftaran_magang.email]',
+                'rules' => 'required|trim|valid_email|is_unique[pendaftaran_magang.email]',
                 'errors' => [
                     'is_unique' => 'Email ini sudah pernah didaftarkan sebelumnya.'
                 ]
             ],
             'nomor_whatsapp' => [
-                'rules' => 'required|numeric|min_length[11]|is_unique[pendaftaran_magang.nomor_whatsapp]',
+                'rules' => 'required|trim|numeric|min_length[11]|is_unique[pendaftaran_magang.nomor_whatsapp]',
                 'errors' => [
                     'is_unique' => 'Nomor WhatsApp ini sudah pernah didaftarkan sebelumnya.',
                     'numeric'   => 'Nomor WhatsApp hanya boleh berisi angka tanpa spasi atau simbol.',
@@ -47,16 +47,16 @@ class Pendaftaran extends Controller
                 ]
             ],
             'nomor_darurat'  => [
-                'rules' => 'required|numeric|min_length[11]|differs[nomor_whatsapp]',
+                'rules' => 'required|trim|numeric|min_length[11]|differs[nomor_whatsapp]',
                 'errors' => [
                     'numeric'    => 'Nomor Darurat hanya boleh berisi angka tanpa spasi atau simbol.',
                     'min_length' => 'Nomor Darurat harus terdiri dari minimal 11 digit angka.',
                     'differs'    => 'Nomor Darurat harus berbeda dengan Nomor WhatsApp Anda.'
                 ]
             ],
-            'asal_kampus'    => 'required',
-            'program_studi'  => 'required',
-            'divisi_pilihan' => 'required',
+            'asal_kampus'    => 'required|trim',
+            'program_studi'  => 'required|trim',
+            'divisi_pilihan' => 'required|trim',
             'semester'       => 'required|integer',
             'jenis_magang'   => 'required|in_list[Wajib,Mandiri]',
             'periode_mulai'  => 'required',
@@ -105,13 +105,13 @@ class Pendaftaran extends Controller
 
         $data = [
             'token_pendaftaran' => $token,
-            'nama_lengkap'    => $this->request->getPost('nama_lengkap'),
-            'email'           => $this->request->getPost('email'),
-            'nomor_whatsapp'  => $this->request->getPost('nomor_whatsapp'),
-            'nomor_darurat'   => $this->request->getPost('nomor_darurat'),
-            'asal_kampus'     => $this->request->getPost('asal_kampus'),
-            'program_studi'   => $this->request->getPost('program_studi'),
-            'divisi_pilihan'  => $this->request->getPost('divisi_pilihan'),
+            'nama_lengkap'    => trim((string)$this->request->getPost('nama_lengkap')),
+            'email'           => trim((string)$this->request->getPost('email')),
+            'nomor_whatsapp'  => trim((string)$this->request->getPost('nomor_whatsapp')),
+            'nomor_darurat'   => trim((string)$this->request->getPost('nomor_darurat')),
+            'asal_kampus'     => trim((string)$this->request->getPost('asal_kampus')),
+            'program_studi'   => trim((string)$this->request->getPost('program_studi')),
+            'divisi_pilihan'  => trim((string)$this->request->getPost('divisi_pilihan')),
             'semester'        => $this->request->getPost('semester'),
             'jenis_magang'    => $this->request->getPost('jenis_magang'),
             'periode_mulai'   => $this->request->getPost('periode_mulai'),
