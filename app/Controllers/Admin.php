@@ -84,7 +84,6 @@ class Admin extends BaseController
             ->where('is_archived', 0)
             ->groupStart()
                 ->where('status', 'Diterima')
-                ->orWhere('status', 'Lolos_Final')
             ->groupEnd()
             ->countAllResults();
 
@@ -101,7 +100,7 @@ class Admin extends BaseController
         $data['total_menunggu'] = $this->pendaftaranModel
             ->where('is_archived', 0)
             ->whereNotIn('status', [
-                'Diterima', 'Lolos_Final', 'Ditolak',
+                'Diterima', 'Ditolak',
                 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'
             ])
             ->countAllResults();
@@ -392,6 +391,7 @@ class Admin extends BaseController
         if ($targetStatus !== $pendaftaran['status']) {
             $data['status_changed_at'] = date('Y-m-d H:i:s');
         }
+        
         $step = $this->getInterviewStep($targetStatus);
 
         if ($step > 0) {
@@ -432,6 +432,10 @@ class Admin extends BaseController
             'aksi_html'    => $this->renderAksiCell($updated),
         ], $this->itemPayload($updated));
 
+        if ($targetStatus !== $pendaftaran['status']) {
+            $this->sendStatusEmail(array_merge($pendaftaran, $data));
+        }
+
         if ($this->request->isAJAX()) {
             return $this->response->setJSON($payload);
         }
@@ -457,6 +461,24 @@ class Admin extends BaseController
     // ==============================================================
     //  HELPER PRIVATE
     // ==============================================================
+
+    private function getInterviewStep($status)
+    {
+        if (preg_match('/Interview_(\d)/', $status, $matches)) {
+            return (int) $matches[1];
+        }
+        return 0;
+    }
+
+    private function parseJadwal(string $jadwal): ?string
+    {
+        $jadwal = str_replace('T', ' ', $jadwal);
+        $timestamp = strtotime($jadwal);
+        if ($timestamp === false) {
+            return null;
+        }
+        return date('Y-m-d H:i:s', $timestamp);
+    }
 
     /**
      * FIX: sebelumnya kode ini pakai nama field ('surat_pengantar') sebagai
@@ -492,7 +514,7 @@ class Admin extends BaseController
      *  tabel utama & bisa dipulihkan admin) begitu kena tenggat:
      *    - Ditolak / Tidak Lolos Interview  -> arsip 7 hari setelah status ditetapkan
      *    - Menunggu                        -> arsip 6 bulan setelah tanggal daftar
-     *    - Lolos_Final / Diterima          -> arsip 1 tahun setelah status ditetapkan
+     *    - Diterima                        -> arsip 1 tahun setelah status ditetapkan
      *
      *  TAHAP 2 - HAPUS PERMANEN kalau sudah 7 hari di arsip dan tidak
      *  dipulihkan admin.
@@ -517,7 +539,7 @@ class Admin extends BaseController
 
         $accepted = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->whereIn('status', ['Lolos_Final', 'Diterima'])
+            ->whereIn('status', ['Diterima'])
             ->where('status_changed_at IS NOT NULL')
             ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-1 year')))
             ->findAll();
@@ -553,24 +575,6 @@ class Admin extends BaseController
         }
     }
 
-
-    private function getInterviewStep($status)
-    {
-        if (preg_match('/Interview_(\d)/', $status, $matches)) {
-            return (int) $matches[1];
-        }
-        return 0;
-    }
-
-    private function parseJadwal(string $jadwal): ?string
-    {
-        $jadwal = str_replace('T', ' ', $jadwal);
-        $timestamp = strtotime($jadwal);
-        if ($timestamp === false) {
-            return null;
-        }
-        return date('Y-m-d H:i:s', $timestamp);
-    }
 
     private function jsonOrRedirect(bool $success, string $message, int $code = 200)
     {
@@ -615,9 +619,9 @@ class Admin extends BaseController
     private function statusBadgeClass(string $status): string
     {
         return match (true) {
-            in_array($status, ['Diterima', 'Lolos_Final'], true) => 'bg-success',
+            in_array($status, ['Diterima'], true) => 'bg-success',
             in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true) => 'bg-danger',
-            $status === 'Progress Diterima' => 'bg-info',
+            $status === 'Progress' => 'bg-info',
             $status === 'Lolos_Interview_1' => 'bg-primary',   // biru
             $status === 'Lolos_Interview_2' => 'bg-info',      // cyan
             $status === 'Lolos_Interview_3' => 'bg-purple',    // ungu (custom, lihat CSS di dashboard.php)
@@ -633,8 +637,8 @@ class Admin extends BaseController
         if (preg_match('/^Tidak_Lolos_Interview_(\d)$/', $status, $m)) {
             return 'TIDAK LOLOS TAHAP ' . $m[1];
         }
-        if ($status === 'Lolos_Final') {
-            return 'LOLOS FINAL';
+        if ($status === 'Diterima') {
+            return 'DITERIMA';
         }
         return str_replace('_', ' ', $status);
     }
@@ -751,7 +755,7 @@ class Admin extends BaseController
                 ? "<div style='text-align:center;margin-top:20px;'><a href='" . esc($zoom) . "' style='background-color:#1e3a8a;color:#ffffff;padding:12px 30px;text-decoration:none;font-size:15px;font-weight:bold;border-radius:5px;display:inline-block;'>Gabung Link Zoom / Meet</a></div>"
                 : "<p style='font-size:14px;color:#666;'>Link Zoom akan diinformasikan lebih lanjut oleh tim kami.</p>";
             $footerNote = "Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet Anda stabil.";
-        } elseif (in_array($status, ['Diterima', 'Lolos_Final'], true)) {
+        } elseif (in_array($status, ['Diterima'], true)) {
             $subject = "Selamat! Anda Diterima - Future Talent Program";
             $headline = "Selamat, Anda Diterima! 🎉";
             $intro = "Selamat! Anda dinyatakan <strong>LOLOS</strong> dan diterima pada program <strong>Future Talent Program</strong>.";
@@ -836,7 +840,7 @@ class Admin extends BaseController
                 . "💻 Link Zoom: " . ($zoom ?: '-') . "\n\n"
                 . "Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet stabil ya. Sampai jumpa!\n\n"
                 . "Salam,\nTim Rekrutmen Magang IOH Semarang";
-        } elseif (in_array($status, ['Diterima', 'Lolos_Final'], true)) {
+        } elseif (in_array($status, ['Diterima'], true)) {
             $message = "Halo *{$nama}*,\n\n"
                 . "Selamat! Anda dinyatakan *LOLOS* dan diterima pada program magang IOH Semarang. 🎉\n"
                 . "Tim kami akan segera menghubungi Anda untuk info langkah selanjutnya.\n\n"
@@ -870,5 +874,28 @@ class Admin extends BaseController
             $digits = '62' . $digits;
         }
         return $digits;
+    }
+
+
+    public function analyzeProposal($id)
+    {
+        if (!session()->get('admin_logged_in')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $pendaftaran = $this->pendaftaranModel->find($id);
+        if (!$pendaftaran || empty($pendaftaran['proposal_magang'])) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Proposal tidak ditemukan.']);
+        }
+
+        $filePath = WRITEPATH . 'uploads/proposal/' . $pendaftaran['proposal_magang'];
+        if (!file_exists($filePath)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'File proposal tidak ditemukan di server.']);
+        }
+
+        $service = new \App\Services\ProposalAnalysisService();
+        $result = $service->analyze($filePath, $pendaftaran['divisi_pilihan']);
+
+        return $this->response->setJSON($result);
     }
 }

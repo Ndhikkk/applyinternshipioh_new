@@ -89,10 +89,10 @@
                                         'Menunggu' => 'bg-warning text-dark',
                                         'Diterima' => 'bg-success text-white',
                                         'Ditolak' => 'bg-danger text-white',
+                                        'Progress' => 'bg-info text-dark',
                                         'Lolos_Interview_1' => 'bg-info text-dark',
                                         'Lolos_Interview_2' => 'bg-info text-dark',
                                         'Lolos_Interview_3' => 'bg-info text-dark',
-                                        'Lolos_Final' => 'bg-success text-white',
                                         'Tidak_Lolos_Interview_1' => 'bg-danger text-white',
                                         'Tidak_Lolos_Interview_2' => 'bg-danger text-white',
                                         'Tidak_Lolos_Interview_3' => 'bg-danger text-white'
@@ -101,8 +101,21 @@
                                     $badgeClass = $statusClass[$currentStatus] ?? 'bg-secondary text-white';
                                     ?>
                                     <div>
+                                        <?php
+                                            // Sesuaikan teks badge sesuai permintaan
+                                            $labelText = str_replace('_', ' ', $currentStatus);
+                                            if ($currentStatus === 'Progress Diterima' || $currentStatus === 'Progress') {
+                                                $labelText = 'Progress';
+                                            } elseif ($currentStatus === 'Lolos_Interview_1') {
+                                                $labelText = 'Interview Tahap 1';
+                                            } elseif ($currentStatus === 'Lolos_Interview_2') {
+                                                $labelText = 'Interview Tahap 2';
+                                            } elseif ($currentStatus === 'Diterima') {
+                                                $labelText = 'Diterima';
+                                            }
+                                        ?>
                                         <span class="badge <?= $badgeClass ?> fs-4 px-5 py-3 rounded-pill shadow-sm fw-bold">
-                                            <?= str_replace('_', ' ', $currentStatus) ?>
+                                            <?= $labelText ?>
                                         </span>
                                     </div>
                                 </div>

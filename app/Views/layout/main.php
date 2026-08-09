@@ -88,8 +88,7 @@
 
         /* Enhanced Navbar (LMS Style) */
         .navbar {
-            background: #ffffff !important;
-            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.98) !important;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 20px 0;
             min-height: 80px;
@@ -99,8 +98,7 @@
 
         .navbar.scrolled {
             padding: 12px 0;
-            background: rgba(255, 255, 255, 0.98) !important;
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 1) !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
         }
 
@@ -168,8 +166,7 @@
             background:
                 radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-            animation: floatBackground 20s ease-in-out infinite;
+            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
         }
 
         @keyframes floatBackground {
@@ -579,13 +576,20 @@
             easing: 'ease-out-cubic'
         });
 
-        // Enhanced Navbar scroll effect
+        // Enhanced Navbar scroll effect (Optimized)
+        let tickingNavbar = false;
         window.addEventListener('scroll', function () {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+            if (!tickingNavbar) {
+                window.requestAnimationFrame(function() {
+                    const navbar = document.querySelector('.navbar');
+                    if (window.scrollY > 50) {
+                        navbar.classList.add('scrolled');
+                    } else {
+                        navbar.classList.remove('scrolled');
+                    }
+                    tickingNavbar = false;
+                });
+                tickingNavbar = true;
             }
         });
 
@@ -632,12 +636,19 @@
             });
         });
 
-        // Add parallax effect to hero section
+        // Add parallax effect to hero section (Optimized)
+        let tickingParallax = false;
         window.addEventListener('scroll', function () {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero-section');
-            if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            if (!tickingParallax) {
+                window.requestAnimationFrame(function() {
+                    const scrolled = window.pageYOffset;
+                    const hero = document.querySelector('.hero-section');
+                    if (hero) {
+                        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+                    }
+                    tickingParallax = false;
+                });
+                tickingParallax = true;
             }
         });
     </script>

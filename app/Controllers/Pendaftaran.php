@@ -33,15 +33,11 @@ class Pendaftaran extends Controller
         $rules = [
             'nama_lengkap'   => 'required',
             'email'          => [
-                'rules' => 'required|valid_email|is_unique[pendaftaran_magang.email]',
-                'errors' => [
-                    'is_unique' => 'Email ini sudah pernah didaftarkan sebelumnya.'
-                ]
+                'rules' => 'required|valid_email'
             ],
             'nomor_whatsapp' => [
-                'rules' => 'required|numeric|min_length[11]|is_unique[pendaftaran_magang.nomor_whatsapp]',
+                'rules' => 'required|numeric|min_length[11]',
                 'errors' => [
-                    'is_unique' => 'Nomor WhatsApp ini sudah pernah didaftarkan sebelumnya.',
                     'numeric'   => 'Nomor WhatsApp hanya boleh berisi angka tanpa spasi atau simbol.',
                     'min_length'=> 'Nomor WhatsApp harus terdiri dari minimal 11 digit angka.'
                 ]
@@ -160,20 +156,14 @@ class Pendaftaran extends Controller
             ->first();
 
         if ($existing) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Gagal! Email atau Nomor WhatsApp pelamar ini sudah pernah terdaftar sebelumnya.'
-            ]);
+            return redirect()->back()->withInput()->with('error', 'Gagal! Email atau Nomor WhatsApp pelamar ini sudah pernah terdaftar sebelumnya.');
         }
 
         $cvName    = $this->handleFileUpload('file_cv', 'cv');
         $suratName = $this->handleFileUpload('file_surat', 'surat');
 
         if ($cvName === false) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Gagal! Dokumen CV yang diunggah tidak valid atau tidak terbaca.'
-            ]);
+            return redirect()->back()->withInput()->with('error', 'Gagal! Dokumen CV yang diunggah tidak valid atau tidak terbaca.');
         }
 
         // GENERATE TOKEN (Maksimal 10 Karakter)

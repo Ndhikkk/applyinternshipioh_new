@@ -52,6 +52,7 @@ $routes->group('admin', function ($routes) {
         $routes->get('detail/(:num)', 'Admin::detail/$1');
         $routes->post('update-status/(:num)', 'Admin::updateStatus/$1');
         $routes->get('analyze-cv/(:num)', 'Admin::analyzeCv/$1');
+        $routes->get('analyze-proposal/(:num)', 'Admin::analyzeProposal/$1');
         $routes->get('toggle-registration', 'Admin::toggleRegistration');
         $routes->get('download/(:num)/(:any)', 'Admin::download/$1/$2');
         $routes->get('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
