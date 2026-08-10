@@ -67,6 +67,25 @@ class Pendaftaran extends Controller
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        // This check gives a useful response for ordinary repeat submissions.
+        // The unique database indexes added by the migration are still required
+        // to handle two requests that arrive at exactly the same time.
+        $email = strtolower(trim((string) $this->request->getPost('email')));
+        $nomorWhatsapp = trim((string) $this->request->getPost('nomor_whatsapp'));
+        $existing = $this->pendaftaranModel
+            ->groupStart()
+                ->where('email', $email)
+                ->orWhere('nomor_whatsapp', $nomorWhatsapp)
+            ->groupEnd()
+            ->first();
+
+        if ($existing !== null) {
+            return redirect()->back()->withInput()->with(
+                'error',
+                'Email atau Nomor WhatsApp ini sudah terdaftar. Gunakan token pendaftaran yang sudah Anda terima.'
+            );
+        }
+
         // Upload file ke Local Server
         $cv = $this->request->getFile('cv');
         $cvName = '';
@@ -102,8 +121,8 @@ class Pendaftaran extends Controller
         $data = [
             'token_pendaftaran' => $token,
             'nama_lengkap'    => trim((string)$this->request->getPost('nama_lengkap')),
-            'email'           => trim((string)$this->request->getPost('email')),
-            'nomor_whatsapp'  => trim((string)$this->request->getPost('nomor_whatsapp')),
+            'email'           => $email,
+            'nomor_whatsapp'  => $nomorWhatsapp,
             'nomor_darurat'   => trim((string)$this->request->getPost('nomor_darurat')),
             'asal_kampus'     => trim((string)$this->request->getPost('asal_kampus')),
             'program_studi'   => trim((string)$this->request->getPost('program_studi')),
@@ -121,18 +140,41 @@ class Pendaftaran extends Controller
         ];
 
         $insertId = $this->pendaftaranModel->insert($data);
+
+        if ($insertId === false) {
+            $this->deleteUploadedFiles([$cvName, $suratName, $proposalName, $ktmName], ['cv', 'surat', 'proposal', 'ktm']);
+
+            return redirect()->back()->withInput()->with(
+                'error',
+                'Email atau Nomor WhatsApp ini sudah terdaftar. Gunakan token pendaftaran yang sudah Anda terima.'
+            );
+        }
+
         $newData  = $this->pendaftaranModel->find($insertId);
 
         // Panggil fungsi kirim email resmi
         $this->sendEmailToken($newData['email'], $newData['nama_lengkap'], $token);
 
-        return view('pendaftaran_success', ['data' => $newData]);
+        // Post/Redirect/Get prevents a browser refresh from posting the same
+        // multipart form again after a successful registration.
+        return redirect()->to(site_url('pendaftaran/success'))->with('registration', $newData);
+    }
+
+    public function success()
+    {
+        $data = session()->getFlashdata('registration');
+
+        if (!is_array($data)) {
+            return redirect()->to(site_url('pendaftaran'));
+        }
+
+        return view('pendaftaran_success', ['data' => $data]);
     }
 
     public function import_cv()
     {
         $nama_lengkap   = $this->request->getPost('nama_lengkap');
-        $email          = $this->request->getPost('email');
+        $email          = strtolower(trim((string) $this->request->getPost('email')));
         $nomor_whatsapp = $this->request->getPost('nomor_whatsapp');
         $asal_kampus    = $this->request->getPost('asal_kampus'); 
         $program_studi  = $this->request->getPost('program_studi');
@@ -202,7 +244,7 @@ class Pendaftaran extends Controller
         } else {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Gagal menyimpan data ekstraksi ke database.'
+                'message' => 'Gagal menyimpan data ekstraksi. Email atau Nomor WhatsApp mungkin sudah terdaftar.'
             ]);
         }
     }
@@ -222,6 +264,20 @@ class Pendaftaran extends Controller
         }
 
         return '';
+    }
+
+    private function deleteUploadedFiles(array $fileNames, array $folders): void
+    {
+        foreach ($fileNames as $index => $fileName) {
+            if ($fileName === '' || !isset($folders[$index])) {
+                continue;
+            }
+
+            $path = WRITEPATH . 'uploads/' . $folders[$index] . '/' . $fileName;
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
     }
 
     /**
@@ -339,10 +395,11 @@ class Pendaftaran extends Controller
 
         // 3. Eksekusi pengiriman
         if (!$emailService->send()) {
-            echo "<h3>Gagal Mengirim Email! Log Error:</h3>";
-            echo $emailService->printDebugger(['headers', 'subject', 'body']);
-            exit;
+            log_message('error', 'Registration token email could not be sent to {email}.', ['email' => $toEmail]);
+            return false;
         }
+
+        return true;
     }
    
 }

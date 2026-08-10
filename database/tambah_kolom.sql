@@ -7,3 +7,8 @@ ALTER TABLE pendaftaran_magang
 
 ALTER TABLE pendaftaran_magang
   ADD UNIQUE KEY uq_pendaftaran_magang_email (email);
+
+-- Jalankan juga di database production untuk mencegah dua request bersamaan
+-- menyimpan pelamar yang sama dengan nomor WhatsApp yang sama.
+ALTER TABLE pendaftaran_magang
+  ADD UNIQUE KEY uq_pendaftaran_magang_nomor_whatsapp (nomor_whatsapp);
