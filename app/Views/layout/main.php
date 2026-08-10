@@ -607,23 +607,31 @@
             });
         });
 
-        // Enhanced form loading states
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function () {
+        // Enhanced form loading states. Register after page-specific submit
+        // handlers so a page can cancel an invalid submission first.
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function (event) {
+                // A multipart upload can take longer than a few seconds in
+                // production. Keep the form locked until the request finishes
+                // (the browser will navigate on success/error), rather than
+                // allowing a second POST while the first one is still active.
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                if (this.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                this.dataset.submitting = 'true';
                 const submitBtn = this.querySelector('button[type="submit"]');
                 if (submitBtn) {
-                    const originalText = submitBtn.innerHTML;
                     submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Memproses...';
                     submitBtn.disabled = true;
-
-                    // Revert after 5 seconds if still processing (safety)
-                    setTimeout(() => {
-                        if (submitBtn.disabled) {
-                            submitBtn.innerHTML = originalText;
-                            submitBtn.disabled = false;
-                        }
-                    }, 5000);
                 }
+                });
             });
         });
 
