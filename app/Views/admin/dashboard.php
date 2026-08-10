@@ -279,46 +279,33 @@
 
                     <!-- ==== Aksi tahap interview (tampil kalau status masih tahap interview) ==== -->
                     <div id="amInterviewActions">
-                        <p class="fw-bold mb-2"><i class="bi bi-clipboard-check"></i> Proses Interview</p>
-                        <div class="d-flex gap-2 mb-3">
-                            <button type="button" class="btn btn-success btn-sm" onclick="showSubForm('lolos')">
-                                <i class="bi bi-check-lg"></i> Loloskan ke Tahap Selanjutnya
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('tolak')">
-                                <i class="bi bi-x-lg"></i> Tidak Lolos
-                            </button>
-                        </div>
+                        <p class="fw-bold mb-2"><i class="bi bi-clipboard-check"></i> Proses Seleksi & Interview</p>
+                        
+                        <!-- Tempat tombol aksi dinamis -->
+                        <div id="dynamicActionButtons" class="d-flex gap-2 mb-3"></div>
 
-                        <!-- Sub form: LOLOS -->
+                        <!-- Sub form: UMUM (Jadwal/Zoom/Catatan) -->
                         <div id="subFormLolos" class="border rounded p-3 mb-3" style="display:none;">
-                            <h6 class="text-success"><i class="bi bi-check-lg"></i> Loloskan Kandidat</h6>
-                            <div class="mb-2">
-                                <label class="form-label small">Jadwal Interview Berikutnya</label>
-                                <input type="datetime-local" id="lolosJadwal" class="form-control form-control-sm">
+                            <h6 id="subFormTitle" class="text-success"><i class="bi bi-check-lg"></i> Proses Lolos</h6>
+                            <input type="hidden" id="targetStatusInput">
+                            
+                            <div id="jadwalZoomWrapper" class="mb-2">
+                                <div class="mb-2">
+                                    <label class="form-label small">Jadwal Interview</label>
+                                    <input type="datetime-local" id="lolosJadwal" class="form-control form-control-sm">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small">Link Zoom / Meet</label>
+                                    <input type="url" id="lolosZoom" class="form-control form-control-sm" placeholder="https://zoom.us/j/...">
+                                </div>
                             </div>
+                            
                             <div class="mb-2">
-                                <label class="form-label small">Link Zoom / Meet</label>
-                                <input type="url" id="lolosZoom" class="form-control form-control-sm" placeholder="https://zoom.us/j/...">
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label small">Catatan Hasil Interview</label>
+                                <label class="form-label small">Catatan (Opsional)</label>
                                 <textarea id="lolosCatatan" class="form-control form-control-sm" rows="2"></textarea>
                             </div>
-                            <button type="button" class="btn btn-success btn-sm" onclick="submitLolos()">
+                            <button type="button" class="btn btn-success btn-sm" onclick="submitDynamicAction()">
                                 <i class="bi bi-check2-circle"></i> Simpan
-                            </button>
-                            <button type="button" class="btn btn-link btn-sm" onclick="hideSubForms()">Batal</button>
-                        </div>
-
-                        <!-- Sub form: TOLAK -->
-                        <div id="subFormTolak" class="border rounded p-3 mb-3" style="display:none;">
-                            <h6 class="text-danger"><i class="bi bi-x-lg"></i> Tandai Tidak Lolos</h6>
-                            <div class="mb-2">
-                                <label class="form-label small">Alasan Tidak Lolos</label>
-                                <textarea id="tolakCatatan" class="form-control form-control-sm" rows="2"></textarea>
-                            </div>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="submitTolak()">
-                                <i class="bi bi-x-circle"></i> Simpan
                             </button>
                             <button type="button" class="btn btn-link btn-sm" onclick="hideSubForms()">Batal</button>
                         </div>
@@ -334,7 +321,7 @@
                                 <label class="form-label small mb-1">Status</label>
                                 <select id="manualStatus" class="form-select form-select-sm">
                                     <option value="Menunggu">Menunggu</option>
-                                    <option value="Progress Diterima">Progress Diterima</option>
+                                    <option value="Progress">Progress</option>
                                     <option value="Diterima">Diterima</option>
                                     <option value="Ditolak">Ditolak</option>
                                 </select>
@@ -453,10 +440,6 @@
     let currentModalId = null;
     let currentModalItem = null;
 
-    // Dibuat lazy (bukan langsung dieksekusi di awal script) supaya tidak
-    // gagal kalau Bootstrap JS dari layout/main belum sempat ke-load duluan.
-    // Ini juga yang bikin error "bootstrap is not defined" sebelumnya
-    // menghentikan SELURUH script di bawahnya (termasuk fungsi openActionModal dkk).
     function getActionModal() {
         return bootstrap.Modal.getOrCreateInstance(document.getElementById('actionModal'));
     }
@@ -485,28 +468,22 @@
     }
 
     function formatStatusLabel(status) {
-        const m1 = status.match(/^Lolos_Interview_(\d)$/);
-        if (m1) return 'INTERVIEW TAHAP ' + m1[1];
-        
-        const m2 = status.match(/^Tidak_Lolos_Interview_(\d)$/);
-        if (m2) return 'TIDAK LOLOS TAHAP ' + m2[1];
-        
-        if (status === 'Lolos_Final') return 'LOLOS FINAL';
-        
-        return status.replace(/_/g, ' ');
+        if (status.includes('Interview') || status === 'Progress') return 'PROGRESS';
+        if (status === 'Diterima') return 'DITERIMA';
+        if (status === 'Ditolak') return 'DITOLAK';
+        if (status === 'Menunggu') return 'MENUNGGU';
+        return status.toUpperCase();
     }
 
     function statusBadgeMarkupFromLabel(status) {
-        const isFinal = ['Diterima', 'Lolos_Final'].includes(status);
-        const isRejected = ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'].includes(status);
+        const isFinal = status === 'Diterima';
+        const isRejected = ['Ditolak'].includes(status);
         let cls = 'bg-warning';
         if (isFinal) cls = 'bg-success';
         else if (isRejected) cls = 'bg-danger';
-        else if (status === 'Progress Diterima') cls = 'bg-info';
-        else if (status === 'Lolos_Interview_1') cls = 'bg-primary';
-        else if (status === 'Lolos_Interview_2') cls = 'bg-info';
-        else if (status === 'Lolos_Interview_3') cls = 'bg-purple';
-        return `<span class="badge ${cls}">${formatStatusLabel(status)}</span>`;
+        else if (status.includes('Interview') || status === 'Progress') cls = 'bg-info';
+        
+        return `<span class="badge ${cls} text-dark">${formatStatusLabel(status)}</span>`;
     }
 
     // ===================== MODAL AKSI =====================
@@ -551,11 +528,13 @@
         }
         document.getElementById('amRiwayat').innerHTML = riwayat || '<span class="text-muted small">Belum ada riwayat interview.</span>';
 
-        // Tampilkan blok aksi interview hanya kalau statusnya memang masih tahap interview
-        const interviewStatuses = ['Menunggu', 'Lolos_Interview_1', 'Lolos_Interview_2', 'Lolos_Interview_3'];
+        // Tampilkan blok aksi interview hanya kalau statusnya memang masih tahap seleksi
+        const interviewStatuses = ['Menunggu', 'Lolos_Interview_1', 'Progress', 'Lolos_Interview_2', 'Lolos_Interview_3'];
         document.getElementById('amInterviewActions').style.display = interviewStatuses.includes(item.status) ? '' : 'none';
 
-        document.getElementById('manualStatus').value = ['Menunggu', 'Diterima', 'Ditolak'].includes(item.status) ? item.status : 'Menunggu';
+        renderDynamicButtons(item.status);
+
+        document.getElementById('manualStatus').value = ['Menunggu', 'Diterima', 'Ditolak', 'Progress'].includes(item.status) ? item.status : 'Menunggu';
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
@@ -565,36 +544,74 @@
         hideSubForms();
     }
 
-    function getInterviewStep(status) {
-        const m = status.match(/Interview_(\d)/);
-        return m ? parseInt(m[1]) : 0;
+    function renderDynamicButtons(status) {
+        const container = document.getElementById('dynamicActionButtons');
+        let html = '';
+
+        if (status === 'Menunggu') {
+            html += `<button type="button" class="btn btn-primary btn-sm" onclick="showSubForm('Lolos_Interview_1', 'Jadwalkan Interview 1', true)">
+                        <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 1
+                     </button>`;
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false)">
+                        <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        } else if (status === 'Lolos_Interview_1') {
+            html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Progress', 'Lolos Interview 1 (ACC)', false)">
+                        <i class="bi bi-check-lg"></i> Lolos Int 1 (ACC)
+                     </button>`;
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_1', 'Tidak Lolos Interview 1', false)">
+                        <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        } else if (status === 'Progress') {
+            html += `<button type="button" class="btn btn-primary btn-sm" onclick="showSubForm('Lolos_Interview_2', 'Jadwalkan Interview 2', true)">
+                        <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 2
+                     </button>`;
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_1', 'Tolak (Batal Lolos)', false)">
+                        <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        } else if (status === 'Lolos_Interview_2') {
+            html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Diterima', 'Diterima', false)">
+                        <i class="bi bi-award"></i> Diterima
+                     </button>`;
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_2', 'Tidak Lolos Interview 2', false)">
+                        <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        }
+
+        container.innerHTML = html;
     }
 
-    function showSubForm(type) {
-        document.getElementById('subFormLolos').style.display = type === 'lolos' ? '' : 'none';
-        document.getElementById('subFormTolak').style.display = type === 'tolak' ? '' : 'none';
+    function showSubForm(targetStatus, titleText, requireSchedule) {
+        document.getElementById('subFormLolos').style.display = '';
+        document.getElementById('subFormTitle').innerHTML = `<i class="bi bi-check2-square"></i> ${titleText}`;
+        document.getElementById('targetStatusInput').value = targetStatus;
+        
+        const isTolak = targetStatus.includes('Tidak') || targetStatus === 'Ditolak';
+        document.getElementById('subFormTitle').className = isTolak ? 'text-danger fw-bold' : 'text-success fw-bold';
+        
+        if (requireSchedule) {
+            document.getElementById('jadwalZoomWrapper').style.display = '';
+        } else {
+            document.getElementById('jadwalZoomWrapper').style.display = 'none';
+            document.getElementById('lolosJadwal').value = '';
+            document.getElementById('lolosZoom').value = '';
+        }
     }
+
     function hideSubForms() {
         document.getElementById('subFormLolos').style.display = 'none';
-        document.getElementById('subFormTolak').style.display = 'none';
     }
 
-    function submitLolos() {
-        const step = getInterviewStep(currentModalItem.status);
-        const nextStep = step + 1;
-        const targetStatus = nextStep > 3 ? 'Lolos_Final' : ('Lolos_Interview_' + nextStep);
-        const jadwalRaw = document.getElementById('lolosJadwal').value; // format: YYYY-MM-DDTHH:MM
+    function submitDynamicAction() {
+        const targetStatus = document.getElementById('targetStatusInput').value;
+        const jadwalRaw = document.getElementById('lolosJadwal').value;
+        const isScheduleVisible = document.getElementById('jadwalZoomWrapper').style.display !== 'none';
+
         submitStatusChange(targetStatus, {
             catatan: document.getElementById('lolosCatatan').value,
-            jadwal: jadwalRaw,
-            link_zoom: document.getElementById('lolosZoom').value
+            jadwal: isScheduleVisible ? jadwalRaw : '',
+            link_zoom: isScheduleVisible ? document.getElementById('lolosZoom').value : ''
         });
-    }
-
-    function submitTolak() {
-        const step = getInterviewStep(currentModalItem.status);
-        const targetStatus = step > 0 ? ('Tidak_Lolos_Interview_' + step) : 'Ditolak';
-        submitStatusChange(targetStatus, { catatan: document.getElementById('tolakCatatan').value });
     }
 
     function submitManual() {

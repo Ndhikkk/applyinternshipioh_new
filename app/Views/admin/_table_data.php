@@ -17,17 +17,24 @@
                 <?php foreach ($pendaftaran as $data): ?>
                     <?php
                         $currentStatus = $data['status'];
-                        $isFinalStage = in_array($currentStatus, ['Diterima', 'Lolos_Final']);
-                        $isRejected = in_array($currentStatus, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3']);
-                        $badgeClass = match (true) {
-                            $isFinalStage => 'bg-success',
-                            $isRejected => 'bg-danger',
-                            $currentStatus === 'Progress Diterima' => 'bg-info',
-                            $currentStatus === 'Lolos_Interview_1' => 'bg-primary',
-                            $currentStatus === 'Lolos_Interview_2' => 'bg-info',
-                            $currentStatus === 'Lolos_Interview_3' => 'bg-purple',
-                            default => 'bg-warning',
-                        };
+                        $isFinal = $currentStatus === 'Diterima';
+                        $isRejected = $currentStatus === 'Ditolak';
+                        $isProgress = str_contains($currentStatus, 'Interview') || $currentStatus === 'Progress';
+                        
+                        $badgeClass = 'bg-warning text-dark';
+                        if ($isFinal) {
+                            $badgeClass = 'bg-success';
+                        } elseif ($isRejected) {
+                            $badgeClass = 'bg-danger';
+                        } elseif ($isProgress) {
+                            $badgeClass = 'bg-info text-dark';
+                        }
+                        
+                        $statusLabel = 'MENUNGGU';
+                        if ($isFinal) $statusLabel = 'DITERIMA';
+                        if ($isRejected) $statusLabel = 'DITOLAK';
+                        if ($isProgress) $statusLabel = 'PROGRESS';
+
                         $step = 0;
                         if (preg_match('/Interview_(\d)/', $currentStatus, $m)) { $step = (int) $m[1]; }
                         $jadwalKey = 'jadwal_interview_' . $step;
@@ -60,7 +67,8 @@
                             </span>
                         </td>
                         <td class="text-center" data-label="Status" id="status-cell-<?= $data['id'] ?>">
-                            <span class="badge <?= $badgeClass ?>"><?= str_replace('_', ' ', esc($currentStatus)) ?></span>
+                            <span class="badge <?= $badgeClass ?>"><?= esc($statusLabel) ?></span>
+
                             <?php if ($step > 0 && !empty($data[$jadwalKey])): ?>
                                 <div class="small text-muted mt-2">
                                     <i class="bi bi-calendar-event"></i> <?= date('d/m/Y H:i', strtotime($data[$jadwalKey])) ?> WIB
@@ -118,7 +126,6 @@
                                 title="<?= empty($data['proposal_magang']) ? 'Proposal tidak tersedia' : 'Download Proposal Magang' ?>"
                                 <?= empty($data['proposal_magang']) ? 'onclick="return false;"' : '' ?>>
                                     <i class="bi bi-journal-text"></i>
-                                </a>
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/ktm') ?>"
                                 class="btn btn-outline-info <?= empty($data['ktm']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['ktm']) ? 'KTM tidak tersedia' : 'Download KTM' ?>"

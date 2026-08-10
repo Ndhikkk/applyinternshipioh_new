@@ -265,6 +265,34 @@
                     <span class="divisi-tag">Retention</span>
                 </div>
             </div>
+
+            <!-- Divisi 9: Direct Sales Executive -->
+            <div class="divisi-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="divisi-icon">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+                <h4 class="divisi-title">Direct Sales Executive</h4>
+                <p class="divisi-desc">Menjalankan strategi penjualan langsung ke pelanggan, membangun relasi dengan calon konsumen, serta mencapai target akuisisi produk dan layanan di lapangan.</p>
+                <div class="divisi-tags">
+                    <span class="divisi-tag">Sales</span>
+                    <span class="divisi-tag">Field Marketing</span>
+                    <span class="divisi-tag">Target</span>
+                </div>
+            </div>
+
+            <!-- Divisi 10: Capability Building -->
+            <div class="divisi-card" data-aos="fade-up" data-aos-delay="550">
+                <div class="divisi-icon">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+                <h4 class="divisi-title">Capability Building</h4>
+                <p class="divisi-desc">Merancang dan menjalankan program pengembangan kompetensi karyawan, pelatihan internal, serta strategi peningkatan kapasitas tim untuk mendukung pertumbuhan organisasi.</p>
+                <div class="divisi-tags">
+                    <span class="divisi-tag">Training</span>
+                    <span class="divisi-tag">Development</span>
+                    <span class="divisi-tag">HR</span>
+                </div>
+            </div>
         </div>
 
         <!-- Call to Action -->
@@ -310,7 +338,7 @@
                                 <div class="stat-label">Kepuasan</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-number">8</div>
+                                <div class="stat-number">10</div>
                                 <div class="stat-label">Divisi</div>
                             </div>
                             <div class="stat-item">
@@ -695,15 +723,13 @@
 
     /* ===== DIVISI GRID ===== */
     .divisi-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 25px;
         margin-bottom: 40px;
     }
 
     .divisi-card {
-        flex: 0 0 calc(33.333% - 17px); /* Desktop: 3 columns */
         background: white;
         border-radius: 24px;
         padding: 25px;
@@ -945,8 +971,8 @@
             max-width: 350px;
         }
         
-        .divisi-card {
-            flex: 0 0 calc(50% - 12.5px); /* Tablet: 2 columns */
+        .divisi-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         }
     }
 
@@ -967,6 +993,16 @@
 
         .tech-logo {
             max-width: 300px;
+        }
+
+        .section-main-title,
+        .section-subtitle,
+        .divisi-subtitle {
+            font-size: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
         }
 
         .section-main-title,
@@ -1006,10 +1042,10 @@
 
         .divisi-grid {
             gap: 20px;
+            grid-template-columns: 1fr;
         }
 
         .divisi-card {
-            flex: 0 0 100%; /* Mobile: 1 column */
             padding: 20px;
         }
 

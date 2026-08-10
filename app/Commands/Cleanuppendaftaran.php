@@ -27,7 +27,7 @@ class Cleanuppendaftaran extends BaseCommand
 
         // ---- TAHAP 1: masuk arsip ----
         $rejected = $model->where('is_archived', 0)
-            ->whereIn('status', ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'])
+            ->whereIn('status', ['Ditolak'])
             ->where('status_changed_at IS NOT NULL')
             ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
             ->findAll();
@@ -40,7 +40,7 @@ class Cleanuppendaftaran extends BaseCommand
         $archivedCount += $this->archive($model, $waiting, 'Menunggu (6 bulan)');
 
         $accepted = $model->where('is_archived', 0)
-            ->whereIn('status', ['Lolos_Final', 'Diterima'])
+            ->whereIn('status', ['Diterima'])
             ->where('status_changed_at IS NOT NULL')
             ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-1 year')))
             ->findAll();
