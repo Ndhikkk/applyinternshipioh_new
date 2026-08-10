@@ -72,12 +72,7 @@ class Pendaftaran extends Controller
         // to handle two requests that arrive at exactly the same time.
         $email = strtolower(trim((string) $this->request->getPost('email')));
         $nomorWhatsapp = trim((string) $this->request->getPost('nomor_whatsapp'));
-        $existing = $this->pendaftaranModel
-            ->groupStart()
-                ->where('email', $email)
-                ->orWhere('nomor_whatsapp', $nomorWhatsapp)
-            ->groupEnd()
-            ->first();
+        $existing = $this->findExistingRegistration($email, $nomorWhatsapp);
 
         if ($existing !== null) {
             return redirect()->back()->withInput()->with(
@@ -144,9 +139,17 @@ class Pendaftaran extends Controller
         if ($insertId === false) {
             $this->deleteUploadedFiles([$cvName, $suratName, $proposalName, $ktmName], ['cv', 'surat', 'proposal', 'ktm']);
 
+            // Another request can insert the same applicant between the
+            // pre-check above and this INSERT. Treat that request as the same
+            // registration, rather than showing an error after it succeeded.
+            $existing = $this->findExistingRegistration($email, $nomorWhatsapp);
+            if ($existing !== null) {
+                return redirect()->to(site_url('pendaftaran/success'))->with('registration', $existing);
+            }
+
             return redirect()->back()->withInput()->with(
                 'error',
-                'Email atau Nomor WhatsApp ini sudah terdaftar. Gunakan token pendaftaran yang sudah Anda terima.'
+                'Pendaftaran tidak dapat disimpan. Silakan coba lagi.'
             );
         }
 
@@ -278,6 +281,16 @@ class Pendaftaran extends Controller
                 unlink($path);
             }
         }
+    }
+
+    private function findExistingRegistration(string $email, string $nomorWhatsapp): ?array
+    {
+        return $this->pendaftaranModel
+            ->groupStart()
+                ->where('email', $email)
+                ->orWhere('nomor_whatsapp', $nomorWhatsapp)
+            ->groupEnd()
+            ->first();
     }
 
     /**
