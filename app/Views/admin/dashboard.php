@@ -133,29 +133,173 @@
 
    <!-- Data Table -->
 <style>
-/* CSS khusus untuk memberi jarak pada tombol pagination */
+/* ── Professional Pagination Styling ── */
 .ajax-pagination .pagination {
-    gap: 8px; /* Memberi jarak antar tombol */
+    gap: 5px;
     margin-bottom: 0;
+    flex-wrap: wrap;
+    align-items: center;
 }
+
+/* Base page-link style */
 .ajax-pagination .page-item .page-link {
-    border-radius: 8px; /* Membuat tombol membulat */
-    padding: 8px 16px;
-    border: 1px solid #dee2e6;
-    color: #495057;
-    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #e3e6f0;
+    color: #5a6072;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: #fff;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
+    text-decoration: none;
+    line-height: 1;
+    gap: 6px;
 }
+
+/* Icon size inside buttons */
+.ajax-pagination .page-item .page-link i {
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+/* ── Nav buttons (First, Previous, Next, Last) ── */
+.ajax-pagination .page-item .page-link.page-nav-btn {
+    padding: 0 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #6b7280;
+    border-color: #e5e7eb;
+    background-color: #fafbfc;
+}
+.ajax-pagination .page-item:not(.disabled) .page-link.page-nav-btn:hover {
+    background-color: #f0f4ff;
+    border-color: #a3b8e0;
+    color: #3b5998;
+    box-shadow: 0 2px 8px rgba(59, 89, 152, 0.1);
+    transform: translateY(-1px);
+}
+.ajax-pagination .page-item:not(.disabled) .page-link.page-nav-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Nav label text */
+.ajax-pagination .page-nav-label {
+    font-size: 0.8rem;
+}
+
+/* ── Visual divider between nav & numbers ── */
+.ajax-pagination .page-separator .page-divider {
+    border: none;
+    background: none;
+    color: #d1d5db;
+    font-size: 0.9rem;
+    padding: 0 2px;
+    min-width: unset;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ── Page number buttons ── */
+.ajax-pagination .page-number .page-link {
+    font-weight: 600;
+    min-width: 40px;
+    border-radius: 10px;
+}
+
+/* Active page number */
 .ajax-pagination .page-item.active .page-link {
-    background-color: var(--indosat-red, #E31837);
-    border-color: var(--indosat-red, #E31837);
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(227, 24, 55, 0.3);
+    background: linear-gradient(135deg, var(--indosat-red, #E31837) 0%, #c41230 100%);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(227, 24, 55, 0.35);
+    transform: translateY(-1px);
 }
-.ajax-pagination .page-item:not(.active) .page-link:hover {
-    background-color: #f8f9fa;
-    color: var(--indosat-dark-red, #8B1A3A);
-    border-color: #cdd3d8;
+
+/* Number hover */
+.ajax-pagination .page-number:not(.active) .page-link:hover {
+    background-color: #fef2f4;
+    border-color: var(--indosat-red, #E31837);
+    color: var(--indosat-red, #E31837);
+    box-shadow: 0 2px 8px rgba(227, 24, 55, 0.12);
+    transform: translateY(-1px);
+}
+.ajax-pagination .page-number:not(.active) .page-link:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ── Disabled state ── */
+.ajax-pagination .page-item.disabled .page-link {
+    background-color: #f8f9fb;
+    color: #c4c8d4;
+    border-color: #eef0f4;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* ── Responsive: hide nav labels on small screens ── */
+@media (max-width: 576px) {
+    .ajax-pagination .page-nav-label {
+        display: none;
+    }
+    .ajax-pagination .page-item .page-link.page-nav-btn {
+        padding: 0 10px;
+        min-width: 36px;
+    }
+    .ajax-pagination .page-separator {
+        display: none;
+    }
+}
+
+/* ── Fallback: style default CI4 pager (bare li > a without Bootstrap classes) ── */
+.ajax-pagination .pagination > li {
+    list-style: none;
+}
+.ajax-pagination .pagination > li > a,
+.ajax-pagination .pagination > li > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid #e3e6f0;
+    color: #5a6072;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: #fff;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
+    text-decoration: none;
+    line-height: 1;
+}
+.ajax-pagination .pagination > li.active > a,
+.ajax-pagination .pagination > li.active > span {
+    background: linear-gradient(135deg, var(--indosat-red, #E31837) 0%, #c41230 100%);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(227, 24, 55, 0.35);
+    transform: translateY(-1px);
+}
+.ajax-pagination .pagination > li:not(.active) > a:hover {
+    background-color: #fef2f4;
+    border-color: var(--indosat-red, #E31837);
+    color: var(--indosat-red, #E31837);
+    box-shadow: 0 2px 8px rgba(227, 24, 55, 0.12);
+    transform: translateY(-1px);
+}
+.ajax-pagination .pagination > li:not(.active) > a:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 /* CSS Responsif Khusus Tabel di Mobile (Card Layout) */
@@ -410,27 +554,7 @@
 #dataTable thead th:last-child { background-color: #f8f9fa; z-index: 3; }
 #dataTable tbody tr:hover td:last-child { background-color: #f1f5fb; }
 
-/* Menghilangkan kesan mepet pada Pagination (Pages) */
-.ajax-pagination .pagination {
-    gap: 8px; /* Memberi jarak antar tombol halaman */
-    margin: 0;
-}
-.ajax-pagination .page-item .page-link {
-    border-radius: 8px !important;
-    padding: 8px 16px;
-    border: 1px solid #e3e6f0;
-    color: #4e73df;
-    font-weight: 500;
-}
-.ajax-pagination .page-item.active .page-link {
-    background-color: #4e73df;
-    border-color: #4e73df;
-    color: white;
-}
-.ajax-pagination .page-item.disabled .page-link {
-    background-color: #f8f9fa;
-    color: #858796;
-}
+/* ── Pagination overrides (ensures consistency) ── */
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

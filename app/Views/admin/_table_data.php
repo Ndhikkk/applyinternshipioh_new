@@ -188,11 +188,17 @@
 </div>
 
 <?php if (!empty($pager)): ?>
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 flex-wrap gap-2">
-        <small class="text-muted">
-            Halaman <?= $pager->getCurrentPage('pendaftaran') ?> dari <?= max($pager->getPageCount('pendaftaran'), 1) ?>
-            (Total <?= $total_pendaftar ?> data)
-        </small>
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 flex-wrap gap-3 px-1">
+        <div class="pagination-info d-flex align-items-center gap-2">
+            <span class="badge bg-light text-secondary border" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-journal-text me-1"></i>
+                Halaman <strong class="text-dark"><?= $pager->getCurrentPage('pendaftaran') ?></strong> dari <strong class="text-dark"><?= max($pager->getPageCount('pendaftaran'), 1) ?></strong>
+            </span>
+            <span class="badge bg-light text-secondary border" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-people me-1"></i>
+                <strong class="text-dark"><?= $total_pendaftar ?></strong> data
+            </span>
+        </div>
         <!-- Custom class added to links for delegating click events in AJAX -->
         <div class="ajax-pagination">
             <?= $pager->links('pendaftaran', 'default_full') ?>
