@@ -98,10 +98,8 @@
                                 <?php
                                 $tanggalDaftar = $data['created_at'] ?? '';
                                 if ($tanggalDaftar && trim($tanggalDaftar) !== ''):
-                                    $date = new DateTime($tanggalDaftar, new DateTimeZone('UTC'));
-                                    $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
                                 ?>
-                                    <?= $date->format('d/m/Y H:i') ?>
+                                    <?= date('d/m/Y H:i', strtotime($tanggalDaftar)) ?>
                                 <?php else: ?>
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>

@@ -72,13 +72,21 @@ class Pendaftaran extends Controller
         // to handle two requests that arrive at exactly the same time.
         $email = strtolower(trim((string) $this->request->getPost('email')));
         $nomorWhatsapp = trim((string) $this->request->getPost('nomor_whatsapp'));
+        $requestId = bin2hex(random_bytes(6));
+        log_message('info', 'Registration POST received. request_id={requestId}', ['requestId' => $requestId]);
         $existing = $this->findExistingRegistration($email, $nomorWhatsapp);
 
         if ($existing !== null) {
-            return redirect()->back()->withInput()->with(
-                'error',
-                'Email atau Nomor WhatsApp ini sudah terdaftar. Gunakan token pendaftaran yang sudah Anda terima.'
+            log_message(
+                'info',
+                'Registration POST reused an existing registration. request_id={requestId}, registration_id={registrationId}',
+                ['requestId' => $requestId, 'registrationId' => $existing['id']]
             );
+
+            // A retry must be safe. It may be a browser retry, a slow-network
+            // retry, or the same form submitted twice; in every case, show the
+            // original successful registration rather than a false error.
+            return redirect()->to(site_url('pendaftaran/success'))->with('registration', $existing);
         }
 
         // Upload file ke Local Server
@@ -144,6 +152,11 @@ class Pendaftaran extends Controller
             // registration, rather than showing an error after it succeeded.
             $existing = $this->findExistingRegistration($email, $nomorWhatsapp);
             if ($existing !== null) {
+                log_message(
+                    'info',
+                    'Registration INSERT raced with another request and reused its row. request_id={requestId}, registration_id={registrationId}',
+                    ['requestId' => $requestId, 'registrationId' => $existing['id']]
+                );
                 return redirect()->to(site_url('pendaftaran/success'))->with('registration', $existing);
             }
 
@@ -154,6 +167,11 @@ class Pendaftaran extends Controller
         }
 
         $newData  = $this->pendaftaranModel->find($insertId);
+        log_message(
+            'info',
+            'Registration inserted. request_id={requestId}, registration_id={registrationId}',
+            ['requestId' => $requestId, 'registrationId' => $insertId]
+        );
 
         // Panggil fungsi kirim email resmi
         $this->sendEmailToken($newData['email'], $newData['nama_lengkap'], $token);
