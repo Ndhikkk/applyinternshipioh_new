@@ -73,7 +73,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pendaftar</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_pendaftar ?></div>
                             <div class="mt-2 mb-0 text-muted text-xs">
-                                <span class="text-success me-2"><i class="bi bi-arrow-up"></i> Semua waktu</span>
+                                <span class="text-primary me-2"><i class="bi bi-arrow-up"></i> Semua waktu</span>
                             </div>
                         </div>
                         <div class="col-auto"><i class="bi bi-people display-6 text-indosat"></i></div>
