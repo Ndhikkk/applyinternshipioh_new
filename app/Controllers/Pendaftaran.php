@@ -358,7 +358,7 @@ class Pendaftaran extends Controller
         $config = new \Config\Email();
         $config->protocol   = 'smtp';
         $config->SMTPHost   = 'smtp.gmail.com';
-        $config->SMTPUser   = 'farezaairo@gmail.com';
+        $config->SMTPUser   = 'nnusa0001@gmail.com';
         $config->SMTPPass   = 'xerd xhmk bzpp rmbs'; 
         $config->SMTPPort   = 587;
         $config->SMTPCrypto = 'tls';
