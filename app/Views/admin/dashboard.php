@@ -448,7 +448,7 @@
                                 <label class="form-label small">Catatan (Opsional)</label>
                                 <textarea id="lolosCatatan" class="form-control form-control-sm" rows="2"></textarea>
                             </div>
-                            <button type="button" class="btn btn-success btn-sm" onclick="submitDynamicAction()">
+                            <button type="button" id="dynamicSaveButton" class="btn btn-success btn-sm" onclick="submitDynamicAction()">
                                 <i class="bi bi-check2-circle"></i> Simpan
                             </button>
                             <button type="button" class="btn btn-link btn-sm" onclick="hideSubForms()">Batal</button>
@@ -506,7 +506,7 @@
                         
                         <!-- Baris 3: Button Simpan -->
                         <div class="text-end">
-                            <button type="button" class="btn btn-primary btn-sm px-4" onclick="submitManual()">Simpan Perubahan</button>
+                            <button type="button" id="manualSaveButton" class="btn btn-primary btn-sm px-4" onclick="submitManual()">Simpan Perubahan</button>
                         </div>
                     </div>
 
@@ -700,28 +700,28 @@
 
         if (status === 'Menunggu') {
             if (item.jadwal_interview_1) {
-                html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Progress', 'Lolos Interview 1 (ACC)', false)">
+                html += `<button type="button" id="approveInterview1Button" class="btn btn-success btn-sm" onclick="showSubForm('Progress', 'Lolos Interview 1 (ACC)', false, this)">
                             <i class="bi bi-check-lg"></i> Lolos Int 1 (ACC)
                          </button>`;
             } else {
-                html += `<button type="button" id="scheduleInterview1Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_1', 'Jadwalkan Interview 1', true)">
+                html += `<button type="button" id="scheduleInterview1Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_1', 'Jadwalkan Interview 1', true, this)">
                             <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 1
                          </button>`;
             }
-            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false)">
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false, this)">
                         <i class="bi bi-x-lg"></i> Tolak
                      </button>`;
         } else if (status === 'Progress') {
             if (item.jadwal_interview_2) {
-                html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Diterima', 'Diterima', false)">
+                html += `<button type="button" id="acceptCandidateButton" class="btn btn-success btn-sm" onclick="showSubForm('Diterima', 'Diterima', false, this)">
                             <i class="bi bi-award"></i> Diterima
                          </button>`;
             } else {
-                html += `<button type="button" id="scheduleInterview2Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_2', 'Jadwalkan Interview 2', true)">
+                html += `<button type="button" id="scheduleInterview2Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_2', 'Jadwalkan Interview 2', true, this)">
                             <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 2
                          </button>`;
             }
-            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false)">
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false, this)">
                         <i class="bi bi-x-lg"></i> Tolak
                      </button>`;
         }
@@ -729,7 +729,20 @@
         container.innerHTML = html;
     }
 
-    function showSubForm(targetStatus, titleText, requireSchedule) {
+    let activeActionButton = null;
+    let submissionInProgress = false;
+
+    function showSubForm(targetStatus, titleText, requireSchedule, sourceButton) {
+        if (activeActionButton && activeActionButton !== sourceButton) {
+            activeActionButton.style.opacity = '';
+            activeActionButton.disabled = false;
+        }
+        activeActionButton = sourceButton || null;
+        if (activeActionButton) {
+            activeActionButton.style.opacity = '0.7';
+            activeActionButton.disabled = true;
+        }
+
         document.getElementById('subFormLolos').style.display = '';
         document.getElementById('subFormTitle').innerHTML = `<i class="bi bi-check2-square"></i> ${titleText}`;
         document.getElementById('targetStatusInput').value = targetStatus;
@@ -739,11 +752,6 @@
         
         if (requireSchedule) {
             document.getElementById('jadwalZoomWrapper').style.display = '';
-            const scheduleButton = document.getElementById('scheduleInterview1Button') || document.getElementById('scheduleInterview2Button');
-            if (scheduleButton) {
-                scheduleButton.style.opacity = '0.7';
-                scheduleButton.disabled = true;
-            }
         } else {
             document.getElementById('jadwalZoomWrapper').style.display = 'none';
             document.getElementById('lolosJadwal').value = '';
@@ -753,9 +761,32 @@
 
     function hideSubForms() {
         document.getElementById('subFormLolos').style.display = 'none';
+        if (activeActionButton) {
+            activeActionButton.style.opacity = '';
+            activeActionButton.disabled = false;
+            activeActionButton = null;
+        }
+    }
+
+    function setButtonLoading(button, label) {
+        if (!button || submissionInProgress) return false;
+        submissionInProgress = true;
+        button.dataset.originalHtml = button.innerHTML;
+        button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${label}`;
+        button.disabled = true;
+        return true;
+    }
+
+    function resetButtonLoading(button) {
+        submissionInProgress = false;
+        if (!button) return;
+        button.innerHTML = button.dataset.originalHtml || button.innerHTML;
+        button.disabled = false;
     }
 
     function submitDynamicAction() {
+        const saveButton = document.getElementById('dynamicSaveButton');
+        if (!setButtonLoading(saveButton, 'Menyimpan...')) return;
         const targetStatus = document.getElementById('targetStatusInput').value;
         const jadwalRaw = document.getElementById('lolosJadwal').value;
         const isScheduleVisible = document.getElementById('jadwalZoomWrapper').style.display !== 'none';
@@ -764,23 +795,26 @@
             catatan: document.getElementById('lolosCatatan').value,
             jadwal: isScheduleVisible ? jadwalRaw : '',
             link_zoom: isScheduleVisible ? document.getElementById('lolosZoom').value : ''
-        });
+        }, saveButton);
     }
 
     function submitManual() {
+        const saveButton = document.getElementById('manualSaveButton');
+        if (!setButtonLoading(saveButton, 'Menyimpan...')) return;
         const targetStatus = document.getElementById('manualStatus').value;
         submitStatusChange(targetStatus, { 
             catatan: document.getElementById('manualCatatan').value,
             divisi_pilihan: document.getElementById('editDivisi').value,
             periode_mulai: document.getElementById('editPeriodeMulai').value,
             periode_selesai: document.getElementById('editPeriodeSelesai').value
-        });
+        }, saveButton);
     }
 
-    function submitStatusChange(targetStatus, params) {
+    function submitStatusChange(targetStatus, params, saveButton) {
         const id = currentModalId;
         apiPost(buildUrl(id, targetStatus), params).then(json => {
             if (!json.success) {
+                resetButtonLoading(saveButton);
                 Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
                 return;
             }
@@ -788,6 +822,11 @@
             const statusCell = document.getElementById('status-cell-' + id);
             if (statusCell && json.badge_html !== undefined) statusCell.innerHTML = json.badge_html;
 
+            // The modal is reused. Restore button labels/states before hiding
+            // it so the spinner or faded action never leaks into the next
+            // interview/rejection/manual-update action.
+            resetButtonLoading(saveButton);
+            hideSubForms();
             getActionModal().hide();
             toast('success', json.message);
 
