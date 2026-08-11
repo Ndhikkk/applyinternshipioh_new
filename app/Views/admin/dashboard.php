@@ -587,12 +587,31 @@
             .catch(() => ({ success: false, message: 'Tidak dapat menghubungi server.' }));
     }
 
+    function apiPost(url, params = {}) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '<?= csrf_hash() ?>',
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: new URLSearchParams(params).toString()
+        })
+            .then(async res => {
+                const json = await res.json().catch(() => ({ success: false, message: 'Respon server tidak valid.' }));
+                if (!res.ok && json.success === undefined) json.success = false;
+                return json;
+            })
+            .catch(() => ({ success: false, message: 'Tidak dapat menghubungi server.' }));
+    }
+
     function toast(icon, text) {
         Swal.fire({ icon, text, toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
     }
 
     function formatStatusLabel(status) {
-        if (status.includes('Interview') || status === 'Progress') return 'PROGRESS';
+        if (status.includes('Interview')) return status.toUpperCase();
+        if (status === 'Progress') return 'PROGRESS';
         if (status === 'Diterima') return 'DITERIMA';
         if (status === 'Ditolak') return 'DITOLAK';
         if (status === 'Menunggu') return 'MENUNGGU';
@@ -608,6 +627,12 @@
         else if (status.includes('Interview') || status === 'Progress') cls = 'bg-info';
         
         return `<span class="badge ${cls} text-dark">${formatStatusLabel(status)}</span>`;
+    }
+
+    function displayStatus(item) {
+        if (item.status === 'Menunggu' && item.jadwal_interview_1) return 'Interview Tahap 1';
+        if (item.status === 'Progress' && item.jadwal_interview_2) return 'Interview Tahap 2';
+        return item.status;
     }
 
     // ===================== MODAL AKSI =====================
@@ -633,7 +658,7 @@
     }
 
     function renderModalContent(item) {
-        document.getElementById('amStatusBadge').innerHTML = statusBadgeMarkupFromLabel(item.status);
+        document.getElementById('amStatusBadge').innerHTML = statusBadgeMarkupFromLabel(displayStatus(item));
 
         // Riwayat interview
         let riwayat = '';
@@ -653,12 +678,12 @@
         document.getElementById('amRiwayat').innerHTML = riwayat || '<span class="text-muted small">Belum ada riwayat interview.</span>';
 
         // Tampilkan blok aksi interview hanya kalau statusnya memang masih tahap seleksi
-        const interviewStatuses = ['Menunggu', 'Lolos_Interview_1', 'Progress', 'Lolos_Interview_2', 'Lolos_Interview_3'];
+        const interviewStatuses = ['Menunggu', 'Progress'];
         document.getElementById('amInterviewActions').style.display = interviewStatuses.includes(item.status) ? '' : 'none';
 
-        renderDynamicButtons(item.status);
+        renderDynamicButtons(item);
 
-        document.getElementById('manualStatus').value = ['Menunggu', 'Diterima', 'Ditolak', 'Progress'].includes(item.status) ? item.status : 'Menunggu';
+        document.getElementById('manualStatus').value = item.status;
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
@@ -668,36 +693,35 @@
         hideSubForms();
     }
 
-    function renderDynamicButtons(status) {
+    function renderDynamicButtons(item) {
+        const status = item.status;
         const container = document.getElementById('dynamicActionButtons');
         let html = '';
 
         if (status === 'Menunggu') {
-            html += `<button type="button" class="btn btn-primary btn-sm" onclick="showSubForm('Lolos_Interview_1', 'Jadwalkan Interview 1', true)">
-                        <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 1
-                     </button>`;
+            if (item.jadwal_interview_1) {
+                html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Progress', 'Lolos Interview 1 (ACC)', false)">
+                            <i class="bi bi-check-lg"></i> Lolos Int 1 (ACC)
+                         </button>`;
+            } else {
+                html += `<button type="button" id="scheduleInterview1Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_1', 'Jadwalkan Interview 1', true)">
+                            <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 1
+                         </button>`;
+            }
             html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false)">
                         <i class="bi bi-x-lg"></i> Tolak
                      </button>`;
-        } else if (status === 'Lolos_Interview_1') {
-            html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Progress', 'Lolos Interview 1 (ACC)', false)">
-                        <i class="bi bi-check-lg"></i> Lolos Int 1 (ACC)
-                     </button>`;
-            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_1', 'Tidak Lolos Interview 1', false)">
-                        <i class="bi bi-x-lg"></i> Tolak
-                     </button>`;
         } else if (status === 'Progress') {
-            html += `<button type="button" class="btn btn-primary btn-sm" onclick="showSubForm('Lolos_Interview_2', 'Jadwalkan Interview 2', true)">
-                        <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 2
-                     </button>`;
-            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_1', 'Tolak (Batal Lolos)', false)">
-                        <i class="bi bi-x-lg"></i> Tolak
-                     </button>`;
-        } else if (status === 'Lolos_Interview_2') {
-            html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Diterima', 'Diterima', false)">
-                        <i class="bi bi-award"></i> Diterima
-                     </button>`;
-            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Tidak_Lolos_Interview_2', 'Tidak Lolos Interview 2', false)">
+            if (item.jadwal_interview_2) {
+                html += `<button type="button" class="btn btn-success btn-sm" onclick="showSubForm('Diterima', 'Diterima', false)">
+                            <i class="bi bi-award"></i> Diterima
+                         </button>`;
+            } else {
+                html += `<button type="button" id="scheduleInterview2Button" class="btn btn-primary btn-sm" onclick="showSubForm('schedule_interview_2', 'Jadwalkan Interview 2', true)">
+                            <i class="bi bi-calendar-plus"></i> Jadwalkan Interview 2
+                         </button>`;
+            }
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false)">
                         <i class="bi bi-x-lg"></i> Tolak
                      </button>`;
         }
@@ -715,6 +739,11 @@
         
         if (requireSchedule) {
             document.getElementById('jadwalZoomWrapper').style.display = '';
+            const scheduleButton = document.getElementById('scheduleInterview1Button') || document.getElementById('scheduleInterview2Button');
+            if (scheduleButton) {
+                scheduleButton.style.opacity = '0.7';
+                scheduleButton.disabled = true;
+            }
         } else {
             document.getElementById('jadwalZoomWrapper').style.display = 'none';
             document.getElementById('lolosJadwal').value = '';
@@ -750,7 +779,7 @@
 
     function submitStatusChange(targetStatus, params) {
         const id = currentModalId;
-        apiGet(buildUrl(id, targetStatus, params)).then(json => {
+        apiPost(buildUrl(id, targetStatus), params).then(json => {
             if (!json.success) {
                 Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
                 return;
@@ -762,8 +791,10 @@
             getActionModal().hide();
             toast('success', json.message);
 
-            const hasEmail = json.item && json.item.email;
-            askFollowUps(id, !!hasEmail);
+            if (json.should_prompt_notifications !== false) {
+                const hasEmail = json.item && json.item.email;
+                askFollowUps(id, !!hasEmail);
+            }
         });
     }
 

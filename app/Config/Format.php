@@ -61,4 +61,10 @@ class Format extends BaseConfig
         'application/xml'  => 0,
         'text/xml'         => 0,
     ];
+
+    /**
+     * Maximum nesting depth used when formatting JSON responses.
+     * Required by the installed CodeIgniter JSON formatter.
+     */
+    public int $jsonEncodeDepth = 512;
 }

@@ -67,9 +67,6 @@ class PendaftaranModel extends Model
         return [
             'Menunggu',
             'Progress',
-            'Lolos_Interview_1', 'Tidak_Lolos_Interview_1',
-            'Lolos_Interview_2', 'Tidak_Lolos_Interview_2',
-            'Lolos_Interview_3', 'Tidak_Lolos_Interview_3',
             'Diterima',
             'Ditolak'
         ];

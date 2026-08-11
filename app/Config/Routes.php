@@ -55,7 +55,10 @@ $routes->group('admin', function ($routes) {
         $routes->get('analyze-proposal/(:num)', 'Admin::analyzeProposal/$1');
         $routes->get('toggle-registration', 'Admin::toggleRegistration');
         $routes->get('download/(:num)/(:any)', 'Admin::download/$1/$2');
+        // Read-only modal/email/WhatsApp requests use GET; every status
+        // transition is sent as POST by the dashboard JavaScript.
         $routes->get('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
+        $routes->post('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
         $routes->get('hapus/(:num)', 'Admin::delete/$1');
         $routes->get('testform', 'Testform::index');
     });

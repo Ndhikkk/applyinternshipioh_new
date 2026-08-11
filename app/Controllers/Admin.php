@@ -89,20 +89,12 @@ class Admin extends BaseController
 
         $data['total_ditolak'] = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->groupStart()
-                ->where('status', 'Ditolak')
-                ->orWhere('status', 'Tidak_Lolos_Interview_1')
-                ->orWhere('status', 'Tidak_Lolos_Interview_2')
-                ->orWhere('status', 'Tidak_Lolos_Interview_3')
-            ->groupEnd()
+            ->where('status', 'Ditolak')
             ->countAllResults();
 
         $data['total_menunggu'] = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->whereNotIn('status', [
-                'Diterima', 'Ditolak',
-                'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'
-            ])
+            ->whereIn('status', ['Menunggu', 'Progress'])
             ->countAllResults();
 
         $data['total_arsip'] = $this->pendaftaranModel->where('is_archived', 1)->countAllResults();
@@ -306,9 +298,9 @@ class Admin extends BaseController
      *   - 'info'   -> GET data lengkap 1 kandidat (buat isi modal aksi)
      *   - 'wa'     -> GET link WhatsApp siap kirim
      *   - 'email'  -> kirim email notifikasi sesuai status saat ini
-     *   - selain itu -> dianggap NAMA STATUS TUJUAN (mis. 'Lolos_Interview_2',
-     *                   'Diterima', 'Ditolak', 'Menunggu') dan akan mengubah
-     *                   status kandidat.
+     *   - selain itu -> dianggap status tujuan ('Menunggu', 'Progress',
+     *                   'Diterima', atau 'Ditolak') dan akan mengubah status
+     *                   kandidat.
      */
     public function processInterview($id, $action)
     {
@@ -373,7 +365,49 @@ class Admin extends BaseController
             return $this->response->setJSON(['success' => true, 'message' => 'Divisi dan Periode Magang berhasil diperbarui.']);
         }
 
+        if (preg_match('/^schedule_interview_([12])$/', $action, $matches)) {
+            if (!$this->request->is('post')) {
+                return $this->jsonOrRedirect(false, 'Jadwal interview harus dikirim melalui POST.', 405);
+            }
+
+            $step = (int) $matches[1];
+            $expectedStatus = $step === 1 ? 'Menunggu' : 'Progress';
+            if ($pendaftaran['status'] !== $expectedStatus) {
+                return $this->jsonOrRedirect(false, "Interview tahap {$step} tidak dapat dijadwalkan pada status kandidat saat ini.", 422);
+            }
+
+            $jadwal = trim((string) $this->request->getPost('jadwal'));
+            $parsed = $this->parseJadwal($jadwal);
+            if ($parsed === null) {
+                return $this->jsonOrRedirect(false, 'Jadwal interview wajib diisi dengan format yang valid.', 422);
+            }
+
+            $data = [
+                'jadwal_interview_' . $step => $parsed,
+                'link_zoom_' . $step        => trim((string) $this->request->getPost('link_zoom')),
+                'catatan_interview_' . $step=> trim((string) $this->request->getPost('catatan')),
+            ];
+
+            if (!$this->pendaftaranModel->update($id, $data)) {
+                return $this->jsonOrRedirect(false, "Gagal menyimpan jadwal interview tahap {$step}.", 500);
+            }
+
+            $updated = $this->pendaftaranModel->find($id);
+            return $this->response->setJSON(array_merge([
+                'success'                     => true,
+                'message'                     => "Jadwal Interview Tahap {$step} berhasil disimpan. Status kandidat tidak berubah.",
+                'id'                          => (int) $id,
+                'status'                      => $updated['status'],
+                'badge_html'                  => $this->renderStatusBadge($updated),
+                'should_prompt_notifications' => false,
+            ], $this->itemPayload($updated)));
+        }
+
         // Selain itu: $action adalah target status baru
+        if (!$this->request->is('post')) {
+            return $this->jsonOrRedirect(false, 'Perubahan status harus dikirim melalui POST.', 405);
+        }
+
         return $this->handleSetStatus($id, $pendaftaran, $action);
     }
 
@@ -381,6 +415,29 @@ class Admin extends BaseController
     {
         if (!in_array($targetStatus, PendaftaranModel::statusList(), true)) {
             return $this->jsonOrRedirect(false, 'Status tujuan tidak dikenali: ' . $targetStatus, 422);
+        }
+
+        $allowedTransitions = [
+            'Menunggu' => ['Progress', 'Ditolak'],
+            'Progress' => ['Diterima', 'Ditolak'],
+        ];
+
+        if (isset($allowedTransitions[$pendaftaran['status']])
+            && !in_array($targetStatus, $allowedTransitions[$pendaftaran['status']], true)
+            && $targetStatus !== $pendaftaran['status']) {
+            return $this->jsonOrRedirect(false, 'Transisi status tidak valid. Muat ulang data kandidat lalu coba lagi.', 422);
+        }
+
+        if ($pendaftaran['status'] === 'Menunggu'
+            && $targetStatus === 'Progress'
+            && empty($pendaftaran['jadwal_interview_1'])) {
+            return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 1 harus disimpan sebelum kandidat dapat dinyatakan lolos.', 422);
+        }
+
+        if ($pendaftaran['status'] === 'Progress'
+            && $targetStatus === 'Diterima'
+            && empty($pendaftaran['jadwal_interview_2'])) {
+            return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 2 harus disimpan sebelum kandidat dapat dinyatakan diterima.', 422);
         }
 
         $catatan  = trim((string) ($this->request->getGet('catatan') ?? $this->request->getPost('catatan') ?? ''));
@@ -392,26 +449,7 @@ class Admin extends BaseController
             $data['status_changed_at'] = date('Y-m-d H:i:s');
         }
         
-        $step = $this->getInterviewStep($targetStatus);
-
-        if ($step > 0) {
-            // Lolos_Interview_N atau Tidak_Lolos_Interview_N
-            if ($catatan !== '') {
-                $data['catatan_interview_' . $step] = $catatan;
-            }
-            if (str_starts_with($targetStatus, 'Lolos_Interview_')) {
-                if ($jadwal !== '') {
-                    $parsed = $this->parseJadwal($jadwal);
-                    if ($parsed === null) {
-                        return $this->jsonOrRedirect(false, 'Format jadwal tidak valid. Gunakan format YYYY-MM-DD HH:MM.', 422);
-                    }
-                    $data['jadwal_interview_' . $step] = $parsed;
-                }
-                if ($linkZoom !== '') {
-                    $data['link_zoom_' . $step] = $linkZoom;
-                }
-            }
-        } elseif ($catatan !== '') {
+        if ($catatan !== '') {
             $data['catatan_admin'] = $catatan;
         }
 
@@ -427,7 +465,7 @@ class Admin extends BaseController
             'id'           => (int) $id,
             'has_email'    => !empty($updated['email']),
             'status'       => $updated['status'],
-            'status_label' => $this->formatStatusLabel($updated['status']),
+            'status_label' => $this->formatStatusLabel($this->displayStatus($updated)),
             'badge_html'   => $this->renderStatusBadge($updated),
             'aksi_html'    => $this->renderAksiCell($updated),
         ], $this->itemPayload($updated));
@@ -524,7 +562,7 @@ class Admin extends BaseController
         // ---- TAHAP 1: masuk arsip ----
         $rejected = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->whereIn('status', ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'])
+            ->where('status', 'Ditolak')
             ->where('status_changed_at IS NOT NULL')
             ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
             ->findAll();
@@ -620,37 +658,36 @@ class Admin extends BaseController
     {
         return match (true) {
             in_array($status, ['Diterima'], true) => 'bg-success',
-            in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true) => 'bg-danger',
-            $status === 'Progress' => 'bg-info',
-            $status === 'Lolos_Interview_1' => 'bg-primary',   // biru
-            $status === 'Lolos_Interview_2' => 'bg-info',      // cyan
-            $status === 'Lolos_Interview_3' => 'bg-purple',    // ungu (custom, lihat CSS di dashboard.php)
-            default => 'bg-warning',                            // Menunggu
+            $status === 'Ditolak' => 'bg-danger',
+            in_array($status, ['Progress', 'Interview Tahap 1', 'Interview Tahap 2'], true) => 'bg-info',
+            default => 'bg-warning',
         };
+    }
+
+    private function displayStatus(array $item): string
+    {
+        if ($item['status'] === 'Menunggu' && !empty($item['jadwal_interview_1'])) {
+            return 'Interview Tahap 1';
+        }
+        if ($item['status'] === 'Progress' && !empty($item['jadwal_interview_2'])) {
+            return 'Interview Tahap 2';
+        }
+        return $item['status'];
     }
 
     private function formatStatusLabel(string $status): string
     {
-        if (preg_match('/^Lolos_Interview_(\d)$/', $status, $m)) {
-            return 'INTERVIEW TAHAP ' . $m[1];
-        }
-        if (preg_match('/^Tidak_Lolos_Interview_(\d)$/', $status, $m)) {
-            return 'TIDAK LOLOS TAHAP ' . $m[1];
-        }
-        if ($status === 'Diterima') {
-            return 'DITERIMA';
-        }
-        return str_replace('_', ' ', $status);
+        return strtoupper($status);
     }
 
     private function renderStatusBadge(array $item): string
     {
-        $status = $item['status'];
+        $status = $this->displayStatus($item);
         $class = $this->statusBadgeClass($status);
 
         $html = '<span class="badge ' . $class . '">' . esc($this->formatStatusLabel($status)) . '</span>';
 
-        $step = $this->getInterviewStep($status);
+        $step = $status === 'Interview Tahap 1' ? 1 : ($status === 'Interview Tahap 2' ? 2 : 0);
         if ($step > 0 && !empty($item['jadwal_interview_' . $step])) {
             $html .= '<div class="small text-muted mt-1"><i class="bi bi-calendar-event"></i> '
                 . date('d/m/Y H:i', strtotime($item['jadwal_interview_' . $step])) . ' WIB</div>';
