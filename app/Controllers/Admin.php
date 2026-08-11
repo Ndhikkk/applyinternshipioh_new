@@ -879,7 +879,7 @@ class Admin extends BaseController
                 . "Salam,\nTim Rekrutmen Magang IOH Semarang";
         } elseif (in_array($status, ['Diterima'], true)) {
             $message = "Halo *{$nama}*,\n\n"
-                . "Selamat! Anda dinyatakan *LOLOS* dan diterima pada program magang IOH Semarang. 🎉\n"
+                . "Selamat! Anda dinyatakan *LOLOS* dan diterima pada program magang IOH Semarang.\n"
                 . "Tim kami akan segera menghubungi Anda untuk info langkah selanjutnya.\n\n"
                 . "Salam,\nTim Rekrutmen Magang IOH Semarang";
         } elseif (in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
