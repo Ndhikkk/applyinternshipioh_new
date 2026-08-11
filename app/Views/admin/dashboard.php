@@ -1,6 +1,6 @@
 <?= $this->extend('layout/main') ?>
 
-<?= $this->section('title') ?>Dashboard Admin - IOH Semarang<?= $this->endSection() ?>
+<?= $this->section('title') ?>Dashboard Admin - IOH<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <div class="container-fluid py-4">
@@ -10,7 +10,7 @@
             <h1 class="h3 mb-1 text-gray-800 fw-bold text-nowrap">
                 <i class="bi bi-speedometer2 text-indosat"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
             </h1>
-            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang menunggu dihapus permanen (7 hari sejak diarsipkan)' : 'Kelola pendaftaran magang IOH Semarang' ?></p>
+            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang menunggu dihapus permanen (7 hari sejak diarsipkan)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
         </div>
         
         <div class="d-flex flex-wrap flex-lg-nowrap gap-2 align-items-center w-100 w-lg-auto justify-content-start justify-content-lg-end">
@@ -18,11 +18,11 @@
             <div class="d-flex align-items-center w-100 w-lg-auto mb-2 mb-lg-0 me-lg-2 justify-content-between justify-content-lg-start">
                 <span class="fw-bold me-2 text-nowrap">Status Pendaftaran:</span>
                 <?php if ($registration_open == '1'): ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran magang?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran program?">
                         <i class="bi bi-unlock-fill me-1"></i> DIBUKA
                     </a>
                 <?php else: ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Buka pendaftaran magang?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Buka pendaftaran program?">
                         <i class="bi bi-lock-fill me-1"></i> DITUTUP
                     </a>
                 <?php endif; ?>
@@ -38,7 +38,7 @@
                 </a>
                 
                 <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0">
-                    <i class="bi bi-file-earmark-pdf"></i> genrate CV
+                    <i class="bi bi-file-earmark-pdf"></i> Generate CV
                 </a>
 
                 <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0" title="Logout">
@@ -491,7 +491,7 @@
                         <!-- Baris 2: Periode & Catatan -->
                         <div class="row g-2 mb-3 align-items-end">
                             <div class="col-md-6">
-                                <label class="form-label small mb-1">Periode Magang</label>
+                                <label class="form-label small mb-1">Periode Program</label>
                                 <div class="d-flex gap-1">
                                     <input type="date" id="editPeriodeMulai" class="form-control form-control-sm" title="Mulai">
                                     <span class="align-self-center">-</span>

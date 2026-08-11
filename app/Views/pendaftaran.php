@@ -75,7 +75,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nomor Darurat *</label>
                                 <input type="text" inputmode="numeric" name="nomor_darurat" class="form-control"
-                                    value="<?= old('nomor_darurat') ?>" placeholder="Contoh: 08123456789 (Orang Tua)" minlength="11" maxlength="15"
+                                    value="<?= old('nomor_darurat') ?>" placeholder="Contoh: 081234567891" minlength="11" maxlength="15"
                                     oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('darurat_alert').style.display = (this.value.length > 0 && this.value.length < 11) ? 'block' : 'none';" required>
                                 <small id="darurat_alert" class="text-danger mt-1" style="display:none; font-size: 0.85em;"><i class="bi bi-exclamation-circle"></i> Nomor belum valid.</small>
                                 <div class="form-text">Nomor keluarga/kerabat yang bisa dihubungi. Pastikan nomor ini berbeda dari nomor telepon utama Anda.</div>
@@ -106,15 +106,15 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Jenis Magang *</label>
+                                <label class="form-label">Jenis Program *</label>
                                 <select name="jenis_magang" class="form-select" required>
-                                    <option value="">Pilih Jenis Magang</option>
-                                    <option value="Wajib" <?= old('jenis_magang') == 'Wajib' ? 'selected' : '' ?>>Magang Wajib</option>
-                                    <option value="Mandiri" <?= old('jenis_magang') == 'Mandiri' ? 'selected' : '' ?>>Magang Mandiri</option>
+                                    <option value="">Pilih Jenis Program</option>
+                                    <option value="Wajib" <?= old('jenis_magang') == 'Wajib' ? 'selected' : '' ?>>Program Wajib</option>
+                                    <option value="Mandiri" <?= old('jenis_magang') == 'Mandiri' ? 'selected' : '' ?>>Program Mandiri</option>
                                 </select>
                                 <div class="form-text">
-                                    <strong>Magang Wajib:</strong> Magang yang merupakan bagian dari kurikulum kampus<br>
-                                    <strong>Magang Mandiri:</strong> Magang yang dilakukan secara sukarela untuk pengembangan skill
+                                    <strong>Program Wajib:</strong> Program yang merupakan bagian dari kurikulum kampus<br>
+                                    <strong>Program Mandiri:</strong> Program yang dilakukan secara sukarela untuk pengembangan skill
                                 </div>
                             </div>
 
@@ -141,13 +141,13 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Periode Magang - Mulai *</label>
+                                <label class="form-label">Periode Program - Mulai *</label>
                                 <input type="date" name="periode_mulai" class="form-control"
                                     value="<?= old('periode_mulai') ?>" min="<?= date('Y-m-d') ?>" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Periode Magang - Selesai *</label>
+                                <label class="form-label">Periode Program - Selesai *</label>
                                 <input type="date" name="periode_selesai" class="form-control"
                                     value="<?= old('periode_selesai') ?>" min="<?= date('Y-m-d') ?>" required>
                             </div>
@@ -168,13 +168,13 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Surat Pengantar</label>
                                 <input type="file" name="surat_pengantar" class="form-control" accept=".pdf">
-                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk magang mandiri</em></div>
+                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk kegiatan mandiri</em></div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Proposal Magang</label>
+                                <label class="form-label">Proposal Program</label>
                                 <input type="file" name="proposal_magang" class="form-control" accept=".pdf">
-                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk magang mandiri</em></div>
+                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk program mandiri</em></div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -188,8 +188,8 @@
                             <h6><i class="bi bi-info-circle"></i> Informasi Upload Berkas:</h6>
                             <ul class="mb-0">
                                 <li><strong>CV:</strong> Wajib diupload oleh semua pendaftar</li>
-                                <li><strong>Surat Pengantar & Proposal:</strong> Wajib untuk magang wajib, opsional untuk magang mandiri</li>
-                                <li><strong>KTM:</strong> Opsional untuk semua jenis magang</li>
+                                <li><strong>Surat Pengantar & Proposal:</strong> Wajib untuk program wajib, opsional untuk program mandiri</li>
+                                <li><strong>KTM:</strong> Opsional untuk semua jenis program</li>
                                 <li>File CV, Surat Pengantar, dan Proposal harus dalam format PDF</li>
                                 <li>File KTM dapat berupa PDF, JPG, atau PNG</li>
                                 <li>Total maksimal semua file: 10MB</li>
