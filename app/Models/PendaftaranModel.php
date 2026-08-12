@@ -27,7 +27,7 @@ class PendaftaranModel extends Model
         'nomor_whatsapp',
         'asal_kampus',
         'program_studi',
-        'kota_pilihan',
+        'regional_interview',
         'divisi_pilihan',
         'semester',
         'jenis_magang',

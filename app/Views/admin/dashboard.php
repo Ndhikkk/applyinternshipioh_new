@@ -696,7 +696,7 @@
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
-        document.getElementById('editKota').value = item.kota_pilihan || '';
+        document.getElementById('editKota').value = item.regional_interview || '';
         document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
         document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
 
@@ -814,7 +814,7 @@
         const targetStatus = document.getElementById('manualStatus').value;
         submitStatusChange(targetStatus, { 
             catatan: document.getElementById('manualCatatan').value,
-            kota_pilihan: document.getElementById('editKota').value,
+            regional_interview: document.getElementById('editKota').value,
             divisi_pilihan: document.getElementById('editDivisi').value,
             periode_mulai: document.getElementById('editPeriodeMulai').value,
             periode_selesai: document.getElementById('editPeriodeSelesai').value

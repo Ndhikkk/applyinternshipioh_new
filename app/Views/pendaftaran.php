@@ -120,11 +120,11 @@
 
                             <div class="col-md-6 mb-3">
                                 <label class="small fw-bold text-secondary">Kota Pilihan *</label>
-                                <select name="kota_pilihan" class="form-select form-select-sm" required>
+                                <select name="regional_interview" class="form-select form-select-sm" required>
                                     <option value="">Pilih Kota</option>
-                                    <option value="Semarang" <?= old('kota_pilihan') === 'Semarang' ? 'selected' : '' ?>>Semarang</option>
-                                    <option value="Surabaya" <?= old('kota_pilihan') === 'Surabaya' ? 'selected' : '' ?>>Surabaya</option>
-                                    <option value="Bali" <?= old('kota_pilihan') === 'Bali' ? 'selected' : '' ?>>Bali</option>
+                                    <option value="Semarang" <?= old('regional_interview') === 'Semarang' ? 'selected' : '' ?>>Semarang</option>
+                                    <option value="Surabaya" <?= old('regional_interview') === 'Surabaya' ? 'selected' : '' ?>>Surabaya</option>
+                                    <option value="Bali" <?= old('regional_interview') === 'Bali' ? 'selected' : '' ?>>Bali</option>
                                 </select>
                                 <div class="form-text">Pilih kota penempatan magang yang Anda inginkan.</div>
                             </div>

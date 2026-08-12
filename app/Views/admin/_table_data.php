@@ -63,7 +63,7 @@
                         </td>
                         <td class="text-nowrap" data-label="Kota Magang">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-                            <?= esc($data['kota_pilihan'] ?? '-') ?>
+                            <?= esc($data['regional_interview'] ?? '-') ?>
                         </td>
                         <td class="text-nowrap" data-label="Divisi / Jenis">
                             <div class="mb-1"><?= esc($data['divisi_pilihan'] ?? '-') ?></div>
