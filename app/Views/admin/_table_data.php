@@ -4,6 +4,7 @@
             <tr>
                 <th class="fw-bold" style="min-width:220px;">Kandidat</th>
                 <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
+                <th class="fw-bold text-nowrap">Kota Magang</th>
                 <th class="fw-bold text-nowrap">Divisi / Jenis</th>
                 <th class="fw-bold text-center" style="min-width:140px;">Status</th>
                 <th class="fw-bold text-nowrap">Periode Magang</th>
@@ -59,6 +60,10 @@
                             <div class="fw-semibold mb-1"><?= esc($data['asal_kampus']) ?></div>
                             <div class="small text-muted mb-1"><?= esc($data['program_studi']) ?></div>
                             <span class="badge bg-light text-dark border">Smt <?= esc($data['semester']) ?></span>
+                        </td>
+                        <td class="text-nowrap" data-label="Kota Magang">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                            <?= esc($data['kota_pilihan'] ?? '-') ?>
                         </td>
                         <td class="text-nowrap" data-label="Divisi / Jenis">
                             <div class="mb-1"><?= esc($data['divisi_pilihan'] ?? '-') ?></div>
@@ -169,7 +174,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="8" class="text-center py-5">
+                    <td colspan="9" class="text-center py-5">
                         <div class="text-muted">
                             <i class="bi bi-inbox display-4 d-block mb-3"></i>
                             <?php if ($is_arsip): ?>

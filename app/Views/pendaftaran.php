@@ -118,6 +118,17 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-secondary">Kota Pilihan *</label>
+                                <select name="kota_pilihan" class="form-select form-select-sm" required>
+                                    <option value="">Pilih Kota</option>
+                                    <option value="Semarang" <?= old('kota_pilihan') === 'Semarang' ? 'selected' : '' ?>>Semarang</option>
+                                    <option value="Surabaya" <?= old('kota_pilihan') === 'Surabaya' ? 'selected' : '' ?>>Surabaya</option>
+                                    <option value="Bali" <?= old('kota_pilihan') === 'Bali' ? 'selected' : '' ?>>Bali</option>
+                                </select>
+                                <div class="form-text">Pilih kota penempatan magang yang Anda inginkan.</div>
+                            </div>
+
                            <div class="col-md-6 mb-3">
                                 <label class="small fw-bold text-secondary">Divisi Pilihan *</label>
                                 <select name="divisi_pilihan" id="form_divisi" class="form-control form-control-sm" style="border-radius: 6px;" required>
@@ -143,13 +154,13 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Periode Program - Mulai *</label>
                                 <input type="date" name="periode_mulai" class="form-control"
-                                    value="<?= old('periode_mulai') ?>" min="<?= date('Y-m-d') ?>" required>
+                                    value="<?= old('periode_mulai') ?>" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Periode Program - Selesai *</label>
                                 <input type="date" name="periode_selesai" class="form-control"
-                                    value="<?= old('periode_selesai') ?>" min="<?= date('Y-m-d') ?>" required>
+                                    value="<?= old('periode_selesai') ?>" required>
                             </div>
                         </div>
 
@@ -174,7 +185,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Proposal Program</label>
                                 <input type="file" name="proposal_magang" class="form-control" accept=".pdf">
-                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional untuk program mandiri</em></div>
+                                <div class="form-text">Format: PDF, Maksimal: 2MB<br><em>Opsional</em></div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -188,7 +199,8 @@
                             <h6><i class="bi bi-info-circle"></i> Informasi Upload Berkas:</h6>
                             <ul class="mb-0">
                                 <li><strong>CV:</strong> Wajib diupload oleh semua pendaftar</li>
-                                <li><strong>Surat Pengantar & Proposal:</strong> Wajib untuk program wajib, opsional untuk program mandiri</li>
+                                <li><strong>Surat Pengantar :</strong> Wajib untuk program wajib, opsional untuk program mandiri</li>
+                                <li><strong>Proposal:</strong> Opsional untuk semua jenis program</li>
                                 <li><strong>KTM:</strong> Opsional untuk semua jenis program</li>
                                 <li>File CV, Surat Pengantar, dan Proposal harus dalam format PDF</li>
                                 <li>File KTM dapat berupa PDF, JPG, atau PNG</li>

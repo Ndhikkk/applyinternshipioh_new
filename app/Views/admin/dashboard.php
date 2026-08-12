@@ -459,9 +459,9 @@
                     <div id="amManualActions">
                         <p class="fw-bold mb-2 mt-2"><i class="bi bi-pencil-square"></i> Ubah Data Manual</p>
                         
-                        <!-- Baris 1: Status & Divisi -->
+                        <!-- Baris 1: Status, Kota & Divisi -->
                         <div class="row g-2 mb-2 align-items-end">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label small mb-1">Status</label>
                                 <select id="manualStatus" class="form-select form-select-sm">
                                     <option value="Menunggu">Menunggu</option>
@@ -470,7 +470,16 @@
                                     <option value="Ditolak">Ditolak</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1">Kota Pilihan</label>
+                                <select id="editKota" class="form-select form-select-sm">
+                                    <option value="">Pilih Kota</option>
+                                    <option value="Semarang">Semarang</option>
+                                    <option value="Surabaya">Surabaya</option>
+                                    <option value="Bali">Bali</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label small mb-1">Divisi Pilihan</label>
                                 <select id="editDivisi" class="form-select form-select-sm">
                                     <option value="">Pilih Divisi</option>
@@ -687,6 +696,7 @@
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
+        document.getElementById('editKota').value = item.kota_pilihan || '';
         document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
         document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
 
@@ -804,6 +814,7 @@
         const targetStatus = document.getElementById('manualStatus').value;
         submitStatusChange(targetStatus, { 
             catatan: document.getElementById('manualCatatan').value,
+            kota_pilihan: document.getElementById('editKota').value,
             divisi_pilihan: document.getElementById('editDivisi').value,
             periode_mulai: document.getElementById('editPeriodeMulai').value,
             periode_selesai: document.getElementById('editPeriodeSelesai').value

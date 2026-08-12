@@ -441,6 +441,10 @@ class Admin extends BaseController
         }
 
         $catatan  = trim((string) ($this->request->getGet('catatan') ?? $this->request->getPost('catatan') ?? ''));
+        $kota     = trim((string) ($this->request->getPost('kota_pilihan') ?? ''));
+        $divisi   = trim((string) ($this->request->getPost('divisi_pilihan') ?? ''));
+        $mulai    = trim((string) ($this->request->getPost('periode_mulai') ?? ''));
+        $selesai  = trim((string) ($this->request->getPost('periode_selesai') ?? ''));
         $jadwal   = trim((string) ($this->request->getGet('jadwal') ?? $this->request->getPost('jadwal') ?? ''));
         $linkZoom = trim((string) ($this->request->getGet('link_zoom') ?? $this->request->getPost('link_zoom') ?? ''));
 
@@ -451,6 +455,21 @@ class Admin extends BaseController
         
         if ($catatan !== '') {
             $data['catatan_admin'] = $catatan;
+        }
+        if ($kota !== '') {
+            if (!in_array($kota, ['Semarang', 'Surabaya', 'Bali'], true)) {
+                return $this->jsonOrRedirect(false, 'Kota pilihan tidak valid.', 422);
+            }
+            $data['kota_pilihan'] = $kota;
+        }
+        if ($divisi !== '') {
+            $data['divisi_pilihan'] = $divisi;
+        }
+        if ($mulai !== '') {
+            $data['periode_mulai'] = $mulai;
+        }
+        if ($selesai !== '') {
+            $data['periode_selesai'] = $selesai;
         }
 
         if (!$this->pendaftaranModel->update($id, $data)) {
@@ -646,7 +665,7 @@ class Admin extends BaseController
             'catatan_interview_1', 'catatan_interview_2', 'catatan_interview_3',
             'catatan_admin', 'email_terkirim',
             'is_archived', 'archived_at', 'archived_reason',
-            'divisi_pilihan', 'periode_mulai', 'periode_selesai'
+            'kota_pilihan', 'divisi_pilihan', 'periode_mulai', 'periode_selesai'
         ];
         foreach ($fields as $f) {
             $out['item'][$f] = $item[$f] ?? null;
