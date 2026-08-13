@@ -17,7 +17,7 @@
             
             <div class="d-flex align-items-center w-100 w-lg-auto mb-2 mb-lg-0 me-lg-2 justify-content-between justify-content-lg-start">
                 <span class="fw-bold me-2 text-nowrap">Status Pendaftaran:</span>
-                <?php if ($registration_open == '1'): ?>
+                <?php if (($registration_open ?? '1') == '1'): ?>
                     <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran program?">
                         <i class="bi bi-unlock-fill me-1"></i> DIBUKA
                     </a>
@@ -497,21 +497,22 @@
                             </div>
                         </div>
 
-                        <!-- Baris 2: Kota Magang bertahap agar daftar kota lebih ringkas -->
+                        <!-- Baris 2: Kota Pilihan bertahap agar daftar kota lebih ringkas -->
                         <div class="row g-2 mb-2 align-items-end">
                             <div class="col-md-4">
-                                <label class="form-label small mb-1">Provinsi Kota Magang</label>
-                                <select id="editProvinsiMagang" class="form-select form-select-sm" onchange="updateKotaMagangOptions()">
+                                <label class="form-label small mb-1">Provinsi Kota Pilihan</label>
+                                <select id="editProvinsiPilihan" class="form-select form-select-sm" onchange="updateKotaPilihanOptions()">
                                     <option value="">Pilih Provinsi</option>
-                                    <?php foreach (array_keys($kota_magang_options) as $provinsi): ?>
+                                    <?php $options = $kota_pilihan_options ?? $kota_magang_options; ?>
+                                    <?php foreach (array_keys($options) as $provinsi): ?>
                                         <option value="<?= esc($provinsi) ?>"><?= esc($provinsi) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-8">
-                                <label class="form-label small mb-1">Kota Magang</label>
-                                <input type="search" id="editKotaMagang" list="editKotaMagangList" class="form-control form-control-sm" placeholder="Pilih provinsi, lalu cari kota/kabupaten" autocomplete="off" disabled>
-                                <datalist id="editKotaMagangList"></datalist>
+                                <label class="form-label small mb-1">Kota Pilihan</label>
+                                <input type="search" id="editKotaPilihan" list="editKotaPilihanList" class="form-control form-control-sm" placeholder="Pilih provinsi, lalu cari kota/kabupaten" autocomplete="off" disabled>
+                                <datalist id="editKotaPilihanList"></datalist>
                             </div>
                         </div>
 
@@ -715,8 +716,10 @@
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
         document.getElementById('editKota').value = item.regional_interview || '';
-        document.getElementById('editProvinsiMagang').value = findProvinsiKotaMagang(item.kota_magang || '');
-        updateKotaMagangOptions(item.kota_magang || '');
+        const currentKotaPilihan = item.kota_pilihan || item.kota_magang || '';
+        const provEl = document.getElementById('editProvinsiPilihan') || document.getElementById('editProvinsiMagang');
+        if (provEl) provEl.value = findProvinsiKotaPilihan(currentKotaPilihan);
+        updateKotaPilihanOptions(currentKotaPilihan);
         document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
         document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
 
@@ -761,13 +764,14 @@
 
     let activeActionButton = null;
     let submissionInProgress = false;
-    const kotaMagangByProvinsi = <?= json_encode($kota_magang_options, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const kotaPilihanByProvinsi = <?= json_encode($kota_pilihan_options ?? $kota_magang_options, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
-    function updateKotaMagangOptions(selectedKota = '') {
-        const provinsiInput = document.getElementById('editProvinsiMagang');
-        const kotaInput = document.getElementById('editKotaMagang');
-        const kotaList = document.getElementById('editKotaMagangList');
-        const cities = kotaMagangByProvinsi[provinsiInput.value] || [];
+    function updateKotaPilihanOptions(selectedKota = '') {
+        const provinsiInput = document.getElementById('editProvinsiPilihan') || document.getElementById('editProvinsiMagang');
+        const kotaInput = document.getElementById('editKotaPilihan') || document.getElementById('editKotaMagang');
+        const kotaList = document.getElementById('editKotaPilihanList') || document.getElementById('editKotaMagangList');
+        if (!provinsiInput || !kotaInput || !kotaList) return;
+        const cities = kotaPilihanByProvinsi[provinsiInput.value] || [];
 
         kotaList.innerHTML = cities.map(kota => `<option value="${kota}"></option>`).join('');
         kotaInput.disabled = cities.length === 0;
@@ -775,8 +779,16 @@
         kotaInput.value = selectedKota;
     }
 
+    function updateKotaMagangOptions(selectedKota = '') {
+        updateKotaPilihanOptions(selectedKota);
+    }
+
+    function findProvinsiKotaPilihan(kota) {
+        return Object.keys(kotaPilihanByProvinsi).find(provinsi => kotaPilihanByProvinsi[provinsi].includes(kota)) || '';
+    }
+
     function findProvinsiKotaMagang(kota) {
-        return Object.keys(kotaMagangByProvinsi).find(provinsi => kotaMagangByProvinsi[provinsi].includes(kota)) || '';
+        return findProvinsiKotaPilihan(kota);
     }
 
     function showSubForm(targetStatus, titleText, requireSchedule, sourceButton) {
@@ -849,10 +861,11 @@
         const saveButton = document.getElementById('manualSaveButton');
         if (!setButtonLoading(saveButton, 'Menyimpan...')) return;
         const targetStatus = document.getElementById('manualStatus').value;
+        const selectedKotaPilihan = (document.getElementById('editKotaPilihan') || document.getElementById('editKotaMagang'))?.value || '';
         submitStatusChange(targetStatus, { 
             catatan: document.getElementById('manualCatatan').value,
             regional_interview: document.getElementById('editKota').value,
-            kota_magang: document.getElementById('editKotaMagang').value,
+            kota_pilihan: selectedKotaPilihan,
             divisi_pilihan: document.getElementById('editDivisi').value,
             periode_mulai: document.getElementById('editPeriodeMulai').value,
             periode_selesai: document.getElementById('editPeriodeSelesai').value

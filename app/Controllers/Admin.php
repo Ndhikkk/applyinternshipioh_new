@@ -120,7 +120,8 @@ class Admin extends BaseController
         $data['keyword'] = $keyword;
         $data['is_arsip'] = $isArsip;
         $data['registration_open'] = $this->settingsModel->getValue('registration_open') ?? '1';
-        $data['kota_magang_options'] = (new \Config\InternshipLocations())->kotaMagang;
+        $data['kota_pilihan_options'] = (new \Config\InternshipLocations())->kotaPilihan;
+        $data['kota_magang_options']  = $data['kota_pilihan_options'];
 
         if ($this->request->isAJAX()) {
             return view('admin/_table_data', $data);
@@ -443,7 +444,7 @@ class Admin extends BaseController
 
         $catatan  = trim((string) ($this->request->getGet('catatan') ?? $this->request->getPost('catatan') ?? ''));
         $kota     = trim((string) ($this->request->getPost('regional_interview') ?? ''));
-        $kotaMagang = trim((string) ($this->request->getPost('kota_magang') ?? ''));
+        $kotaPilihan = trim((string) ($this->request->getPost('kota_pilihan') ?? $this->request->getPost('kota_magang') ?? ''));
         $divisi   = trim((string) ($this->request->getPost('divisi_pilihan') ?? ''));
         $mulai    = trim((string) ($this->request->getPost('periode_mulai') ?? ''));
         $selesai  = trim((string) ($this->request->getPost('periode_selesai') ?? ''));
@@ -460,15 +461,15 @@ class Admin extends BaseController
         }
         if ($kota !== '') {
             if (!in_array($kota, ['Semarang', 'Surabaya', 'Bali'], true)) {
-                return $this->jsonOrRedirect(false, 'Kota pilihan tidak valid.', 422);
+                return $this->jsonOrRedirect(false, 'Regional interview tidak valid.', 422);
             }
             $data['regional_interview'] = $kota;
         }
-        if ($kotaMagang !== '') {
-            if (!in_array($kotaMagang, (new \Config\InternshipLocations())->allKotaMagang(), true)) {
-                return $this->jsonOrRedirect(false, 'Kota magang tidak valid.', 422);
+        if ($kotaPilihan !== '') {
+            if (!in_array($kotaPilihan, (new \Config\InternshipLocations())->allKotaPilihan(), true)) {
+                return $this->jsonOrRedirect(false, 'Kota pilihan tidak valid.', 422);
             }
-            $data['kota_magang'] = $kotaMagang;
+            $data['kota_pilihan'] = $kotaPilihan;
         }
         if ($divisi !== '') {
             $data['divisi_pilihan'] = $divisi;
@@ -673,7 +674,7 @@ class Admin extends BaseController
             'catatan_interview_1', 'catatan_interview_2', 'catatan_interview_3',
             'catatan_admin', 'email_terkirim',
             'is_archived', 'archived_at', 'archived_reason',
-            'regional_interview', 'kota_magang', 'divisi_pilihan', 'periode_mulai', 'periode_selesai'
+            'regional_interview', 'kota_pilihan', 'divisi_pilihan', 'periode_mulai', 'periode_selesai'
         ];
         foreach ($fields as $f) {
             $out['item'][$f] = $item[$f] ?? null;

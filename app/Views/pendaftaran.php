@@ -130,18 +130,19 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="small fw-bold text-secondary">Kota Magang *</label>
-                                <select name="kota_magang" class="form-select form-select-sm" required>
-                                    <option value="">Pilih Kota/Kabupaten Magang</option>
-                                    <?php foreach ($kota_magang_options as $provinsi => $kotaList): ?>
+                                <label class="small fw-bold text-secondary">Kota Pilihan *</label>
+                                <select name="kota_pilihan" class="form-select form-select-sm" required>
+                                    <option value="">Pilih Kota/Kabupaten Pilihan</option>
+                                    <?php $options = $kota_pilihan_options ?? $kota_magang_options; ?>
+                                    <?php foreach ($options as $provinsi => $kotaList): ?>
                                         <optgroup label="<?= esc($provinsi) ?>">
                                             <?php foreach ($kotaList as $kota): ?>
-                                                <option value="<?= esc($kota) ?>" <?= old('kota_magang') === $kota ? 'selected' : '' ?>><?= esc($kota) ?></option>
+                                                <option value="<?= esc($kota) ?>" <?= (old('kota_pilihan') ?? old('kota_magang')) === $kota ? 'selected' : '' ?>><?= esc($kota) ?></option>
                                             <?php endforeach; ?>
                                         </optgroup>
                                     <?php endforeach; ?>
                                 </select>
-                                <div class="form-text">Pilih kota atau kabupaten tujuan magang.</div>
+                                <div class="form-text">Pilih kota atau kabupaten pilihan pelaksanaan program.</div>
                             </div>
 
                            <div class="col-md-6 mb-3">

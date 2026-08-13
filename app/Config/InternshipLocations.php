@@ -7,7 +7,7 @@ use CodeIgniter\Config\BaseConfig;
 class InternshipLocations extends BaseConfig
 {
     /** @var array<string, list<string>> */
-    public array $kotaMagang = [
+    public array $kotaPilihan = [
         'Jawa Tengah' => [
             'Kabupaten Banjarnegara', 'Kabupaten Banyumas', 'Kabupaten Batang', 'Kabupaten Blora', 'Kabupaten Boyolali', 'Kabupaten Brebes', 'Kabupaten Cilacap', 'Kabupaten Demak', 'Kabupaten Grobogan', 'Kabupaten Jepara', 'Kabupaten Karanganyar', 'Kabupaten Kebumen', 'Kabupaten Kendal', 'Kabupaten Klaten', 'Kabupaten Kudus', 'Kabupaten Magelang', 'Kabupaten Pati', 'Kabupaten Pekalongan', 'Kabupaten Pemalang', 'Kabupaten Purbalingga', 'Kabupaten Purworejo', 'Kabupaten Rembang', 'Kabupaten Semarang', 'Kabupaten Sragen', 'Kabupaten Sukoharjo', 'Kabupaten Tegal', 'Kabupaten Temanggung', 'Kabupaten Wonogiri', 'Kabupaten Wonosobo', 'Kota Magelang', 'Kota Pekalongan', 'Kota Salatiga', 'Kota Semarang', 'Kota Surakarta', 'Kota Tegal',
         ],
@@ -19,9 +19,24 @@ class InternshipLocations extends BaseConfig
         ],
     ];
 
+    /** @var array<string, list<string>> */
+    public array $kotaMagang = [];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->kotaMagang = $this->kotaPilihan;
+    }
+
+    /** @return list<string> */
+    public function allKotaPilihan(): array
+    {
+        return array_merge(...array_values($this->kotaPilihan));
+    }
+
     /** @return list<string> */
     public function allKotaMagang(): array
     {
-        return array_merge(...array_values($this->kotaMagang));
+        return $this->allKotaPilihan();
     }
 }
