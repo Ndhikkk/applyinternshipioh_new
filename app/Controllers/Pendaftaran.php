@@ -369,7 +369,7 @@ class Pendaftaran extends Controller
         $config = new \Config\Email();
         $config->protocol   = 'smtp';
         $config->SMTPHost   = 'smtp.gmail.com';
-        $config->SMTPUser   = 'nnusa0001@gmail.com';
+        $config->SMTPUser   = 'farezaairo@gmail.com';
         $config->SMTPPass   = 'xerd xhmk bzpp rmbs'; 
         $config->SMTPPort   = 587;
         $config->SMTPCrypto = 'tls';
@@ -383,8 +383,7 @@ class Pendaftaran extends Controller
         $emailService->setFrom('farezaairo@gmail.com', 'Future Talent Program');
         $emailService->setTo($toEmail);
         $emailService->setSubject('🔑 Token Pendaftaran - Future Talent Program');
-        
-       
+
         $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png'; 
 
         // 2. Desain Template Email HTML (Responsive Card Layout)
@@ -437,7 +436,8 @@ class Pendaftaran extends Controller
 
         // 3. Eksekusi pengiriman
         if (!$emailService->send()) {
-            log_message('error', 'Registration token email could not be sent to {email}.', ['email' => $toEmail]);
+            $debug = $emailService->printDebugger(['headers']);
+            log_message('error', 'Registration token email could not be sent to {email}. Debug: {debug}', ['email' => $toEmail, 'debug' => $debug]);
             return false;
         }
 
