@@ -531,8 +531,17 @@
                                 <input type="text" id="manualCatatan" class="form-control form-control-sm" placeholder="Catatan (opsional)">
                             </div>
                         </div>
+
+                        <!-- Baris 4: Upload Proposal -->
+                        <div class="row g-2 mb-3 align-items-end">
+                            <div class="col-12">
+                                <label class="form-label small mb-1"><i class="bi bi-journal-arrow-up me-1"></i>Upload / Ganti Proposal (PDF, maks 2MB)</label>
+                                <input type="file" id="editProposalFile" class="form-control form-control-sm" accept=".pdf">
+                                <div id="currentProposalInfo" class="form-text small mt-1"></div>
+                            </div>
+                        </div>
                         
-                        <!-- Baris 3: Button Simpan -->
+                        <!-- Button Simpan -->
                         <div class="text-end">
                             <button type="button" id="manualSaveButton" class="btn btn-primary btn-sm px-4" onclick="submitManual()">Simpan Perubahan</button>
                         </div>
@@ -616,15 +625,18 @@
     }
 
     function apiPost(url, params = {}) {
-        return fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '<?= csrf_hash() ?>',
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-            },
-            body: new URLSearchParams(params).toString()
-        })
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+        };
+        let body;
+        if (params instanceof FormData) {
+            body = params;
+        } else {
+            headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+            body = new URLSearchParams(params).toString();
+        }
+        return fetch(url, { method: 'POST', headers, body })
             .then(async res => {
                 const json = await res.json().catch(() => ({ success: false, message: 'Respon server tidak valid.' }));
                 if (!res.ok && json.success === undefined) json.success = false;
@@ -722,6 +734,16 @@
         updateKotaPilihanOptions(currentKotaPilihan);
         document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
         document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
+
+        // Reset proposal file input & show current status
+        const proposalInput = document.getElementById('editProposalFile');
+        if (proposalInput) proposalInput.value = '';
+        const proposalInfo = document.getElementById('currentProposalInfo');
+        if (proposalInfo) {
+            proposalInfo.innerHTML = item.proposal_magang
+                ? `<span class="text-success"><i class="bi bi-file-earmark-check"></i> Proposal saat ini tersedia</span>`
+                : `<span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada proposal yang diunggah</span>`;
+        }
 
         hideSubForms();
     }
@@ -862,14 +884,21 @@
         if (!setButtonLoading(saveButton, 'Menyimpan...')) return;
         const targetStatus = document.getElementById('manualStatus').value;
         const selectedKotaPilihan = (document.getElementById('editKotaPilihan') || document.getElementById('editKotaMagang'))?.value || '';
-        submitStatusChange(targetStatus, { 
-            catatan: document.getElementById('manualCatatan').value,
-            regional_interview: document.getElementById('editKota').value,
-            kota_pilihan: selectedKotaPilihan,
-            divisi_pilihan: document.getElementById('editDivisi').value,
-            periode_mulai: document.getElementById('editPeriodeMulai').value,
-            periode_selesai: document.getElementById('editPeriodeSelesai').value
-        }, saveButton, true);
+
+        const formData = new FormData();
+        formData.append('catatan', document.getElementById('manualCatatan').value);
+        formData.append('regional_interview', document.getElementById('editKota').value);
+        formData.append('kota_pilihan', selectedKotaPilihan);
+        formData.append('divisi_pilihan', document.getElementById('editDivisi').value);
+        formData.append('periode_mulai', document.getElementById('editPeriodeMulai').value);
+        formData.append('periode_selesai', document.getElementById('editPeriodeSelesai').value);
+
+        const proposalInput = document.getElementById('editProposalFile');
+        if (proposalInput && proposalInput.files.length > 0) {
+            formData.append('proposal_magang', proposalInput.files[0]);
+        }
+
+        submitStatusChange(targetStatus, formData, saveButton, true);
     }
 
     function submitStatusChange(targetStatus, params, saveButton, refreshTable = false) {

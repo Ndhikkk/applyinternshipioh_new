@@ -481,6 +481,35 @@ class Admin extends BaseController
             $data['periode_selesai'] = $selesai;
         }
 
+        // --- Handle proposal file upload ---
+        $proposalFile = $this->request->getFile('proposal_magang');
+        if ($proposalFile && $proposalFile->isValid() && !$proposalFile->hasMoved()) {
+            // Validate: PDF only, max 2MB
+            if ($proposalFile->getClientMimeType() !== 'application/pdf') {
+                return $this->jsonOrRedirect(false, 'File proposal harus berformat PDF.', 422);
+            }
+            if ($proposalFile->getSize() > 2 * 1024 * 1024) {
+                return $this->jsonOrRedirect(false, 'Ukuran file proposal maksimal 2MB.', 422);
+            }
+
+            $uploadDir = WRITEPATH . 'uploads/proposal';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            // Delete old proposal file if exists
+            if (!empty($pendaftaran['proposal_magang'])) {
+                $oldFile = $uploadDir . '/' . $pendaftaran['proposal_magang'];
+                if (is_file($oldFile)) {
+                    unlink($oldFile);
+                }
+            }
+
+            $newName = $proposalFile->getRandomName();
+            $proposalFile->move($uploadDir, $newName);
+            $data['proposal_magang'] = $newName;
+        }
+
         if (!$this->pendaftaranModel->update($id, $data)) {
             return $this->jsonOrRedirect(false, 'Gagal menyimpan perubahan: ' . implode(', ', $this->pendaftaranModel->errors()), 500);
         }
@@ -674,7 +703,8 @@ class Admin extends BaseController
             'catatan_interview_1', 'catatan_interview_2', 'catatan_interview_3',
             'catatan_admin', 'email_terkirim',
             'is_archived', 'archived_at', 'archived_reason',
-            'regional_interview', 'kota_pilihan', 'divisi_pilihan', 'periode_mulai', 'periode_selesai'
+            'regional_interview', 'kota_pilihan', 'divisi_pilihan', 'periode_mulai', 'periode_selesai',
+            'proposal_magang'
         ];
         foreach ($fields as $f) {
             $out['item'][$f] = $item[$f] ?? null;
