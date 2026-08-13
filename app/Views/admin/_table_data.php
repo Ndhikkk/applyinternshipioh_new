@@ -4,10 +4,10 @@
             <tr>
                 <th class="fw-bold" style="min-width:220px;">Kandidat</th>
                 <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
-                <th class="fw-bold text-nowrap">Kota Magang</th>
+                <th class="fw-bold text-nowrap">Regional Interview</th>
                 <th class="fw-bold text-nowrap">Divisi / Jenis</th>
                 <th class="fw-bold text-center" style="min-width:140px;">Status</th>
-                <th class="fw-bold text-nowrap">Periode Magang</th>
+                <th class="fw-bold text-nowrap">Periode</th>
                 <th class="fw-bold text-nowrap">Tanggal Daftar</th>
                 <th class="fw-bold text-center">Berkas</th>
                 <th class="fw-bold text-center text-nowrap">Aksi</th>
@@ -61,7 +61,7 @@
                             <div class="small text-muted mb-1"><?= esc($data['program_studi']) ?></div>
                             <span class="badge bg-light text-dark border">Smt <?= esc($data['semester']) ?></span>
                         </td>
-                        <td class="text-nowrap" data-label="Kota Magang">
+                        <td class="text-nowrap" data-label="Regional Interview">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i>
                             <?= esc($data['regional_interview'] ?? '-') ?>
                         </td>
@@ -89,7 +89,7 @@
                                 <div class="small text-muted"><?= esc($data['archived_reason'] ?? '') ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-nowrap" data-label="Periode Magang">
+                        <td class="text-nowrap" data-label="Periode">
                             <small class="d-block mb-1">
                                 <span class="text-muted">Mulai:</span> <?= !empty($data['periode_mulai']) ? date('d/m/Y', strtotime($data['periode_mulai'])) : '-' ?>
                             </small>

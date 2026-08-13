@@ -126,7 +126,7 @@
                                     <option value="Surabaya" <?= old('regional_interview') === 'Surabaya' ? 'selected' : '' ?>>Surabaya</option>
                                     <option value="Bali" <?= old('regional_interview') === 'Bali' ? 'selected' : '' ?>>Bali</option>
                                 </select>
-                                <div class="form-text">Pilih kota penempatan magang yang Anda inginkan.</div>
+                                <div class="form-text">Pilih kota untuk interview.</div>
                             </div>
 
                            <div class="col-md-6 mb-3">
