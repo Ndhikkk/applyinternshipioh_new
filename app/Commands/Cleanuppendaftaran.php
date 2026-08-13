@@ -19,39 +19,28 @@ class Cleanuppendaftaran extends BaseCommand
 {
     protected $group       = 'App';
     protected $name        = 'cleanup:pendaftaran';
-    protected $description = 'Arsipkan & hapus otomatis data pendaftaran magang sesuai kebijakan retensi (Ditolak 7 hari, Menunggu 6 bulan, Lolos/Diterima 1 tahun masuk arsip -> dihapus permanen 7 hari kemudian kalau tidak dipulihkan).';
+    protected $description = 'Arsipkan & hapus otomatis data pendaftaran magang sesuai kebijakan retensi (Arsip jika 2 minggu tidak ada perubahan pada updated_at -> dihapus/disembunyikan dari arsip jika 3 minggu tidak ada perubahan).';
 
     public function run(array $params)
     {
         $model = new PendaftaranModel();
+        $twoWeeksAgo   = date('Y-m-d H:i:s', strtotime('-14 days'));
+        $threeWeeksAgo = date('Y-m-d H:i:s', strtotime('-21 days'));
 
-        // ---- TAHAP 1: masuk arsip ----
-        $rejected = $model->where('is_archived', 0)
-            ->whereIn('status', ['Ditolak'])
-            ->where('status_changed_at IS NOT NULL')
-            ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
+        // ---- TAHAP 1: masuk arsip jika tidak ada perubahan selama 2 minggu ----
+        $inactive = $model->where('is_archived', 0)
+            ->where('COALESCE(updated_at, created_at) <=', $twoWeeksAgo)
             ->findAll();
-        $archivedCount = $this->archive($model, $rejected, 'Ditolak (7 hari)');
+        $archivedCount = $this->archive($model, $inactive, 'Tidak ada perubahan (2 minggu)');
 
-        $waiting = $model->where('is_archived', 0)
-            ->where('status', 'Menunggu')
-            ->where('created_at <=', date('Y-m-d H:i:s', strtotime('-6 months')))
-            ->findAll();
-        $archivedCount += $this->archive($model, $waiting, 'Menunggu (6 bulan)');
-
-        $accepted = $model->where('is_archived', 0)
-            ->whereIn('status', ['Diterima'])
-            ->where('status_changed_at IS NOT NULL')
-            ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-1 year')))
-            ->findAll();
-        $archivedCount += $this->archive($model, $accepted, 'Lolos/Diterima (1 tahun)');
-
-        // ---- TAHAP 2: sudah di arsip 7 hari -> hapus permanen ----
+        // ---- TAHAP 2: hapus/sembunyikan dari arsip jika 3 minggu tidak ada perubahan ----
         $expired = $model->where('is_archived', 1)
-            ->where('archived_at IS NOT NULL')
-            ->where('archived_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
+            ->groupStart()
+                ->where('COALESCE(updated_at, created_at) <=', $threeWeeksAgo)
+                ->orWhere('archived_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
+            ->groupEnd()
             ->findAll();
-        $purgedCount = $this->purge($model, $expired, 'sudah 7 hari di arsip');
+        $purgedCount = $this->purge($model, $expired, 'tidak ada perubahan 3 minggu / 7 hari di arsip');
 
         CLI::write("Selesai. {$archivedCount} data masuk arsip, {$purgedCount} data dihapus permanen.", 'green');
     }

@@ -10,7 +10,7 @@
             <h1 class="h3 mb-1 text-gray-800 fw-bold text-nowrap">
                 <i class="bi bi-speedometer2 text-indosat"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
             </h1>
-            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang menunggu dihapus permanen (7 hari sejak diarsipkan)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
+            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang akan dihapus permanen (3 minggu tanpa perubahan / 7 hari di arsip)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
         </div>
         
         <div class="d-flex flex-wrap flex-lg-nowrap gap-2 align-items-center w-100 w-lg-auto justify-content-start justify-content-lg-end">

@@ -606,47 +606,32 @@ class Admin extends BaseController
      * dibuka, atau lewat cron `php spark cleanup:pendaftaran`):
      *
      *  TAHAP 1 - masuk ARSIP dulu (belum dihapus, cuma disembunyikan dari
-     *  tabel utama & bisa dipulihkan admin) begitu kena tenggat:
-     *    - Ditolak / Tidak Lolos Interview  -> arsip 7 hari setelah status ditetapkan
-     *    - Menunggu                        -> arsip 6 bulan setelah tanggal daftar
-     *    - Diterima                        -> arsip 1 tahun setelah status ditetapkan
+     *  tabel utama & bisa dipulihkan admin) jika tidak ada perubahan selama 2 minggu (based on updated_at)
      *
-     *  TAHAP 2 - HAPUS PERMANEN kalau sudah 7 hari di arsip dan tidak
-     *  dipulihkan admin.
+     *  TAHAP 2 - HAPUS PERMANEN / Sembunyikan dari arsip jika tidak ada perubahan selama 3 minggu (21 hari)
+     *  berdasarkan updated_at (atau 7 hari setelah masuk arsip).
      */
     private function runRetentionCleanup(): void
     {
-        // ---- TAHAP 1: masuk arsip ----
-        $rejected = $this->pendaftaranModel
-            ->where('is_archived', 0)
-            ->where('status', 'Ditolak')
-            ->where('status_changed_at IS NOT NULL')
-            ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
-            ->findAll();
-        $this->archiveCandidates($rejected, 'Ditolak (7 hari)');
+        $twoWeeksAgo   = date('Y-m-d H:i:s', strtotime('-14 days'));
+        $threeWeeksAgo = date('Y-m-d H:i:s', strtotime('-21 days'));
 
-        $waiting = $this->pendaftaranModel
+        // ---- TAHAP 1: masuk arsip jika tidak ada perubahan selama 2 minggu ----
+        $inactive = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->where('status', 'Menunggu')
-            ->where('created_at <=', date('Y-m-d H:i:s', strtotime('-6 months')))
+            ->where('COALESCE(updated_at, created_at) <=', $twoWeeksAgo)
             ->findAll();
-        $this->archiveCandidates($waiting, 'Menunggu (6 bulan)');
+        $this->archiveCandidates($inactive, 'Tidak ada perubahan (2 minggu)');
 
-        $accepted = $this->pendaftaranModel
-            ->where('is_archived', 0)
-            ->whereIn('status', ['Diterima'])
-            ->where('status_changed_at IS NOT NULL')
-            ->where('status_changed_at <=', date('Y-m-d H:i:s', strtotime('-1 year')))
-            ->findAll();
-        $this->archiveCandidates($accepted, 'Lolos/Diterima (1 tahun)');
-
-        // ---- TAHAP 2: sudah di arsip 7 hari -> hapus permanen ----
+        // ---- TAHAP 2: hapus permanen jika 3 minggu tidak ada perubahan / 7 hari di arsip ----
         $expired = $this->pendaftaranModel
             ->where('is_archived', 1)
-            ->where('archived_at IS NOT NULL')
-            ->where('archived_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
+            ->groupStart()
+                ->where('COALESCE(updated_at, created_at) <=', $threeWeeksAgo)
+                ->orWhere('archived_at <=', date('Y-m-d H:i:s', strtotime('-7 days')))
+            ->groupEnd()
             ->findAll();
-        $this->purgeCandidates($expired, 'sudah 7 hari di arsip');
+        $this->purgeCandidates($expired, 'tidak ada perubahan 3 minggu / 7 hari di arsip');
     }
 
     private function archiveCandidates(array $rows, string $reason): void
