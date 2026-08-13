@@ -19,6 +19,7 @@ class Pendaftaran extends Controller
     {
         $settingsModel = new AppSettingsModel();
         $data['registration_open'] = $settingsModel->getValue('registration_open') ?? '1';
+        $data['kota_magang_options'] = (new \Config\InternshipLocations())->kotaMagang;
         
         // Contoh daftar divisi (bisa juga Anda ambil dari database jika ada tabel divisi)
         $data['divisi_list'] = ['Web Developer', 'Mobile Developer', 'UI/UX Designer', 'Digital Marketing', 'Content Writer'];
@@ -53,6 +54,7 @@ class Pendaftaran extends Controller
             'asal_kampus'    => 'required|trim',
             'program_studi'  => 'required|trim',
             'regional_interview' => 'required|in_list[Semarang,Surabaya,Bali]',
+            'kota_magang'    => 'required|max_length[100]',
             'divisi_pilihan' => 'required|trim',
             'semester'       => 'required|integer',
             'jenis_magang'   => 'required|in_list[Wajib,Mandiri]',
@@ -66,6 +68,11 @@ class Pendaftaran extends Controller
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        $kotaMagang = trim((string) $this->request->getPost('kota_magang'));
+        if (!in_array($kotaMagang, (new \Config\InternshipLocations())->allKotaMagang(), true)) {
+            return redirect()->back()->withInput()->with('errors', ['kota_magang' => 'Kota magang yang dipilih tidak valid.']);
         }
 
         // This check gives a useful response for ordinary repeat submissions.
@@ -131,6 +138,7 @@ class Pendaftaran extends Controller
             'asal_kampus'     => trim((string)$this->request->getPost('asal_kampus')),
             'program_studi'   => trim((string)$this->request->getPost('program_studi')),
             'regional_interview' => $this->request->getPost('regional_interview'),
+            'kota_magang'       => $kotaMagang,
             'divisi_pilihan'  => trim((string)$this->request->getPost('divisi_pilihan')),
             'semester'        => $this->request->getPost('semester'),
             'jenis_magang'    => $this->request->getPost('jenis_magang'),

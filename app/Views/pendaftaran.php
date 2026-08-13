@@ -119,7 +119,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="small fw-bold text-secondary">Kota Pilihan *</label>
+                                <label class="small fw-bold text-secondary">Regional Interview *</label>
                                 <select name="regional_interview" class="form-select form-select-sm" required>
                                     <option value="">Pilih Kota</option>
                                     <option value="Semarang" <?= old('regional_interview') === 'Semarang' ? 'selected' : '' ?>>Semarang</option>
@@ -127,6 +127,21 @@
                                     <option value="Bali" <?= old('regional_interview') === 'Bali' ? 'selected' : '' ?>>Bali</option>
                                 </select>
                                 <div class="form-text">Pilih kota untuk interview.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-secondary">Kota Magang *</label>
+                                <select name="kota_magang" class="form-select form-select-sm" required>
+                                    <option value="">Pilih Kota/Kabupaten Magang</option>
+                                    <?php foreach ($kota_magang_options as $provinsi => $kotaList): ?>
+                                        <optgroup label="<?= esc($provinsi) ?>">
+                                            <?php foreach ($kotaList as $kota): ?>
+                                                <option value="<?= esc($kota) ?>" <?= old('kota_magang') === $kota ? 'selected' : '' ?>><?= esc($kota) ?></option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="form-text">Pilih kota atau kabupaten tujuan magang.</div>
                             </div>
 
                            <div class="col-md-6 mb-3">

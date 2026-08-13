@@ -459,7 +459,7 @@
                     <div id="amManualActions">
                         <p class="fw-bold mb-2 mt-2"><i class="bi bi-pencil-square"></i> Ubah Data Manual</p>
                         
-                        <!-- Baris 1: Status, Kota & Divisi -->
+                        <!-- Baris 1: Status, Regional Interview & Divisi -->
                         <div class="row g-2 mb-2 align-items-end">
                             <div class="col-md-4">
                                 <label class="form-label small mb-1">Status</label>
@@ -471,7 +471,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small mb-1">Kota Pilihan</label>
+                                <label class="form-label small mb-1">Regional Interview</label>
                                 <select id="editKota" class="form-select form-select-sm">
                                     <option value="">Pilih Kota</option>
                                     <option value="Semarang">Semarang</option>
@@ -497,7 +497,25 @@
                             </div>
                         </div>
 
-                        <!-- Baris 2: Periode & Catatan -->
+                        <!-- Baris 2: Kota Magang bertahap agar daftar kota lebih ringkas -->
+                        <div class="row g-2 mb-2 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1">Provinsi Kota Magang</label>
+                                <select id="editProvinsiMagang" class="form-select form-select-sm" onchange="updateKotaMagangOptions()">
+                                    <option value="">Pilih Provinsi</option>
+                                    <?php foreach (array_keys($kota_magang_options) as $provinsi): ?>
+                                        <option value="<?= esc($provinsi) ?>"><?= esc($provinsi) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small mb-1">Kota Magang</label>
+                                <input type="search" id="editKotaMagang" list="editKotaMagangList" class="form-control form-control-sm" placeholder="Pilih provinsi, lalu cari kota/kabupaten" autocomplete="off" disabled>
+                                <datalist id="editKotaMagangList"></datalist>
+                            </div>
+                        </div>
+
+                        <!-- Baris 3: Periode & Catatan -->
                         <div class="row g-2 mb-3 align-items-end">
                             <div class="col-md-6">
                                 <label class="form-label small mb-1">Periode Program</label>
@@ -697,6 +715,8 @@
 
         document.getElementById('editDivisi').value = item.divisi_pilihan || '';
         document.getElementById('editKota').value = item.regional_interview || '';
+        document.getElementById('editProvinsiMagang').value = findProvinsiKotaMagang(item.kota_magang || '');
+        updateKotaMagangOptions(item.kota_magang || '');
         document.getElementById('editPeriodeMulai').value = item.periode_mulai || '';
         document.getElementById('editPeriodeSelesai').value = item.periode_selesai || '';
 
@@ -741,6 +761,23 @@
 
     let activeActionButton = null;
     let submissionInProgress = false;
+    const kotaMagangByProvinsi = <?= json_encode($kota_magang_options, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
+    function updateKotaMagangOptions(selectedKota = '') {
+        const provinsiInput = document.getElementById('editProvinsiMagang');
+        const kotaInput = document.getElementById('editKotaMagang');
+        const kotaList = document.getElementById('editKotaMagangList');
+        const cities = kotaMagangByProvinsi[provinsiInput.value] || [];
+
+        kotaList.innerHTML = cities.map(kota => `<option value="${kota}"></option>`).join('');
+        kotaInput.disabled = cities.length === 0;
+        kotaInput.placeholder = cities.length ? 'Ketik untuk mencari kota/kabupaten' : 'Pilih provinsi terlebih dahulu';
+        kotaInput.value = selectedKota;
+    }
+
+    function findProvinsiKotaMagang(kota) {
+        return Object.keys(kotaMagangByProvinsi).find(provinsi => kotaMagangByProvinsi[provinsi].includes(kota)) || '';
+    }
 
     function showSubForm(targetStatus, titleText, requireSchedule, sourceButton) {
         if (activeActionButton && activeActionButton !== sourceButton) {
@@ -815,13 +852,14 @@
         submitStatusChange(targetStatus, { 
             catatan: document.getElementById('manualCatatan').value,
             regional_interview: document.getElementById('editKota').value,
+            kota_magang: document.getElementById('editKotaMagang').value,
             divisi_pilihan: document.getElementById('editDivisi').value,
             periode_mulai: document.getElementById('editPeriodeMulai').value,
             periode_selesai: document.getElementById('editPeriodeSelesai').value
-        }, saveButton);
+        }, saveButton, true);
     }
 
-    function submitStatusChange(targetStatus, params, saveButton) {
+    function submitStatusChange(targetStatus, params, saveButton, refreshTable = false) {
         const id = currentModalId;
         apiPost(buildUrl(id, targetStatus), params).then(json => {
             if (!json.success) {
@@ -840,6 +878,10 @@
             hideSubForms();
             getActionModal().hide();
             toast('success', json.message);
+
+            if (refreshTable && window.refreshDashboardTable) {
+                window.refreshDashboardTable();
+            }
 
             if (json.should_prompt_notifications !== false) {
                 const hasEmail = json.item && json.item.email;
@@ -982,6 +1024,10 @@
                 Swal.fire('Error', 'Gagal memuat data pencarian.', 'error');
             });
         }
+
+        window.refreshDashboardTable = function () {
+            loadData(window.location.href);
+        };
 
         function handleSearch() {
             const val = searchInput.value.trim();

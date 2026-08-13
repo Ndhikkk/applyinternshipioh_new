@@ -28,6 +28,7 @@ class PendaftaranModel extends Model
         'asal_kampus',
         'program_studi',
         'regional_interview',
+        'kota_magang',
         'divisi_pilihan',
         'semester',
         'jenis_magang',

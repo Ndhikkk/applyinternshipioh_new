@@ -5,6 +5,7 @@
                 <th class="fw-bold" style="min-width:220px;">Kandidat</th>
                 <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
                 <th class="fw-bold text-nowrap">Regional Interview</th>
+                <th class="fw-bold text-nowrap">Kota Magang</th>
                 <th class="fw-bold text-nowrap">Divisi / Jenis</th>
                 <th class="fw-bold text-center" style="min-width:140px;">Status</th>
                 <th class="fw-bold text-nowrap">Periode</th>
@@ -64,6 +65,10 @@
                         <td class="text-nowrap" data-label="Regional Interview">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i>
                             <?= esc($data['regional_interview'] ?? '-') ?>
+                        </td>
+                        <td class="text-nowrap" data-label="Kota Magang">
+                            <i class="bi bi-building text-primary me-1"></i>
+                            <?= esc($data['kota_magang'] ?? '-') ?>
                         </td>
                         <td class="text-nowrap" data-label="Divisi / Jenis">
                             <div class="mb-1"><?= esc($data['divisi_pilihan'] ?? '-') ?></div>
@@ -174,7 +179,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="9" class="text-center py-5">
+                    <td colspan="10" class="text-center py-5">
                         <div class="text-muted">
                             <i class="bi bi-inbox display-4 d-block mb-3"></i>
                             <?php if ($is_arsip): ?>
