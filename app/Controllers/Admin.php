@@ -432,18 +432,6 @@ class Admin extends BaseController
                 && $targetStatus !== $pendaftaran['status']) {
                 return $this->jsonOrRedirect(false, 'Transisi status tidak valid. Muat ulang data kandidat lalu coba lagi.', 422);
             }
-
-            if ($pendaftaran['status'] === 'Menunggu'
-                && $targetStatus === 'Progress'
-                && empty($pendaftaran['jadwal_interview_1'])) {
-                return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 1 harus disimpan sebelum kandidat dapat dinyatakan lolos.', 422);
-            }
-
-            if ($pendaftaran['status'] === 'Progress'
-                && $targetStatus === 'Diterima'
-                && empty($pendaftaran['jadwal_interview_2'])) {
-                return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 2 harus disimpan sebelum kandidat dapat dinyatakan diterima.', 422);
-            }
         }
 
         $catatan  = trim((string) ($this->request->getGet('catatan') ?? $this->request->getPost('catatan') ?? ''));
@@ -713,18 +701,25 @@ class Admin extends BaseController
 
     private function displayStatus(array $item): string
     {
-        if ($item['status'] === 'Menunggu' && !empty($item['jadwal_interview_1'])) {
+        $status = $item['status'] ?? 'Menunggu';
+        if (empty($status)) {
+            $status = 'Menunggu';
+        }
+        if ($status === 'Menunggu' && !empty($item['jadwal_interview_1'])) {
             return 'Interview Tahap 1';
         }
-        if ($item['status'] === 'Progress' && !empty($item['jadwal_interview_2'])) {
+        if ($status === 'Progress' && !empty($item['jadwal_interview_2'])) {
             return 'Interview Tahap 2';
         }
-        return $item['status'];
+        return $status;
     }
 
-    private function formatStatusLabel(string $status): string
+    private function formatStatusLabel(?string $status): string
     {
-        return strtoupper($status);
+        if (empty($status)) {
+            return 'MENUNGGU';
+        }
+        return strtoupper(str_replace('_', ' ', $status));
     }
 
     private function renderStatusBadge(array $item): string

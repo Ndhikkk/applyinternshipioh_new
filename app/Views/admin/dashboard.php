@@ -650,15 +650,17 @@
     }
 
     function formatStatusLabel(status) {
+        if (!status) return 'MENUNGGU';
         if (status.includes('Interview')) return status.toUpperCase();
         if (status === 'Progress') return 'PROGRESS';
         if (status === 'Diterima') return 'DITERIMA';
         if (status === 'Ditolak') return 'DITOLAK';
         if (status === 'Menunggu') return 'MENUNGGU';
-        return status.toUpperCase();
+        return status.replace(/_/g, ' ').toUpperCase();
     }
 
     function statusBadgeMarkupFromLabel(status) {
+        if (!status) status = 'Menunggu';
         const isFinal = status === 'Diterima';
         const isRejected = ['Ditolak'].includes(status);
         let cls = 'bg-warning';
@@ -670,6 +672,7 @@
     }
 
     function displayStatus(item) {
+        if (!item || !item.status) return 'Menunggu';
         if (item.status === 'Menunggu' && item.jadwal_interview_1) return 'Interview Tahap 1';
         if (item.status === 'Progress' && item.jadwal_interview_2) return 'Interview Tahap 2';
         return item.status;

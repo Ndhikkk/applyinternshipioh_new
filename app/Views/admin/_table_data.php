@@ -18,7 +18,8 @@
             <?php if (!empty($pendaftaran)): ?>
                 <?php foreach ($pendaftaran as $data): ?>
                     <?php
-                        $currentStatus = $data['status'];
+                        $currentStatus = $data['status'] ?? 'Menunggu';
+                        if (empty($currentStatus)) $currentStatus = 'Menunggu';
                         $isFinal = $currentStatus === 'Diterima';
                         $isRejected = $currentStatus === 'Ditolak';
                         $isProgress = str_contains($currentStatus, 'Interview') || $currentStatus === 'Progress';
