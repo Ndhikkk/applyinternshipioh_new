@@ -211,24 +211,25 @@
     font-weight: 600;
     min-width: 40px;
     border-radius: 10px;
+    color: var(--indosat-primary);
 }
 
 /* Active page number */
 .ajax-pagination .page-item.active .page-link {
-    background: linear-gradient(135deg, var(--indosat-red, #E31837) 0%, #c41230 100%);
+    background: var(--indosat-gradient);
     border-color: transparent;
     color: #fff;
     font-weight: 700;
-    box-shadow: 0 4px 14px rgba(227, 24, 55, 0.35);
+    box-shadow: 0 4px 14px rgba(230, 0, 126, 0.35);
     transform: translateY(-1px);
 }
 
 /* Number hover */
 .ajax-pagination .page-number:not(.active) .page-link:hover {
-    background-color: #fef2f4;
-    border-color: var(--indosat-red, #E31837);
-    color: var(--indosat-red, #E31837);
-    box-shadow: 0 2px 8px rgba(227, 24, 55, 0.12);
+    background-color: var(--indosat-accent);
+    border-color: var(--indosat-primary);
+    color: var(--indosat-primary);
+    box-shadow: 0 2px 8px rgba(230, 0, 126, 0.12);
     transform: translateY(-1px);
 }
 .ajax-pagination .page-number:not(.active) .page-link:active {
@@ -283,18 +284,18 @@
 }
 .ajax-pagination .pagination > li.active > a,
 .ajax-pagination .pagination > li.active > span {
-    background: linear-gradient(135deg, var(--indosat-red, #E31837) 0%, #c41230 100%);
+    background: var(--indosat-gradient);
     border-color: transparent;
     color: #fff;
     font-weight: 700;
-    box-shadow: 0 4px 14px rgba(227, 24, 55, 0.35);
+    box-shadow: 0 4px 14px rgba(230, 0, 126, 0.35);
     transform: translateY(-1px);
 }
 .ajax-pagination .pagination > li:not(.active) > a:hover {
-    background-color: #fef2f4;
-    border-color: var(--indosat-red, #E31837);
-    color: var(--indosat-red, #E31837);
-    box-shadow: 0 2px 8px rgba(227, 24, 55, 0.12);
+    background-color: var(--indosat-accent);
+    border-color: var(--indosat-primary);
+    color: var(--indosat-primary);
+    box-shadow: 0 2px 8px rgba(230, 0, 126, 0.12);
     transform: translateY(-1px);
 }
 .ajax-pagination .pagination > li:not(.active) > a:active {
@@ -374,7 +375,7 @@
 <div class="card border-0 shadow-sm" data-aos="fade-up">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">
-            <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : 'Data Pendaftar Magang' ?>
+            <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : 'Data Pendaftar Program' ?>
         </h6>
         <div class="d-flex gap-2">
             <!-- Diubah dari form menjadi div untuk menjamin tidak ada reload -->
