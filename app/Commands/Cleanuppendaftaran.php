@@ -60,19 +60,13 @@ class Cleanuppendaftaran extends BaseCommand
 
     private function purge(PendaftaranModel $model, array $rows, string $reason): int
     {
-        $map = ['cv' => 'cv', 'surat_pengantar' => 'surat', 'ktm' => 'ktm'];
-
         foreach ($rows as $row) {
-            foreach ($map as $field => $folder) {
-                if (!empty($row[$field])) {
-                    $path = WRITEPATH . 'uploads/' . $folder . '/' . $row[$field];
-                    if (file_exists($path)) {
-                        @unlink($path);
-                    }
-                }
-            }
-            $model->delete($row['id']);
-            CLI::write("- Hapus permanen #{$row['id']} {$row['nama_lengkap']} ({$reason})");
+            $model->update($row['id'], [
+                'is_archived'     => 1,
+                'archived_at'     => date('Y-m-d H:i:s'),
+                'archived_reason' => $reason,
+            ]);
+            CLI::write("- Arsipkan #{$row['id']} {$row['nama_lengkap']} ({$reason})");
         }
 
         return count($rows);

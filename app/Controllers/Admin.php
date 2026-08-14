@@ -219,13 +219,16 @@ class Admin extends BaseController
         $pendaftaran = $this->pendaftaranModel->find($id);
 
         if ($pendaftaran) {
-            $this->deleteCandidateFiles($pendaftaran);
-            $this->pendaftaranModel->delete($id);
+            $this->pendaftaranModel->update($id, [
+                'is_archived'     => 1,
+                'archived_at'     => date('Y-m-d H:i:s'),
+                'archived_reason' => 'Dihapus manual oleh admin',
+            ]);
 
             if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['success' => true, 'id' => (int) $id, 'message' => 'Data pendaftaran berhasil dihapus dari sistem.']);
+                return $this->response->setJSON(['success' => true, 'id' => (int) $id, 'message' => 'Data pendaftaran berhasil diarsipkan.']);
             }
-            return redirect()->to('/admin/dashboard')->with('success', 'Data pendaftaran berhasil dihapus dari sistem.');
+            return redirect()->to('/admin/dashboard')->with('success', 'Data pendaftaran berhasil diarsipkan.');
         }
 
         if ($this->request->isAJAX()) {
@@ -641,9 +644,12 @@ class Admin extends BaseController
     private function purgeCandidates(array $rows, string $reason): void
     {
         foreach ($rows as $row) {
-            $this->deleteCandidateFiles($row);
-            $this->pendaftaranModel->delete($row['id']);
-            log_message('info', "Hapus permanen kandidat #{$row['id']} ({$row['nama_lengkap']}) - {$reason}");
+            $this->pendaftaranModel->update($row['id'], [
+                'is_archived'     => 1,
+                'archived_at'     => date('Y-m-d H:i:s'),
+                'archived_reason' => $reason,
+            ]);
+            log_message('info', "Arsipkan kandidat #{$row['id']} ({$row['nama_lengkap']}) - {$reason}");
         }
     }
 
