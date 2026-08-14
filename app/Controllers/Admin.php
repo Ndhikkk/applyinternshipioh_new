@@ -419,27 +419,31 @@ class Admin extends BaseController
             return $this->jsonOrRedirect(false, 'Status tujuan tidak dikenali: ' . $targetStatus, 422);
         }
 
-        $allowedTransitions = [
-            'Menunggu' => ['Progress', 'Ditolak'],
-            'Progress' => ['Diterima', 'Ditolak'],
-        ];
+        $isManual = ($this->request->getPost('is_manual') === '1') || ($this->request->getGet('is_manual') === '1');
 
-        if (isset($allowedTransitions[$pendaftaran['status']])
-            && !in_array($targetStatus, $allowedTransitions[$pendaftaran['status']], true)
-            && $targetStatus !== $pendaftaran['status']) {
-            return $this->jsonOrRedirect(false, 'Transisi status tidak valid. Muat ulang data kandidat lalu coba lagi.', 422);
-        }
+        if (!$isManual) {
+            $allowedTransitions = [
+                'Menunggu' => ['Progress', 'Ditolak'],
+                'Progress' => ['Diterima', 'Ditolak'],
+            ];
 
-        if ($pendaftaran['status'] === 'Menunggu'
-            && $targetStatus === 'Progress'
-            && empty($pendaftaran['jadwal_interview_1'])) {
-            return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 1 harus disimpan sebelum kandidat dapat dinyatakan lolos.', 422);
-        }
+            if (isset($allowedTransitions[$pendaftaran['status']])
+                && !in_array($targetStatus, $allowedTransitions[$pendaftaran['status']], true)
+                && $targetStatus !== $pendaftaran['status']) {
+                return $this->jsonOrRedirect(false, 'Transisi status tidak valid. Muat ulang data kandidat lalu coba lagi.', 422);
+            }
 
-        if ($pendaftaran['status'] === 'Progress'
-            && $targetStatus === 'Diterima'
-            && empty($pendaftaran['jadwal_interview_2'])) {
-            return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 2 harus disimpan sebelum kandidat dapat dinyatakan diterima.', 422);
+            if ($pendaftaran['status'] === 'Menunggu'
+                && $targetStatus === 'Progress'
+                && empty($pendaftaran['jadwal_interview_1'])) {
+                return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 1 harus disimpan sebelum kandidat dapat dinyatakan lolos.', 422);
+            }
+
+            if ($pendaftaran['status'] === 'Progress'
+                && $targetStatus === 'Diterima'
+                && empty($pendaftaran['jadwal_interview_2'])) {
+                return $this->jsonOrRedirect(false, 'Jadwal Interview Tahap 2 harus disimpan sebelum kandidat dapat dinyatakan diterima.', 422);
+            }
         }
 
         $catatan  = trim((string) ($this->request->getGet('catatan') ?? $this->request->getPost('catatan') ?? ''));

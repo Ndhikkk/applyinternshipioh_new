@@ -886,6 +886,7 @@
         const selectedKotaPilihan = (document.getElementById('editKotaPilihan') || document.getElementById('editKotaMagang'))?.value || '';
 
         const formData = new FormData();
+        formData.append('is_manual', '1');
         formData.append('catatan', document.getElementById('manualCatatan').value);
         formData.append('regional_interview', document.getElementById('editKota').value);
         formData.append('kota_pilihan', selectedKotaPilihan);
