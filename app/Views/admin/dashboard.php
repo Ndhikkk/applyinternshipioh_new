@@ -5,17 +5,17 @@
 <?= $this->section('content') ?>
 <div class="container-fluid py-4">
     <!-- Header -->
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3" data-aos="fade-down">
-        <div class="me-lg-3">
+    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-start align-items-xl-center mb-4 gap-3" data-aos="fade-down">
+        <div class="me-xl-3">
             <h1 class="h3 mb-1 text-gray-800 fw-bold text-nowrap">
                 <i class="bi bi-speedometer2 text-indosat"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
             </h1>
             <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang akan dihapus permanen (3 minggu tanpa perubahan / 7 hari di arsip)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
         </div>
         
-        <div class="d-flex flex-wrap flex-lg-nowrap gap-2 align-items-center w-100 w-lg-auto justify-content-start justify-content-lg-end">
+        <div class="d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center w-100 w-xl-auto justify-content-start justify-content-xl-end">
             
-            <div class="d-flex align-items-center w-100 w-lg-auto mb-2 mb-lg-0 me-lg-2 justify-content-between justify-content-lg-start">
+            <div class="d-flex align-items-center w-100 w-xl-auto mb-2 mb-xl-0 me-xl-2 justify-content-between justify-content-xl-start">
                 <span class="fw-bold me-2 text-nowrap">Status Pendaftaran:</span>
                 <?php if (($registration_open ?? '1') == '1'): ?>
                     <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran program?">
@@ -28,20 +28,20 @@
                 <?php endif; ?>
             </div>
 
-            <div class="d-flex flex-wrap flex-lg-nowrap gap-2 w-100 w-lg-auto flex-grow-1 flex-lg-grow-0">
-                <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm text-nowrap flex-grow-1 flex-lg-grow-0 <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
+            <div class="d-flex flex-wrap flex-xl-nowrap gap-2 w-100 w-xl-auto flex-grow-1 flex-xl-grow-0">
+                <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm text-nowrap flex-grow-1 flex-xl-grow-0 <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
                     <i class="bi bi-archive"></i> <?= $is_arsip ? 'Kembali' : 'Arsip (' . $total_arsip . ')' ?>
                 </a>
 
-                <a href="<?= site_url('admin/export') ?>" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-lg-grow-0">
+                <a href="<?= site_url('admin/export') ?>" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </a>
                 
-                <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0">
+                <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
                     <i class="bi bi-file-earmark-pdf"></i> Generate CV
                 </a>
 
-                <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm text-nowrap flex-grow-1 flex-lg-grow-0" title="Logout">
+                <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0" title="Logout">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             </div>
@@ -65,7 +65,7 @@
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="100">
             <div class="card stats-card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -81,7 +81,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="200">
             <div class="card stats-card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -97,7 +97,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="300">
             <div class="card stats-card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="400">
             <div class="card stats-card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -329,6 +329,13 @@
         border-bottom: 1px solid #f8f9fc;
         min-height: 2.5rem;
     }
+    /* Konten sel boleh turun baris (email/kampus panjang tidak meluber) */
+    .table-mobile-cards td,
+    .table-mobile-cards td .small,
+    .table-mobile-cards td a {
+        word-break: break-word;
+        white-space: normal;
+    }
     .table-mobile-cards td:last-child {
         border-bottom: none;
         background-color: #f8f9fc; /* Sedikit beda warna untuk kolom aksi */
@@ -353,6 +360,11 @@
     .table-mobile-cards td > div:last-child {
         margin-bottom: 0;
     }
+    /* Kolom Berkas: tombol rata kanan dan boleh turun baris bila sempit */
+    .table-mobile-cards td .btn-group {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
     /* Pengecualian untuk kolom aksi agar tombolnya sejajar atau terpusat dengan rapi */
     .table-mobile-cards td.mobile-col-flex {
         padding-left: 1rem;
@@ -373,13 +385,13 @@
 </style>
 
 <div class="card border-0 shadow-sm" data-aos="fade-up">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-md-between align-items-stretch align-items-md-center gap-2">
         <h6 class="m-0 font-weight-bold text-primary">
             <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : 'Data Pendaftar Program' ?>
         </h6>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 ms-md-auto">
             <!-- Diubah dari form menjadi div untuk menjamin tidak ada reload -->
-            <div class="input-group input-group-sm" id="searchContainer" style="width: 280px;">
+            <div class="input-group input-group-sm flex-grow-1 flex-md-grow-0" id="searchContainer" style="min-width: 0;">
                 <?php if ($is_arsip): ?><input type="hidden" name="arsip" id="arsipParam" value="1"><?php endif; ?>
                 <input type="text" id="searchInput" class="form-control" placeholder="Cari nama, email, kampus..." value="<?= esc($keyword ?? '') ?>" autocomplete="off">
                 <button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="bi bi-search"></i></button>
@@ -592,10 +604,53 @@
 #dataTable thead th:last-child { background-color: #f8f9fa; z-index: 3; }
 #dataTable tbody tr:hover td:last-child { background-color: #f1f5fb; }
 
+/* ── Tombol Aksi seragam: persegi sama sisi setebal tombol WhatsApp ── */
+#dataTable td[data-label="Aksi"] .btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+}
+#dataTable td[data-label="Aksi"] .btn i {
+    font-size: 0.875rem;
+    line-height: 1;
+}
+/* Tombol dengan label teks (Detail): lebar mengikuti isi, tinggi tetap sama */
+#dataTable td[data-label="Aksi"] .btn.btn-aksi-label {
+    width: auto;
+    padding: 0 0.75rem;
+    gap: 0.375rem;
+}
+
+/* Sticky kolom Aksi dinonaktifkan pada mode kartu mobile (tidak relevan saat tabel jadi blok vertikal) */
+@media (max-width: 768px) {
+    #dataTable thead th:last-child,
+    #dataTable tbody td:last-child {
+        position: static;
+        box-shadow: none;
+    }
+}
+
+/* ── Search bar: lebar penuh di mobile, lebar tetap di desktop ── */
+@media (min-width: 768px) {
+    #searchContainer { width: 280px; flex-grow: 0; }
+}
+
+/* ── Penyesuaian kartu statistik di layar kecil ── */
+@media (max-width: 575.98px) {
+    .stats-card .card-body { padding: 0.85rem; }
+    .stats-card .col-auto i { font-size: 1.5rem; }
+    .stats-card .text-xs { font-size: 0.68rem; }
+    .stats-card .h5 { font-size: 1.05rem; margin-bottom: 0; }
+}
+
 /* ── Pagination overrides (ensures consistency) ── */
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>

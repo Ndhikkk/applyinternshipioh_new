@@ -58,20 +58,20 @@
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-nowrap" data-label="Akademik">
+                        <td data-label="Akademik">
                             <div class="fw-semibold mb-1"><?= esc($data['asal_kampus']) ?></div>
                             <div class="small text-muted mb-1"><?= esc($data['program_studi']) ?></div>
                             <span class="badge bg-light text-dark border">Smt <?= esc($data['semester']) ?></span>
                         </td>
-                        <td class="text-nowrap" data-label="Regional Interview">
+                        <td data-label="Regional Interview">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i>
                             <?= esc($data['regional_interview'] ?? '-') ?>
                         </td>
-                        <td class="text-nowrap" data-label="Kota Pilihan">
+                        <td data-label="Kota Pilihan">
                             <i class="bi bi-building text-primary me-1"></i>
                             <?= esc($data['kota_pilihan'] ?? $data['kota_magang'] ?? '-') ?>
                         </td>
-                        <td class="text-nowrap" data-label="Divisi / Jenis">
+                        <td data-label="Divisi / Jenis">
                             <div class="mb-1"><?= esc($data['divisi_pilihan'] ?? '-') ?></div>
                             <span class="badge <?= $data['jenis_magang'] == 'Wajib' ? 'bg-info' : 'bg-secondary' ?>">
                                 <?= esc($data['jenis_magang']) ?>
@@ -95,7 +95,7 @@
                                 <div class="small text-muted"><?= esc($data['archived_reason'] ?? '') ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-nowrap" data-label="Periode">
+                        <td data-label="Periode">
                             <small class="d-block mb-1">
                                 <span class="text-muted">Mulai:</span> <?= !empty($data['periode_mulai']) ? date('d/m/Y', strtotime($data['periode_mulai'])) : '-' ?>
                             </small>
@@ -103,7 +103,7 @@
                                 <span class="text-muted">Selesai:</span> <?= !empty($data['periode_selesai']) ? date('d/m/Y', strtotime($data['periode_selesai'])) : '-' ?>
                             </small>
                         </td>
-                        <td class="text-nowrap" data-label="Tanggal Daftar">
+                        <td data-label="Tanggal Daftar">
                             <small>
                                 <i class="bi bi-calendar3"></i><br>
                                 <?php
@@ -116,7 +116,7 @@
                                 <?php endif; ?>
                             </small>
                         </td>
-                        <td class="text-nowrap" data-label="Berkas">
+                        <td data-label="Berkas">
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/cv') ?>"
                                 class="btn btn-outline-primary <?= empty($data['cv']) ? 'disabled' : '' ?>"
@@ -135,6 +135,7 @@
                                 title="<?= empty($data['proposal_magang']) ? 'Proposal tidak tersedia' : 'Download Proposal Magang' ?>"
                                 <?= empty($data['proposal_magang']) ? 'onclick="return false;"' : '' ?>>
                                     <i class="bi bi-journal-text"></i>
+                                </a>
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/ktm') ?>"
                                 class="btn btn-outline-info <?= empty($data['ktm']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['ktm']) ? 'KTM tidak tersedia' : 'Download KTM' ?>"
@@ -143,17 +144,17 @@
                                 </a>
                             </div>
                         </td>
-                        <td class="text-nowrap text-center mobile-col-flex" data-label="Aksi" id="aksi-cell-<?= $data['id'] ?>">
+                        <td class="text-center mobile-col-flex" data-label="Aksi" id="aksi-cell-<?= $data['id'] ?>">
                             <div class="d-flex gap-2 justify-content-center flex-nowrap">
                                 <?php if ($is_arsip): ?>
-                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="restoreData(<?= $data['id'] ?>)" title="Pulihkan ke Data Aktif">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Pulihkan
+                                    <button type="button" class="btn btn-outline-success btn-sm px-2" onclick="restoreData(<?= $data['id'] ?>)" title="Pulihkan ke Data Aktif">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
                                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="hapusData(<?= $data['id'] ?>)" title="Hapus Permanen Sekarang">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 <?php else: ?>
-                                    <button type="button" class="btn btn-primary btn-sm px-3" onclick="openActionModal(<?= $data['id'] ?>, '<?= esc($data['nama_lengkap'], 'js') ?>')" title="Lihat Detail & Kelola Status">
+                                    <button type="button" class="btn btn-primary btn-sm btn-aksi-label" onclick="openActionModal(<?= $data['id'] ?>, '<?= esc($data['nama_lengkap'], 'js') ?>')" title="Lihat Detail & Kelola Status">
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
                                     <button type="button" class="btn btn-success btn-sm px-2" onclick="openWaLink(<?= $data['id'] ?>)" title="Hubungi Kandidat (WA)">
