@@ -522,7 +522,7 @@
                 <!-- Hapus filter: brightness(0) invert(1) untuk logo berwarna asli -->
                 <img src="<?= base_url('assets/img/tone-indosat.png') ?>" alt="Indosat Ooredoo Hutchison"
                     class="brand-logo" style="filter: none !important;">
-                <span class="fw-bold d-none d-lg-block" style="font-size: 1.1rem;">Indosat Ooredoo Hutchison<br><small style="font-size: 0.8rem; font-weight: 500;">Future Talent Program</small></span>
+                <span class="fw-bold d-none d-lg-block" style="font-size: 1.1rem;">Indosat Ooredoo Hutchison<br><small style="font-size: 0.8rem; font-weight: 500;">Industry-Academia Collaboration Program</small></span>
                 <span class="fw-bold d-lg-none" style="font-size: 1rem;">IOH Internship</span>
             </a>
 

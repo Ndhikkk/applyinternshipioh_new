@@ -10,7 +10,7 @@
             <div class="col-12 col-lg-6">
                 <div class="hero-content text-center text-lg-start">
                     <h1 class="hero-title fw-bold mb-4" aria-label="Program Magang Indosat Ooredoo Hutchison ">
-                        Indosat Ooredoo Hutchison <br> Future Talent Program 
+                        Indosat Ooredoo Hutchison <br> Industry-Academia Collaboration Program
                     </h1>
                     <p class="hero-description mb-5">
                         Siap melangkah ke dunia industri?<br>

@@ -66,5 +66,5 @@ class Format extends BaseConfig
      * Maximum nesting depth used when formatting JSON responses.
      * Required by the installed CodeIgniter JSON formatter.
      */
-    public int $jsonEncodeDepth = 512;
+    public ?int $jsonEncodeDepth = 512;
 }

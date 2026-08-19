@@ -11,7 +11,7 @@
                     <img src="<?= base_url('assets/img/tone-indosat.png') ?>" alt="IOH Semarang" class="brand-logo"
                         style="filter: none !important;">
                     <h4 class="mb-0">Admin Login</h4>
-                    <p class="mb-0 mt-2">IOH Semarang</p>
+                    <p class="mb-0 mt-2">Indosat Ooredoo Hutchison</p>
                 </div>
                 <div class="card-body p-5">
                     <?php if (session()->getFlashdata('error')): ?>
