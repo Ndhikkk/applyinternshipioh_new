@@ -632,6 +632,10 @@ class Admin extends BaseController
     private function archiveCandidates(array $rows, string $reason): void
     {
         foreach ($rows as $row) {
+            if ($row['status'] === 'Diterima') {
+                log_message('info', "Auto-arsip dilewati untuk kandidat #{$row['id']} ({$row['nama_lengkap']}) karena status Diterima.");
+                continue;
+            }
             $this->pendaftaranModel->update($row['id'], [
                 'is_archived'     => 1,
                 'archived_at'     => date('Y-m-d H:i:s'),
