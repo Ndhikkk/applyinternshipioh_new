@@ -509,8 +509,7 @@
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--indosat-dark-red);
-            opacity: 0.8;
+            background: linear-gradient(90deg, rgba(230, 0, 126, 0.75), rgba(255, 79, 163, 0.75));
         }
     </style>
 </head>
