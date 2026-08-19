@@ -1198,7 +1198,7 @@
 <footer class="sticky-footer bg-white mt-5">
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
-            <span>&copy; 2026 IOH Future Talent Program - Admin Panel</span>
+            <span>&copy; 2026 IOH Industry-Academia Collaboration Program - Admin Panel</span>
         </div>
     </div>
 </footer>
