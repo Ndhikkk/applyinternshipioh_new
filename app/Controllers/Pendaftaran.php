@@ -415,7 +415,7 @@ class Pendaftaran extends Controller
                         
                         <!-- TOMBOL AKSI -->
                         <div style='text-align: center; margin-top: 35px;'>
-                            <a href='http://localhost:8080/pendaftaran' style='background-color: #1e3a8a; color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>Cek Status Pendaftaran</a>
+                            <a href='" . base_url('progres') . "' style='background-color: #1e3a8a; color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>Cek Status Pendaftaran</a>
                         </div>
                     </td>
                 </tr>
