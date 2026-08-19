@@ -510,6 +510,7 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--indosat-dark-red);
+            opacity: 0.8;
         }
     </style>
 </head>
