@@ -111,6 +111,7 @@ class Admin extends BaseController
                 ->orLike('nomor_whatsapp', $keyword)
                 ->orLike('token_pendaftaran', $keyword)
                 ->orLike('status', $keyword)
+                ->orLike('divisi_pilihan', $keyword)
             ->groupEnd();
         }
 
