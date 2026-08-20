@@ -293,6 +293,20 @@
                     <span class="divisi-tag">HR</span>
                 </div>
             </div>
+
+            <!-- Divisi 11: SnD -->
+            <div class="divisi-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="divisi-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <h4 class="divisi-title">Sales and Distribution (SnD)</h4>
+                <p class="divisi-desc">Mengelola jaringan distribusi produk dan layanan, strategi penjualan di berbagai channel, serta optimasi channel distribusi untuk memperluas jangkauan pasar.</p>
+                <div class="divisi-tags">
+                    <span class="divisi-tag">Sales</span>
+                    <span class="divisi-tag">Distribution</span>
+                    <span class="divisi-tag">Channel</span>
+                </div>
+            </div>
         </div>
 
         <!-- Call to Action -->

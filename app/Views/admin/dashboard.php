@@ -506,6 +506,7 @@
                                     <option value="Daily Project">Daily Project</option>
                                     <option value="Project Post Paid">Project Post Paid</option>
                                     <option value="Capability Building">Capability Building</option>
+                                    <option value="SnD">SnD</option>
                                 </select>
                             </div>
                         </div>
