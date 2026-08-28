@@ -33,9 +33,9 @@
                     <i class="bi bi-archive"></i> <?= $is_arsip ? 'Kembali' : 'Arsip (' . $total_arsip . ')' ?>
                 </a>
 
-                <a href="<?= site_url('admin/export') ?>" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
+                <button type="button" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-xl-grow-0" id="btnExportExcel" onclick="openExportModal()">
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
-                </a>
+                </button>
                 
                 <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
                     <i class="bi bi-file-earmark-pdf"></i> Generate CV
@@ -1085,6 +1085,54 @@
             const row = document.getElementById('row-' + id);
             if (row) row.remove();
             toast('success', json.message || 'Data berhasil dipulihkan.');
+        });
+    }
+
+    // ===================== MODAL PILIHAN EXPORT EXCEL =====================
+    function openExportModal() {
+        const searchInput = document.getElementById('searchInput');
+        const arsipParam = document.getElementById('arsipParam');
+        const keyword = searchInput ? searchInput.value.trim() : '';
+        const isArsip = !!arsipParam;
+
+        Swal.fire({
+            title: '<i class="bi bi-file-earmark-excel text-success me-2"></i>Pilihan Format Export Excel',
+            html: `
+                <p class="text-muted small mb-3">Silakan pilih susunan kolom yang ingin Anda unduh ke file Excel:</p>
+                <div class="d-flex flex-column gap-2 text-start">
+                    <button type="button" id="swalBtnExportCustom" class="btn btn-outline-primary p-3 text-start d-flex align-items-center gap-3">
+                        <i class="bi bi-layout-text-window-reverse fs-3 text-primary flex-shrink-0"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Susunan Kolom Kustom (12 Kolom + Dropdown)</strong>
+                            <small class="text-muted">Profil, Periode, Status Magang (Active/Completed), Suket Penerimaan, Suket Selesai, & Sertif Selesai.</small>
+                        </div>
+                    </button>
+                    <button type="button" id="swalBtnExportDashboard" class="btn btn-outline-secondary p-3 text-start d-flex align-items-center gap-3">
+                        <i class="bi bi-table fs-3 text-success flex-shrink-0"></i>
+                        <div>
+                            <strong class="d-block text-dark mb-1">Susunan Lengkap Sesuai Dashboard (19 Kolom)</strong>
+                            <small class="text-muted">Semua kolom tabel dashboard tanpa perubahan urutan: Kontak, Akademik, Lokasi, Divisi, Status, Periode, Tanggal, & Catatan.</small>
+                        </div>
+                    </button>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            didOpen: () => {
+                const baseExportUrl = '<?= site_url('admin/export') ?>';
+                function runExport(mode) {
+                    const url = new URL(baseExportUrl);
+                    if (keyword) url.searchParams.set('keyword', keyword);
+                    if (isArsip) url.searchParams.set('arsip', '1');
+                    url.searchParams.set('mode', mode);
+                    window.location.href = url.toString();
+                    Swal.close();
+                }
+
+                document.getElementById('swalBtnExportCustom').addEventListener('click', () => runExport('custom'));
+                document.getElementById('swalBtnExportDashboard').addEventListener('click', () => runExport('dashboard'));
+            }
         });
     }
 

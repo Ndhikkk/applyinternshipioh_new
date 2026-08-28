@@ -6,6 +6,14 @@ use App\Models\AdminModel;
 use App\Models\PendaftaranModel;
 use App\Models\AppSettingsModel;
 use Config\Services;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Conditional;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class Admin extends BaseController
 {
@@ -180,34 +188,329 @@ class Admin extends BaseController
             return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        $pendaftaran = $this->pendaftaranModel->orderBy('created_at', 'DESC')->findAll();
-        $filename = 'data_pendaftaran_magang_' . date('Y-m-d') . '.csv';
+        $isArsip = $this->request->getGet('arsip') == '1';
+        $keyword = $this->request->getGet('keyword');
+        $mode    = $this->request->getGet('mode') ?? 'custom'; // 'custom' or 'all'
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $builder = $this->pendaftaranModel
+            ->where('is_archived', $isArsip ? 1 : 0)
+            ->whereIn('status', ['Diterima', 'Complete']);
 
-        $output = fopen('php://output', 'w');
-        fputcsv($output, ['No', 'Token', 'Nama', 'Email', 'WhatsApp', 'Kampus', 'Program Studi', 'Divisi', 'Semester', 'Jenis Magang', 'Status', 'Periode Magang', 'Tanggal Daftar']);
-
-        $no = 1;
-        foreach ($pendaftaran as $row) {
-            fputcsv($output, [
-                $no++,
-                $row['token_pendaftaran'] ?? '-',
-                $row['nama_lengkap'],
-                $row['email'] ?? '-',
-                $row['nomor_whatsapp'],
-                $row['asal_kampus'],
-                $row['program_studi'],
-                $row['divisi_pilihan'] ?? '-',
-                $row['semester'],
-                $row['jenis_magang'] ?? '-',
-                $row['status'],
-                $row['periode_mulai'] . ' to ' . $row['periode_selesai'],
-                date('d/m/Y H:i', strtotime($row['created_at']))
-            ]);
+        if (!empty($keyword)) {
+            $builder->groupStart()
+                ->like('nama_lengkap', $keyword)
+                ->orLike('email', $keyword)
+                ->orLike('asal_kampus', $keyword)
+                ->orLike('program_studi', $keyword)
+                ->orLike('nomor_whatsapp', $keyword)
+                ->orLike('token_pendaftaran', $keyword)
+                ->orLike('status', $keyword)
+                ->orLike('divisi_pilihan', $keyword)
+                ->orLike('regional_interview', $keyword)
+                ->orLike('kota_pilihan', $keyword)
+            ->groupEnd();
         }
-        fclose($output);
+
+        $sortField = $isArsip ? 'archived_at' : 'created_at';
+        $pendaftaran = $builder->orderBy($sortField, 'DESC')->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle($isArsip ? 'Data Arsip Diterima' : 'Data Peserta Diterima');
+
+        // Tampilkan garis kisi (gridlines)
+        $sheet->setShowGridLines(true);
+
+        $rowIndex = 2;
+        $no = 1;
+
+        if ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') {
+            // Mode SESUAI TAMPILAN DASHBOARD (Urutan Asli Dashboard)
+            $headers = [
+                'No',
+                'Token Pendaftaran',
+                'Nama Lengkap',
+                'Email',
+                'WhatsApp',
+                'Nomor Darurat',
+                'Asal Kampus',
+                'Program Studi',
+                'Semester',
+                'Regional Interview',
+                'Kota Pilihan',
+                'Divisi Pilihan',
+                'Jenis Magang',
+                'Status',
+                'Periode Mulai',
+                'Periode Selesai',
+                'Tanggal Daftar',
+                'Terakhir Diubah',
+                'Catatan Admin / Arsip'
+            ];
+
+            // Tulis header di Baris 1
+            $colIndex = 1;
+            foreach ($headers as $headerText) {
+                $sheet->setCellValue([$colIndex, 1], $headerText);
+                $colIndex++;
+            }
+
+            foreach ($pendaftaran as $row) {
+                $periodeMulai   = !empty($row['periode_mulai']) ? date('d/m/Y', strtotime($row['periode_mulai'])) : '-';
+                $periodeSelesai = !empty($row['periode_selesai']) ? date('d/m/Y', strtotime($row['periode_selesai'])) : '-';
+                $tglDaftar      = !empty($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : '-';
+                $tglUbah        = !empty($row['updated_at']) ? date('d/m/Y H:i', strtotime($row['updated_at'])) : '-';
+                $catatan        = $row['catatan_admin'] ?? $row['archived_reason'] ?? $row['catatan'] ?? '-';
+
+                $sheet->setCellValue([1, $rowIndex], $no++);
+                $sheet->setCellValueExplicit([2, $rowIndex], (string) ($row['token_pendaftaran'] ?? '-'), DataType::TYPE_STRING);
+                $sheet->setCellValue([3, $rowIndex], $row['nama_lengkap'] ?? '-');
+                $sheet->setCellValue([4, $rowIndex], $row['email'] ?? '-');
+                $sheet->setCellValueExplicit([5, $rowIndex], (string) ($row['nomor_whatsapp'] ?? '-'), DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit([6, $rowIndex], (string) ($row['nomor_darurat'] ?? '-'), DataType::TYPE_STRING);
+                $sheet->setCellValue([7, $rowIndex], $row['asal_kampus'] ?? '-');
+                $sheet->setCellValue([8, $rowIndex], $row['program_studi'] ?? '-');
+                $sheet->setCellValue([9, $rowIndex], $row['semester'] ?? '-');
+                $sheet->setCellValue([10, $rowIndex], $row['regional_interview'] ?? '-');
+                $sheet->setCellValue([11, $rowIndex], $row['kota_pilihan'] ?? '-');
+                $sheet->setCellValue([12, $rowIndex], $row['divisi_pilihan'] ?? '-');
+                $sheet->setCellValue([13, $rowIndex], $row['jenis_magang'] ?? '-');
+                $sheet->setCellValue([14, $rowIndex], $row['status'] ?? '-');
+                $sheet->setCellValue([15, $rowIndex], $periodeMulai);
+                $sheet->setCellValue([16, $rowIndex], $periodeSelesai);
+                $sheet->setCellValue([17, $rowIndex], $tglDaftar);
+                $sheet->setCellValue([18, $rowIndex], $tglUbah);
+                $sheet->setCellValue([19, $rowIndex], $catatan);
+
+                $sheet->getRowDimension($rowIndex)->setRowHeight(22);
+                $rowIndex++;
+            }
+        } else {
+            // Mode CUSTOM (12 Kolom: Kolom Utama + Status Magang + Suket & Sertif)
+            $headers = [
+                'No',
+                'Token Pendaftaran',
+                'Nama Lengkap',
+                'Divisi Pilihan',
+                'Asal Kampus',
+                'Program Studi',
+                'Periode Mulai',
+                'Periode Selesai',
+                'Status Magang',
+                'Suket Penerimaan',
+                'Suket Selesai',
+                'Sertif Selesai'
+            ];
+
+            // Tulis header di Baris 1
+            $colIndex = 1;
+            foreach ($headers as $headerText) {
+                $sheet->setCellValue([$colIndex, 1], $headerText);
+                $colIndex++;
+            }
+
+            foreach ($pendaftaran as $row) {
+                $periodeMulai   = !empty($row['periode_mulai']) ? date('d/m/Y', strtotime($row['periode_mulai'])) : '-';
+                $periodeSelesai = !empty($row['periode_selesai']) ? date('d/m/Y', strtotime($row['periode_selesai'])) : '-';
+
+                $currentStatus = $row['status'] ?? '-';
+                if ($currentStatus === 'Diterima') {
+                    $statusDisplay = 'Active';
+                } elseif ($currentStatus === 'Complete') {
+                    $statusDisplay = 'Completed';
+                } else {
+                    $statusDisplay = $currentStatus;
+                }
+
+                $sheet->setCellValue([1, $rowIndex], $no++);
+                $sheet->setCellValueExplicit([2, $rowIndex], (string) ($row['token_pendaftaran'] ?? '-'), DataType::TYPE_STRING);
+                $sheet->setCellValue([3, $rowIndex], $row['nama_lengkap'] ?? '-');
+                $sheet->setCellValue([4, $rowIndex], $row['divisi_pilihan'] ?? '-');
+                $sheet->setCellValue([5, $rowIndex], $row['asal_kampus'] ?? '-');
+                $sheet->setCellValue([6, $rowIndex], $row['program_studi'] ?? '-');
+                $sheet->setCellValue([7, $rowIndex], $periodeMulai);
+                $sheet->setCellValue([8, $rowIndex], $periodeSelesai);
+                $sheet->setCellValue([9, $rowIndex], $statusDisplay);
+                $sheet->setCellValue([10, $rowIndex], 'Belum Diproses');
+                $sheet->setCellValue([11, $rowIndex], 'Belum Diproses');
+                $sheet->setCellValue([12, $rowIndex], 'Belum Diproses');
+
+                $sheet->getRowDimension($rowIndex)->setRowHeight(22);
+                $rowIndex++;
+            }
+
+            // Pasang Excel Data Validation Dropdown pada kolom Status Magang (Kolom I) dan Suket/Sertif (Kolom J, K, L)
+            $maxValidationRow = max(100, $rowIndex + 50);
+            for ($r = 2; $r <= $maxValidationRow; $r++) {
+                // Status Magang (Kolom I)
+                $valStatus = $sheet->getCell('I' . $r)->getDataValidation();
+                $valStatus->setType(DataValidation::TYPE_LIST);
+                $valStatus->setErrorStyle(DataValidation::STYLE_INFORMATION);
+                $valStatus->setAllowBlank(true);
+                $valStatus->setShowInputMessage(true);
+                $valStatus->setShowErrorMessage(true);
+                $valStatus->setShowDropDown(true);
+                $valStatus->setPromptTitle('Status Magang');
+                $valStatus->setPrompt('Pilih Active atau Completed');
+                $valStatus->setFormula1('"Active,Completed"');
+
+                // Suket Penerimaan (Kolom J)
+                $valSuketP = $sheet->getCell('J' . $r)->getDataValidation();
+                $valSuketP->setType(DataValidation::TYPE_LIST);
+                $valSuketP->setErrorStyle(DataValidation::STYLE_INFORMATION);
+                $valSuketP->setAllowBlank(true);
+                $valSuketP->setShowDropDown(true);
+                $valSuketP->setFormula1('"Belum Diproses,Sedang Diproses,Sudah Dikirim"');
+
+                // Suket Selesai (Kolom K)
+                $valSuketS = $sheet->getCell('K' . $r)->getDataValidation();
+                $valSuketS->setType(DataValidation::TYPE_LIST);
+                $valSuketS->setErrorStyle(DataValidation::STYLE_INFORMATION);
+                $valSuketS->setAllowBlank(true);
+                $valSuketS->setShowDropDown(true);
+                $valSuketS->setFormula1('"Belum Diproses,Sedang Diproses,Sudah Dikirim"');
+
+                // Sertif Selesai (Kolom L)
+                $valSertif = $sheet->getCell('L' . $r)->getDataValidation();
+                $valSertif->setType(DataValidation::TYPE_LIST);
+                $valSertif->setErrorStyle(DataValidation::STYLE_INFORMATION);
+                $valSertif->setAllowBlank(true);
+                $valSertif->setShowDropDown(true);
+                $valSertif->setFormula1('"Belum Diproses,Sedang Diproses,Sudah Dikirim"');
+            }
+
+            // === CONDITIONAL FORMATTING (PEWARNAAN OTOMATIS) ===
+            // 1. Rule untuk Status Magang (Kolom I): Active (Hijau) & Completed (Biru)
+            $condActive = new Conditional();
+            $condActive->setConditionType(Conditional::CONDITION_CELLIS);
+            $condActive->setOperatorType(Conditional::OPERATOR_EQUAL);
+            $condActive->addCondition('"Active"');
+            $condActive->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D4EDDA');
+            $condActive->getStyle()->getFont()->getColor()->setRGB('155724');
+            $condActive->getStyle()->getFont()->setBold(true);
+
+            $condCompleted = new Conditional();
+            $condCompleted->setConditionType(Conditional::CONDITION_CELLIS);
+            $condCompleted->setOperatorType(Conditional::OPERATOR_EQUAL);
+            $condCompleted->addCondition('"Completed"');
+            $condCompleted->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('CCE5FF');
+            $condCompleted->getStyle()->getFont()->getColor()->setRGB('004085');
+            $condCompleted->getStyle()->getFont()->setBold(true);
+
+            $sheet->getStyle('I2:I' . $maxValidationRow)->setConditionalStyles([$condActive, $condCompleted]);
+
+            // 2. Rule untuk Suket & Sertif (Kolom J, K, L): Belum Diproses (Merah Muda), Sedang Diproses (Kuning), Sudah Dikirim (Hijau Muda)
+            $condBelum = new Conditional();
+            $condBelum->setConditionType(Conditional::CONDITION_CELLIS);
+            $condBelum->setOperatorType(Conditional::OPERATOR_EQUAL);
+            $condBelum->addCondition('"Belum Diproses"');
+            $condBelum->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F8D7DA');
+            $condBelum->getStyle()->getFont()->getColor()->setRGB('721C24');
+            $condBelum->getStyle()->getFont()->setBold(true);
+
+            $condSedang = new Conditional();
+            $condSedang->setConditionType(Conditional::CONDITION_CELLIS);
+            $condSedang->setOperatorType(Conditional::OPERATOR_EQUAL);
+            $condSedang->addCondition('"Sedang Diproses"');
+            $condSedang->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFF3CD');
+            $condSedang->getStyle()->getFont()->getColor()->setRGB('856404');
+            $condSedang->getStyle()->getFont()->setBold(true);
+
+            $condSudah = new Conditional();
+            $condSudah->setConditionType(Conditional::CONDITION_CELLIS);
+            $condSudah->setOperatorType(Conditional::OPERATOR_EQUAL);
+            $condSudah->addCondition('"Sudah Dikirim"');
+            $condSudah->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D4EDDA');
+            $condSudah->getStyle()->getFont()->getColor()->setRGB('155724');
+            $condSudah->getStyle()->getFont()->setBold(true);
+
+            $docRules = [$condBelum, $condSedang, $condSudah];
+            $sheet->getStyle('J2:J' . $maxValidationRow)->setConditionalStyles($docRules);
+            $sheet->getStyle('K2:K' . $maxValidationRow)->setConditionalStyles($docRules);
+            $sheet->getStyle('L2:L' . $maxValidationRow)->setConditionalStyles($docRules);
+        }
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        // Styling baris header (Indosat Red Accent)
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 11,
+                'name' => 'Calibri',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
+            ],
+            'fill' => [
+                'fillType'   => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'C00000'],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color'       => ['rgb' => '8B0000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:' . $highestColumn . '1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(28);
+
+        $lastRow = max(2, $rowIndex - 1);
+
+        // Styling data cells
+        if ($rowIndex > 2) {
+            $dataStyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color'       => ['rgb' => 'E0E0E0'],
+                    ],
+                ],
+                'alignment' => [
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+            ];
+            $sheet->getStyle('A2:' . $highestColumn . $lastRow)->applyFromArray($dataStyle);
+
+            if ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') {
+                $centerCols = ['A', 'B', 'I', 'J', 'M', 'N', 'O', 'P', 'Q', 'R'];
+            } else {
+                $centerCols = ['A', 'B', 'G', 'H', 'I', 'J', 'K', 'L'];
+            }
+
+            foreach ($centerCols as $col) {
+                $sheet->getStyle($col . '2:' . $col . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        }
+
+        // Aktifkan Filter dropdown pada baris header
+        $sheet->setAutoFilter('A1:' . $highestColumn . $lastRow);
+
+        // Auto-fit lebar kolom
+        foreach (range('A', $highestColumn) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $modeSuffix = ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') ? '_dashboard_' : '_kustom_';
+        $filename = ($isArsip ? 'data_arsip_diterima' : 'data_peserta_diterima') . $modeSuffix . date('Y-m-d_His') . '.xlsx';
+
+        // Bersihkan output buffer agar file zip/xlsx tidak korup
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
         exit;
     }
 
