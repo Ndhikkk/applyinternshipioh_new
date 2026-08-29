@@ -27,8 +27,9 @@
                                 $badge_class = match ($p['status']) {
                                     'Menunggu' => 'bg-warning',
                                     'Diterima' => 'bg-success',
-                                    'Ditolak' => 'bg-danger',
-                                    default => 'bg-secondary'
+                                    'Complete' => 'bg-purple',
+                                    'Ditolak'  => 'bg-danger',
+                                    default    => 'bg-secondary'
                                 };
                                 ?>
                                 <span class="badge <?= $badge_class ?>"><?= esc($p['status']) ?></span>

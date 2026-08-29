@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `pendaftaran_magang` (
   `cv` VARCHAR(255) NOT NULL,
   `surat_pengantar` VARCHAR(255) NOT NULL,
   `ktm` VARCHAR(255) NOT NULL,
-  `status` ENUM('Menunggu', 'Progress', 'Lolos_Interview_1', 'Tidak_Lolos_Interview_1', 'Lolos_Interview_2', 'Tidak_Lolos_Interview_2', 'Lolos_Interview_3', 'Tidak_Lolos_Interview_3', 'Diterima', 'Ditolak') NOT NULL DEFAULT 'Menunggu',
+  `status` ENUM('Menunggu', 'Progress', 'Lolos_Interview_1', 'Tidak_Lolos_Interview_1', 'Lolos_Interview_2', 'Tidak_Lolos_Interview_2', 'Lolos_Interview_3', 'Tidak_Lolos_Interview_3', 'Lolos_Final', 'Diterima', 'Complete', 'Ditolak') NOT NULL DEFAULT 'Menunggu',
   `catatan` TEXT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

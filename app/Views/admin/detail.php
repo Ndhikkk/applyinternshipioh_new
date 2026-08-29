@@ -126,12 +126,11 @@
                         <div class="mb-3">
                             <label class="form-label small text-muted">Ubah status manual (di luar alur interview bertahap)</label>
                             <select name="status" class="form-select">
-                                <option value="Menunggu" <?= $item['status'] === 'Menunggu' ? 'selected' : '' ?>>Menunggu
-                                </option>
-                                <option value="Diterima" <?= $item['status'] === 'Diterima' ? 'selected' : '' ?>>Diterima
-                                </option>
-                                <option value="Ditolak" <?= $item['status'] === 'Ditolak' ? 'selected' : '' ?>>Ditolak
-                                </option>
+                                <option value="Menunggu" <?= $item['status'] === 'Menunggu' ? 'selected' : '' ?>>Menunggu</option>
+                                <option value="Progress" <?= $item['status'] === 'Progress' ? 'selected' : '' ?>>Progress</option>
+                                <option value="Diterima" <?= $item['status'] === 'Diterima' ? 'selected' : '' ?>>Diterima</option>
+                                <option value="Complete" <?= $item['status'] === 'Complete' ? 'selected' : '' ?>>Complete</option>
+                                <option value="Ditolak" <?= $item['status'] === 'Ditolak' ? 'selected' : '' ?>>Ditolak</option>
                             </select>
                         </div>
                         <div class="mb-3">

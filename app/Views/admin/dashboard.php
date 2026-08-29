@@ -480,6 +480,7 @@
                                     <option value="Menunggu">Menunggu</option>
                                     <option value="Progress">Progress</option>
                                     <option value="Diterima">Diterima</option>
+                                    <option value="Complete">Complete (Selesai Magang)</option>
                                     <option value="Ditolak">Ditolak</option>
                                 </select>
                             </div>
@@ -571,10 +572,10 @@
                             <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                         </button>
                         <a id="amBtnPdf" href="#" target="_blank" class="btn btn-danger btn-sm" style="display:none;" title="Unduh Sertifikat PDF">
-                            <i class="bi bi-file-earmark-pdf-fill"></i> Unduh PDF
+                            <i class="bi bi-file-earmark-pdf-fill"></i> Sertifikat PDF
                         </a>
                         <a id="amBtnPptx" href="#" class="btn btn-warning btn-sm text-dark" style="display:none;" title="Unduh Sertifikat PowerPoint (.pptx)">
-                            <i class="bi bi-file-earmark-ppt-fill"></i> Unduh PPTX
+                            <i class="bi bi-file-earmark-ppt-fill"></i> Sertifikat PPTX
                         </a>
                         <button type="button" class="btn btn-outline-danger btn-sm ms-auto" onclick="hapusData(currentModalId, true)">
                             <i class="bi bi-trash"></i> Hapus Data Ini
@@ -714,6 +715,7 @@
 
     function formatStatusLabel(status) {
         if (!status) return 'MENUNGGU';
+        if (status === 'Complete') return 'COMPLETE';
         if (status.includes('Interview')) return status.toUpperCase();
         if (status === 'Progress') return 'PROGRESS';
         if (status === 'Diterima') return 'DITERIMA';
@@ -724,14 +726,16 @@
 
     function statusBadgeMarkupFromLabel(status) {
         if (!status) status = 'Menunggu';
+        const isComplete = status === 'Complete';
         const isFinal = status === 'Diterima';
         const isRejected = ['Ditolak'].includes(status);
-        let cls = 'bg-warning';
-        if (isFinal) cls = 'bg-success';
-        else if (isRejected) cls = 'bg-danger';
-        else if (status.includes('Interview') || status === 'Progress') cls = 'bg-info';
+        let cls = 'bg-warning text-dark';
+        if (isComplete) cls = 'bg-purple text-white';
+        else if (isFinal) cls = 'bg-success text-white';
+        else if (isRejected) cls = 'bg-danger text-white';
+        else if (status.includes('Interview') || status === 'Progress') cls = 'bg-info text-dark';
         
-        return `<span class="badge ${cls} text-dark">${formatStatusLabel(status)}</span>`;
+        return `<span class="badge ${cls}">${formatStatusLabel(status)}</span>`;
     }
 
     function displayStatus(item) {
@@ -811,10 +815,10 @@
                 : `<span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada proposal yang diunggah</span>`;
         }
 
-        // Tombol Sertifikat PDF & PPTX di Modal (Hanya jika status Complete)
+        // Tombol Sertifikat PDF & PPTX di Modal (Status Diterima atau Complete)
         const btnPdf = document.getElementById('amBtnPdf');
         const btnPptx = document.getElementById('amBtnPptx');
-        if (item.status === 'Complete') {
+        if (item.status === 'Diterima' || item.status === 'Complete') {
             if (btnPdf) {
                 btnPdf.href = `<?= site_url('admin/certificate/pdf/') ?>${item.id}`;
                 btnPdf.style.display = '';
@@ -861,6 +865,17 @@
             }
             html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false, this)">
                         <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        } else if (status === 'Diterima') {
+            html += `<button type="button" id="completeCandidateButton" class="btn btn-purple btn-sm" onclick="showSubForm('Complete', 'Selesaikan Magang (Complete)', false, this)">
+                        <i class="bi bi-award-fill"></i> Selesaikan Magang (Complete)
+                     </button>`;
+            html += `<button type="button" class="btn btn-danger btn-sm" onclick="showSubForm('Ditolak', 'Tolak Kandidat', false, this)">
+                        <i class="bi bi-x-lg"></i> Tolak
+                     </button>`;
+        } else if (status === 'Complete') {
+            html += `<button type="button" class="btn btn-outline-success btn-sm" onclick="showSubForm('Diterima', 'Kembalikan ke Status Diterima', false, this)">
+                        <i class="bi bi-arrow-counterclockwise"></i> Kembalikan ke Diterima
                      </button>`;
         }
 

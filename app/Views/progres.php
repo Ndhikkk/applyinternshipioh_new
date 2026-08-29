@@ -88,6 +88,7 @@
                                     $statusClass = [
                                         'Menunggu' => 'bg-warning text-dark',
                                         'Diterima' => 'bg-success text-white',
+                                        'Complete' => 'bg-purple text-white',
                                         'Ditolak' => 'bg-danger text-white',
                                         'Progress' => 'bg-info text-dark',
                                         'Lolos_Interview_1' => 'bg-info text-dark',
@@ -112,6 +113,8 @@
                                                 $labelText = 'Interview Tahap 2';
                                             } elseif ($currentStatus === 'Diterima') {
                                                 $labelText = 'Diterima';
+                                            } elseif ($currentStatus === 'Complete') {
+                                                $labelText = 'Complete (Selesai Magang)';
                                             }
                                         ?>
                                         <span class="badge <?= $badgeClass ?> fs-4 px-5 py-3 rounded-pill shadow-sm fw-bold">

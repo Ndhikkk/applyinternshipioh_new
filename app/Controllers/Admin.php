@@ -81,8 +81,11 @@ class Admin extends BaseController
         }
 
         // Hapus otomatis data yang sudah lewat tenggat waktu retensi
-        // (masuk arsip dulu 7 hari, baru dihapus permanen kalau tidak dipulihkan)
-        $this->runRetentionCleanup();
+        try {
+            $this->runRetentionCleanup();
+        } catch (\Throwable $e) {
+            log_message('error', 'Retention cleanup error: ' . $e->getMessage());
+        }
 
         $isArsip = $this->request->getGet('arsip') == '1';
 
@@ -90,9 +93,7 @@ class Admin extends BaseController
 
         $data['total_diterima'] = $this->pendaftaranModel
             ->where('is_archived', 0)
-            ->groupStart()
-                ->where('status', 'Diterima')
-            ->groupEnd()
+            ->whereIn('status', ['Diterima', 'Complete'])
             ->countAllResults();
 
         $data['total_ditolak'] = $this->pendaftaranModel
@@ -730,8 +731,10 @@ class Admin extends BaseController
 
         if (!$isManual) {
             $allowedTransitions = [
-                'Menunggu' => ['Progress', 'Ditolak'],
+                'Menunggu' => ['Progress', 'Diterima', 'Ditolak'],
                 'Progress' => ['Diterima', 'Ditolak'],
+                'Diterima' => ['Complete', 'Ditolak'],
+                'Complete' => ['Diterima', 'Ditolak'],
             ];
 
             if (isset($allowedTransitions[$pendaftaran['status']])
@@ -936,8 +939,8 @@ class Admin extends BaseController
     private function archiveCandidates(array $rows, string $reason): void
     {
         foreach ($rows as $row) {
-            if ($row['status'] === 'Diterima') {
-                log_message('info', "Auto-arsip dilewati untuk kandidat #{$row['id']} ({$row['nama_lengkap']}) karena status Diterima.");
+            if (in_array($row['status'], ['Diterima', 'Complete'], true)) {
+                log_message('info', "Auto-arsip dilewati untuk kandidat #{$row['id']} ({$row['nama_lengkap']}) karena status {$row['status']}.");
                 continue;
             }
             $this->pendaftaranModel->update($row['id'], [
@@ -1007,6 +1010,7 @@ class Admin extends BaseController
     {
         return match (true) {
             in_array($status, ['Diterima'], true) => 'bg-success',
+            $status === 'Complete' => 'bg-purple',
             $status === 'Ditolak' => 'bg-danger',
             in_array($status, ['Progress', 'Interview Tahap 1', 'Interview Tahap 2'], true) => 'bg-info',
             default => 'bg-warning',

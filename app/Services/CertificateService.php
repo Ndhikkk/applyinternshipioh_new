@@ -121,7 +121,7 @@ class CertificateService
         $periodeMulaiStr   = $this->formatIndonesianDate($data['periode_mulai'] ?? null, '13 April 2026');
         $periodeSelesaiStr = $this->formatIndonesianDate($data['periode_selesai'] ?? null, '13 Agustus 2026');
         $kota              = !empty($data['regional_interview']) ? $data['regional_interview'] : (!empty($data['kota_pilihan']) ? $data['kota_pilihan'] : 'Semarang');
-        $tanggalTerbit     = $this->formatIndonesianDate($data['periode_selesai'] ?? date('Y-m-d'), date('d F Y'));
+        $tanggalTerbit     = $this->formatIndonesianDate(date('Y-m-d'), date('d F Y'));
 
         $replacements = [
             '[nama partisipan]'             => $namaLengkap,
@@ -282,7 +282,7 @@ class CertificateService
 
         // 8. Place & Issue Date (Roboto Serif 17)
         $kota = !empty($data['regional_interview']) ? $data['regional_interview'] : (!empty($data['kota_pilihan']) ? $data['kota_pilihan'] : 'Semarang');
-        $tanggalTerbit = $this->formatIndonesianDate($data['periode_selesai'] ?? date('Y-m-d'), date('d F Y'));
+        $tanggalTerbit = $this->formatIndonesianDate(date('Y-m-d'), date('d F Y'));
         $placeAndDate = "{$kota}, {$tanggalTerbit}";
 
         $pdf->SetXY(20.4, 135);

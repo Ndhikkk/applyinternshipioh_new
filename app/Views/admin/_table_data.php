@@ -20,12 +20,15 @@
                     <?php
                         $currentStatus = $data['status'] ?? 'Menunggu';
                         if (empty($currentStatus)) $currentStatus = 'Menunggu';
+                        $isComplete = $currentStatus === 'Complete';
                         $isFinal = $currentStatus === 'Diterima';
                         $isRejected = $currentStatus === 'Ditolak';
                         $isProgress = str_contains($currentStatus, 'Interview') || $currentStatus === 'Progress';
                         
                         $badgeClass = 'bg-warning text-dark';
-                        if ($isFinal) {
+                        if ($isComplete) {
+                            $badgeClass = 'bg-purple text-white';
+                        } elseif ($isFinal) {
                             $badgeClass = 'bg-success';
                         } elseif ($isRejected) {
                             $badgeClass = 'bg-danger';
@@ -34,9 +37,10 @@
                         }
                         
                         $statusLabel = 'MENUNGGU';
-                        if ($isFinal) $statusLabel = 'DITERIMA';
-                        if ($isRejected) $statusLabel = 'DITOLAK';
-                        if ($isProgress) $statusLabel = 'PROGRESS';
+                        if ($isComplete) $statusLabel = 'COMPLETE';
+                        elseif ($isFinal) $statusLabel = 'DITERIMA';
+                        elseif ($isRejected) $statusLabel = 'DITOLAK';
+                        elseif ($isProgress) $statusLabel = 'PROGRESS';
 
                         $step = 0;
                         if (preg_match('/Interview_(\d)/', $currentStatus, $m)) { $step = (int) $m[1]; }
@@ -157,7 +161,7 @@
                                     <button type="button" class="btn btn-primary btn-sm btn-aksi-label" onclick="openActionModal(<?= $data['id'] ?>, '<?= esc($data['nama_lengkap'], 'js') ?>')" title="Lihat Detail & Kelola Status">
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
-                                    <?php if ($currentStatus === 'Complete'): ?>
+                                    <?php if (in_array($currentStatus, ['Diterima', 'Complete'], true)): ?>
                                         <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
                                             <i class="bi bi-file-earmark-pdf"></i>
                                         </a>

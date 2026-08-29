@@ -70,6 +70,7 @@ class PendaftaranModel extends Model
             'Menunggu',
             'Progress',
             'Diterima',
+            'Complete',
             'Ditolak'
         ];
     }
