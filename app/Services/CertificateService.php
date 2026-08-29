@@ -17,12 +17,69 @@ class CertificateService
 
     public function __construct()
     {
-        $this->pptxTemplatePath = WRITEPATH . 'templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx';
-        $this->assetsPath       = FCPATH . 'assets/img/certificate/';
-        $this->bgPath           = $this->assetsPath . 'bg_certificate.jpg';
-        $this->logoPath         = $this->assetsPath . 'logo_badge.png';
-        $this->linePath         = $this->assetsPath . 'line_accent.png';
-        $this->signaturePath    = $this->assetsPath . 'signature_micha.png';
+        // 1. Template PPTX path resolution
+        $pptxCandidates = [
+            APPPATH . 'ThirdParty/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            WRITEPATH . 'templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            ROOTPATH . 'writable/templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            APPPATH . '../writable/templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+        ];
+        $this->pptxTemplatePath = '';
+        foreach ($pptxCandidates as $p) {
+            if (file_exists($p)) {
+                $this->pptxTemplatePath = $p;
+                break;
+            }
+        }
+        if (!$this->pptxTemplatePath) {
+            $this->pptxTemplatePath = APPPATH . 'ThirdParty/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx';
+        }
+
+        // 2. Image Assets path resolution
+        $imgDirCandidates = [
+            APPPATH . 'ThirdParty/certificate/',
+            defined('FCPATH') ? FCPATH . 'assets/img/certificate/' : '',
+            defined('ROOTPATH') ? ROOTPATH . 'public/assets/img/certificate/' : '',
+            defined('ROOTPATH') ? ROOTPATH . 'assets/img/certificate/' : '',
+            APPPATH . '../public/assets/img/certificate/',
+        ];
+        $this->assetsPath = '';
+        foreach ($imgDirCandidates as $dir) {
+            if (!empty($dir) && is_dir($dir) && file_exists($dir . 'bg_certificate.jpg')) {
+                $this->assetsPath = rtrim($dir, '/') . '/';
+                break;
+            }
+        }
+        if (!$this->assetsPath) {
+            $this->assetsPath = APPPATH . 'ThirdParty/certificate/';
+        }
+
+        $this->bgPath        = $this->assetsPath . 'bg_certificate.jpg';
+        $this->logoPath      = $this->assetsPath . 'logo_badge.png';
+        $this->linePath      = $this->assetsPath . 'line_accent.png';
+        $this->signaturePath = $this->assetsPath . 'signature_micha.png';
+    }
+
+    /**
+     * Get resolved font directory path
+     */
+    protected function getFontPath(): string
+    {
+        $fontDirCandidates = [
+            APPPATH . 'ThirdParty/fonts/',
+            defined('FCPATH') ? FCPATH . 'assets/fonts/' : '',
+            defined('ROOTPATH') ? ROOTPATH . 'public/assets/fonts/' : '',
+            defined('ROOTPATH') ? ROOTPATH . 'assets/fonts/' : '',
+            APPPATH . '../public/assets/fonts/',
+        ];
+
+        foreach ($fontDirCandidates as $dir) {
+            if (!empty($dir) && is_dir($dir) && file_exists($dir . 'Georgia.json')) {
+                return rtrim($dir, '/') . '/';
+            }
+        }
+
+        return APPPATH . 'ThirdParty/fonts/';
     }
 
     /**
@@ -147,13 +204,14 @@ class CertificateService
         if (!class_exists('\\FPDF')) {
             if (file_exists(APPPATH . 'ThirdParty/fpdf/fpdf.php')) {
                 require_once APPPATH . 'ThirdParty/fpdf/fpdf.php';
-            } elseif (file_exists(ROOTPATH . 'vendor/setasign/fpdf/fpdf.php')) {
+            } elseif (defined('ROOTPATH') && file_exists(ROOTPATH . 'vendor/setasign/fpdf/fpdf.php')) {
                 require_once ROOTPATH . 'vendor/setasign/fpdf/fpdf.php';
             }
         }
 
+        $fontPath = $this->getFontPath();
         if (!defined('FPDF_FONTPATH')) {
-            define('FPDF_FONTPATH', FCPATH . 'assets/fonts/');
+            define('FPDF_FONTPATH', $fontPath);
         }
 
         $pdf = new \FPDF('L', 'mm', 'A4');

@@ -811,10 +811,10 @@
                 : `<span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada proposal yang diunggah</span>`;
         }
 
-        // Tombol Sertifikat PDF & PPTX di Modal
+        // Tombol Sertifikat PDF & PPTX di Modal (Hanya jika status Complete)
         const btnPdf = document.getElementById('amBtnPdf');
         const btnPptx = document.getElementById('amBtnPptx');
-        if (item.status === 'Diterima' || item.status === 'Complete') {
+        if (item.status === 'Complete') {
             if (btnPdf) {
                 btnPdf.href = `<?= site_url('admin/certificate/pdf/') ?>${item.id}`;
                 btnPdf.style.display = '';
