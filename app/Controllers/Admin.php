@@ -1306,15 +1306,45 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        $service = new \App\Services\CertificateService();
-        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
-        $cleanName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $nama);
-        $pptxPath = $service->generatePptx($candidate);
+        try {
+            $service = new \App\Services\CertificateService();
+            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+            $binary = $service->generatePptxString($candidate);
 
-        if (!file_exists($pptxPath)) {
-            return redirect()->back()->with('error', 'Gagal membuat file PPTX sertifikat.');
+            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pptx";
+            return $this->response->download($fileName, $binary);
+        } catch (\Throwable $e) {
+            log_message('error', 'Certificate PPTX Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat PPTX: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download single certificate as PDF (Pure PHP Engine in memory)
+     */
+    public function downloadCertificatePdf($id)
+    {
+        if (!session()->get('admin_logged_in')) {
+            return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        return $this->response->download($pptxPath, null)->setFileName('Sertifikat-' . $cleanName . '.pptx');
+        $candidate = $this->pendaftaranModel->find($id);
+        if (!$candidate) {
+            return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
+        }
+
+        try {
+            $service = new \App\Services\CertificateService();
+            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+            $binary = $service->generatePdfString($candidate);
+
+            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
+            return $this->response->download($fileName, $binary);
+        } catch (\Throwable $e) {
+            log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+        }
     }
 }

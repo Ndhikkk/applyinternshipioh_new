@@ -9,29 +9,52 @@ use DOMXPath;
 class CertificateService
 {
     protected string $pptxTemplatePath;
+    protected string $assetsPath;
+    protected string $bgPath;
+    protected string $logoPath;
+    protected string $linePath;
+    protected string $signaturePath;
 
     public function __construct()
     {
         $this->pptxTemplatePath = WRITEPATH . 'templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx';
+        $this->assetsPath       = FCPATH . 'assets/img/certificate/';
+        $this->bgPath           = $this->assetsPath . 'bg_certificate.jpg';
+        $this->logoPath         = $this->assetsPath . 'logo_badge.png';
+        $this->linePath         = $this->assetsPath . 'line_accent.png';
+        $this->signaturePath    = $this->assetsPath . 'signature_micha.png';
     }
 
     /**
-     * Generate Single Certificate as PPTX by replacing placeholders directly in the template
+     * Generate PPTX as binary string in memory
      *
      * @param array $data Data peserta magang
-     * @param string|null $destPath Destination file path
+     * @return string Binary content of PPTX
+     */
+    public function generatePptxString(array $data): string
+    {
+        $tempFile = sys_get_temp_dir() . '/pptx_cert_' . uniqid('', true) . '.pptx';
+        $this->generatePptx($data, $tempFile);
+
+        $binary = file_get_contents($tempFile);
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+
+        return $binary;
+    }
+
+    /**
+     * Generate Single Certificate as PPTX file by replacing placeholders directly in template
+     *
+     * @param array $data Data peserta magang
+     * @param string $destPath Destination file path
      * @return string Output PPTX file path
      */
-    public function generatePptx(array $data, ?string $destPath = null): string
+    public function generatePptx(array $data, string $destPath): string
     {
         if (!file_exists($this->pptxTemplatePath)) {
             throw new \RuntimeException('File template PowerPoint tidak ditemukan di: ' . $this->pptxTemplatePath);
-        }
-
-        if (empty($destPath)) {
-            $namaLengkap = !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : 'Peserta';
-            $cleanName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $namaLengkap);
-            $destPath = WRITEPATH . 'temp_cert_' . time() . '_' . $cleanName . '.pptx';
         }
 
         // Copy template to destination
@@ -110,6 +133,132 @@ class CertificateService
             $zip->close();
         }
 
+        return $destPath;
+    }
+
+    /**
+     * Generate PDF directly as binary string in memory
+     *
+     * @param array $data Data peserta magang
+     * @return string Binary content of PDF
+     */
+    public function generatePdfString(array $data): string
+    {
+        if (!class_exists('\\FPDF')) {
+            if (file_exists(APPPATH . 'ThirdParty/fpdf/fpdf.php')) {
+                require_once APPPATH . 'ThirdParty/fpdf/fpdf.php';
+            } elseif (file_exists(ROOTPATH . 'vendor/setasign/fpdf/fpdf.php')) {
+                require_once ROOTPATH . 'vendor/setasign/fpdf/fpdf.php';
+            }
+        }
+
+        if (!defined('FPDF_FONTPATH')) {
+            define('FPDF_FONTPATH', FCPATH . 'assets/fonts/');
+        }
+
+        $pdf = new \FPDF('L', 'mm', 'A4');
+        $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0);
+
+        // Register custom typography
+        $pdf->AddFont('Georgia', '', 'Georgia.json');
+        $pdf->AddFont('Georgia', 'B', 'Georgia-Bold.json');
+        $pdf->AddFont('RobotoSerif', '', 'RobotoSerif.json');
+        $pdf->AddFont('RobotoSerif', 'B', 'RobotoSerif.json');
+
+        $pdf->AddPage();
+
+        // 1. Background Canvas (297 x 210 mm)
+        if (file_exists($this->bgPath)) {
+            $pdf->Image($this->bgPath, 0, 0, 297, 210);
+        }
+
+        // 2. Logo Badge (Top right: X=238.4, Y=6.4, W=49.3, H=17.5)
+        if (file_exists($this->logoPath)) {
+            $pdf->Image($this->logoPath, 238.4, 6.4, 49.3, 17.5);
+        }
+
+        // Color Scheme: Black, Text 1, Lighter 35% -> #565658 (RGB: 86, 86, 88)
+        $pdf->SetTextColor(86, 86, 88);
+
+        // 3. Title: SERTIFIKAT (Georgia 60 Regular)
+        $pdf->SetFont('Georgia', '', 60);
+        $pdf->SetXY(20.4, 32);
+        $pdf->Cell(256.2, 22, 'SERTIFIKAT', 0, 0, 'C');
+
+        // 4. Subtitle: diberikan kepada : (Roboto Serif 17)
+        $pdf->SetFont('RobotoSerif', '', 17);
+        $pdf->SetXY(20.4, 62);
+        $pdf->Cell(256.2, 8, 'diberikan kepada :', 0, 0, 'C');
+
+        // 5. Candidate Name: [nama partisipan] (Georgia 36 Regular)
+        $namaLengkap = !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : 'Peserta Magang';
+        
+        $nameFontSize = 36;
+        if (strlen($namaLengkap) > 35) {
+            $nameFontSize = 26;
+        } elseif (strlen($namaLengkap) > 28) {
+            $nameFontSize = 30;
+        }
+
+        $pdf->SetFont('Georgia', '', $nameFontSize);
+        $pdf->SetXY(20.4, 75);
+        $pdf->Cell(256.2, 16, $namaLengkap, 0, 0, 'C');
+
+        // 6. Accent Line (X=44, Y=96, W=208.7, H=2)
+        if (file_exists($this->linePath)) {
+            $pdf->Image($this->linePath, 44, 96, 208.7, 2);
+        }
+
+        // 7. Narrative text with dynamic period (Roboto Serif 17)
+        $periodeMulaiStr   = $this->formatIndonesianDate($data['periode_mulai'] ?? null, '13 April 2026');
+        $periodeSelesaiStr = $this->formatIndonesianDate($data['periode_selesai'] ?? null, '13 Agustus 2026');
+
+        $pdf->SetFont('RobotoSerif', '', 17);
+        $pdf->SetXY(20.4, 104);
+        
+        $narration = "Telah melaksanakan Program Industry-Academia Collaboration\n" .
+                     "Program Di Indosat Ooredoo Hutchison Circle Java\n" .
+                     "Terhitung mulai dari {$periodeMulaiStr} sampai {$periodeSelesaiStr}";
+        $pdf->MultiCell(256.2, 7.5, $narration, 0, 'C');
+
+        // 8. Place & Issue Date (Roboto Serif 17)
+        $kota = !empty($data['regional_interview']) ? $data['regional_interview'] : (!empty($data['kota_pilihan']) ? $data['kota_pilihan'] : 'Semarang');
+        $tanggalTerbit = $this->formatIndonesianDate($data['periode_selesai'] ?? date('Y-m-d'), date('d F Y'));
+        $placeAndDate = "{$kota}, {$tanggalTerbit}";
+
+        $pdf->SetXY(20.4, 135);
+        $pdf->Cell(256.2, 8, $placeAndDate, 0, 0, 'C');
+
+        // 9. Digital Signature (Micha Heru)
+        if (file_exists($this->signaturePath)) {
+            $pdf->Image($this->signaturePath, 115, 143, 66.1, 27.1);
+        }
+
+        // 10. Micha Heru (Roboto Serif 17, Underlined)
+        $pdf->SetFont('RobotoSerif', 'U', 17);
+        $pdf->SetXY(20.4, 172);
+        $pdf->Cell(256.2, 7, 'Micha Heru', 0, 0, 'C');
+
+        // 11. VP - Head of Sales Effectiveness (Arial 13)
+        $pdf->SetFont('Arial', '', 13);
+        $pdf->SetXY(20.4, 180);
+        $pdf->Cell(256.2, 6, 'VP - Head of Sales Effectiveness', 0, 0, 'C');
+
+        return $pdf->Output('S');
+    }
+
+    /**
+     * Generate PDF and save to file
+     *
+     * @param array $data Data peserta magang
+     * @param string $destPath Destination PDF path
+     * @return string Output PDF file path
+     */
+    public function generatePdf(array $data, string $destPath): string
+    {
+        $binary = $this->generatePdfString($data);
+        file_put_contents($destPath, $binary);
         return $destPath;
     }
 

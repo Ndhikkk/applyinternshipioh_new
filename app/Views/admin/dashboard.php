@@ -570,8 +570,11 @@
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="openWaLink(currentModalId)">
                             <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                         </button>
-                        <a id="amBtnPptx" href="#" class="btn btn-warning btn-sm text-dark" style="display:none;" title="Generate Sertifikat PowerPoint (.pptx)">
-                            <i class="bi bi-file-earmark-ppt-fill"></i> Generate Sertifikat (PPTX)
+                        <a id="amBtnPdf" href="#" target="_blank" class="btn btn-danger btn-sm" style="display:none;" title="Unduh Sertifikat PDF">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> Unduh PDF
+                        </a>
+                        <a id="amBtnPptx" href="#" class="btn btn-warning btn-sm text-dark" style="display:none;" title="Unduh Sertifikat PowerPoint (.pptx)">
+                            <i class="bi bi-file-earmark-ppt-fill"></i> Unduh PPTX
                         </a>
                         <button type="button" class="btn btn-outline-danger btn-sm ms-auto" onclick="hapusData(currentModalId, true)">
                             <i class="bi bi-trash"></i> Hapus Data Ini
@@ -808,14 +811,20 @@
                 : `<span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada proposal yang diunggah</span>`;
         }
 
-        // Tombol Generate Sertifikat PPTX di Modal
+        // Tombol Sertifikat PDF & PPTX di Modal
+        const btnPdf = document.getElementById('amBtnPdf');
         const btnPptx = document.getElementById('amBtnPptx');
         if (item.status === 'Diterima' || item.status === 'Complete') {
+            if (btnPdf) {
+                btnPdf.href = `<?= site_url('admin/certificate/pdf/') ?>${item.id}`;
+                btnPdf.style.display = '';
+            }
             if (btnPptx) {
                 btnPptx.href = `<?= site_url('admin/certificate/pptx/') ?>${item.id}`;
                 btnPptx.style.display = '';
             }
         } else {
+            if (btnPdf) btnPdf.style.display = 'none';
             if (btnPptx) btnPptx.style.display = 'none';
         }
 
