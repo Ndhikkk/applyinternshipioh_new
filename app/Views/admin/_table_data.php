@@ -65,6 +65,9 @@
                         <td data-label="Akademik">
                             <div class="fw-semibold mb-1"><?= esc($data['asal_kampus']) ?></div>
                             <div class="small text-muted mb-1"><?= esc($data['program_studi']) ?></div>
+                            <?php if (!empty($data['nim'])): ?>
+                                <div class="small text-muted mb-1"><i class="bi bi-card-text"></i> NIM: <?= esc($data['nim']) ?></div>
+                            <?php endif; ?>
                             <span class="badge bg-light text-dark border">Smt <?= esc($data['semester']) ?></span>
                         </td>
                         <td data-label="Regional Interview">
@@ -162,7 +165,7 @@
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
                                     <?php if (in_array($currentStatus, ['Diterima', 'Complete'], true)): ?>
-                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
+                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" target="_blank" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
                                             <i class="bi bi-file-earmark-pdf"></i>
                                         </a>
                                         <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">

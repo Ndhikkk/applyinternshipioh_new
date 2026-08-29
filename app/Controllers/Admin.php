@@ -750,6 +750,7 @@ class Admin extends BaseController
         $divisi   = trim((string) ($this->request->getPost('divisi_pilihan') ?? ''));
         $mulai    = trim((string) ($this->request->getPost('periode_mulai') ?? ''));
         $selesai  = trim((string) ($this->request->getPost('periode_selesai') ?? ''));
+        $nim      = trim((string) ($this->request->getPost('nim') ?? ''));
         $jadwal   = trim((string) ($this->request->getGet('jadwal') ?? $this->request->getPost('jadwal') ?? ''));
         $linkZoom = trim((string) ($this->request->getGet('link_zoom') ?? $this->request->getPost('link_zoom') ?? ''));
 
@@ -758,6 +759,9 @@ class Admin extends BaseController
             $data['status_changed_at'] = date('Y-m-d H:i:s');
         }
         
+        if ($this->request->getPost('nim') !== null) {
+            $data['nim'] = $nim !== '' ? $nim : null;
+        }
         if ($catatan !== '') {
             $data['catatan_admin'] = $catatan;
         }
@@ -991,7 +995,7 @@ class Admin extends BaseController
     {
         $out = ['item' => []];
         $fields = [
-            'id', 'nama_lengkap', 'email', 'nomor_whatsapp', 'status',
+            'id', 'nama_lengkap', 'email', 'nomor_whatsapp', 'nim', 'status',
             'jadwal_interview_1', 'jadwal_interview_2', 'jadwal_interview_3',
             'link_zoom_1', 'link_zoom_2', 'link_zoom_3',
             'catatan_interview_1', 'catatan_interview_2', 'catatan_interview_3',

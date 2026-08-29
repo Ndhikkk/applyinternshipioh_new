@@ -472,6 +472,14 @@
                     <div id="amManualActions">
                         <p class="fw-bold mb-2 mt-2"><i class="bi bi-pencil-square"></i> Ubah Data Manual</p>
                         
+                        <!-- Baris 0: NIM (di atas Status) -->
+                        <div class="row g-2 mb-2 align-items-end">
+                            <div class="col-12">
+                                <label class="form-label small mb-1"><i class="bi bi-card-text me-1"></i>NIM (Nomor Induk Mahasiswa)</label>
+                                <input type="text" id="manualNim" class="form-control form-control-sm" placeholder="Masukkan NIM mahasiswa (opsional)">
+                            </div>
+                        </div>
+
                         <!-- Baris 1: Status, Regional Interview & Divisi -->
                         <div class="row g-2 mb-2 align-items-end">
                             <div class="col-md-4">
@@ -796,6 +804,7 @@
 
         renderDynamicButtons(item);
 
+        document.getElementById('manualNim').value = item.nim || '';
         document.getElementById('manualStatus').value = item.status;
         document.getElementById('manualCatatan').value = item.catatan_admin || '';
 
@@ -998,6 +1007,7 @@
 
         const formData = new FormData();
         formData.append('is_manual', '1');
+        formData.append('nim', document.getElementById('manualNim').value);
         formData.append('catatan', document.getElementById('manualCatatan').value);
         formData.append('regional_interview', document.getElementById('editKota').value);
         formData.append('kota_pilihan', selectedKotaPilihan);

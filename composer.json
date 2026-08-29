@@ -15,6 +15,7 @@
         "codeigniter4/framework": "^4.0",
         "dompdf/dompdf": "^3.1",
         "phpoffice/phpspreadsheet": "^5.9",
+        "phpoffice/phpword": "^1.4",
         "setasign/fpdf": "^1.9",
         "setasign/tfpdf": "^1.33",
         "smalot/pdfparser": "^2.12"

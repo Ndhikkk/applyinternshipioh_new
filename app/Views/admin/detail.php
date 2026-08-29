@@ -81,6 +81,10 @@
                 <td><?= esc($item['program_studi']) ?></td>
             </tr>
             <tr>
+                <th>NIM</th>
+                <td><?= esc($item['nim'] ?? '-') ?></td>
+            </tr>
+            <tr>
                 <th>Semester</th>
                 <td><?= esc($item['semester']) ?></td>
             </tr>
