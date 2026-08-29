@@ -174,6 +174,9 @@
                                         <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
                                             <i class="bi bi-file-earmark-word"></i>
                                         </a>
+                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
+                                            <i class="bi bi-file-earmark-word-fill"></i>
+                                        </a>
                                     <?php endif; ?>
                                     <button type="button" class="btn btn-success btn-sm px-2" onclick="openWaLink(<?= $data['id'] ?>)" title="Hubungi Kandidat (WA)">
                                         <i class="bi bi-whatsapp"></i>

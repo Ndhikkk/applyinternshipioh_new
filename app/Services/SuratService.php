@@ -9,10 +9,11 @@ use DOMXPath;
 class SuratService
 {
     protected string $suratPenerimaanTemplatePath;
+    protected string $suratKeteranganSelesaiTemplatePath;
 
     public function __construct()
     {
-        $candidates = [
+        $candidatesPenerimaan = [
             APPPATH . 'ThirdParty/surat-penerimaan/Surat Penerimaan Industry-Academia Collaboration Program.docx',
             WRITEPATH . 'templates/surat-penerimaan/Surat Penerimaan Industry-Academia Collaboration Program.docx',
             ROOTPATH . 'writable/templates/surat-penerimaan/Surat Penerimaan Industry-Academia Collaboration Program.docx',
@@ -20,7 +21,7 @@ class SuratService
         ];
 
         $this->suratPenerimaanTemplatePath = '';
-        foreach ($candidates as $p) {
+        foreach ($candidatesPenerimaan as $p) {
             if (file_exists($p)) {
                 $this->suratPenerimaanTemplatePath = $p;
                 break;
@@ -29,6 +30,25 @@ class SuratService
 
         if (!$this->suratPenerimaanTemplatePath) {
             $this->suratPenerimaanTemplatePath = APPPATH . 'ThirdParty/surat-penerimaan/Surat Penerimaan Industry-Academia Collaboration Program.docx';
+        }
+
+        $candidatesSelesai = [
+            APPPATH . 'ThirdParty/surat-keterangan-selesai/Surat Keterangan Selesai Industry-Academia Collaboration Program.docx',
+            WRITEPATH . 'templates/surat-keterangan-selesai/Surat Keterangan Selesai Industry-Academia Collaboration Program.docx',
+            ROOTPATH . 'writable/templates/surat-keterangan-selesai/Surat Keterangan Selesai Industry-Academia Collaboration Program.docx',
+            APPPATH . '../writable/templates/surat-keterangan-selesai/Surat Keterangan Selesai Industry-Academia Collaboration Program.docx',
+        ];
+
+        $this->suratKeteranganSelesaiTemplatePath = '';
+        foreach ($candidatesSelesai as $p) {
+            if (file_exists($p)) {
+                $this->suratKeteranganSelesaiTemplatePath = $p;
+                break;
+            }
+        }
+
+        if (!$this->suratKeteranganSelesaiTemplatePath) {
+            $this->suratKeteranganSelesaiTemplatePath = APPPATH . 'ThirdParty/surat-keterangan-selesai/Surat Keterangan Selesai Industry-Academia Collaboration Program.docx';
         }
     }
 
@@ -40,9 +60,6 @@ class SuratService
         if (!file_exists($this->suratPenerimaanTemplatePath)) {
             throw new \RuntimeException('Template surat penerimaan tidak ditemukan di: ' . $this->suratPenerimaanTemplatePath);
         }
-
-        $tempFile = sys_get_temp_dir() . '/surat_' . uniqid('', true) . '.docx';
-        copy($this->suratPenerimaanTemplatePath, $tempFile);
 
         $periodeMulaiStr   = $this->formatIndonesianDate($data['periode_mulai'] ?? null, '-');
         $periodeSelesaiStr = $this->formatIndonesianDate($data['periode_selesai'] ?? null, '-');
@@ -76,6 +93,44 @@ class SuratService
             '[divisi_pilihan]'     => !empty($data['divisi_pilihan']) ? trim($data['divisi_pilihan']) : '-',
             '[tanggal penerbitan]' => $tanggalTerbit,
         ];
+
+        return $this->renderDocx($this->suratPenerimaanTemplatePath, $replacements);
+    }
+
+    /**
+     * Generate Surat Keterangan Selesai as binary string in memory
+     */
+    public function generateSuratKeteranganSelesaiString(array $data): string
+    {
+        if (!file_exists($this->suratKeteranganSelesaiTemplatePath)) {
+            throw new \RuntimeException('Template surat keterangan selesai tidak ditemukan di: ' . $this->suratKeteranganSelesaiTemplatePath);
+        }
+
+        $periodeMulaiStr   = $this->formatIndonesianDate($data['periode_mulai'] ?? null, '-');
+        $periodeSelesaiStr = $this->formatIndonesianDate($data['periode_selesai'] ?? null, '-');
+        $tanggalTerbit     = $this->formatIndonesianDate(date('Y-m-d'), date('d F Y'));
+
+        $replacements = [
+            '[nama_lengkap]'        => !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : '-',
+            '[nim]'                 => !empty($data['nim']) ? trim($data['nim']) : '-',
+            '[asal_kampus]'         => !empty($data['asal_kampus']) ? trim($data['asal_kampus']) : '-',
+            '[program_studi]'       => !empty($data['program_studi']) ? trim($data['program_studi']) : '-',
+            '[divisi_pilihan]'      => !empty($data['divisi_pilihan']) ? trim($data['divisi_pilihan']) : '-',
+            '[periode_mulai]'       => $periodeMulaiStr,
+            '[periode_selesai]'     => $periodeSelesaiStr,
+            '[tanggal_penerbitan]'  => $tanggalTerbit,
+        ];
+
+        return $this->renderDocx($this->suratKeteranganSelesaiTemplatePath, $replacements);
+    }
+
+    /**
+     * Render a .docx template with placeholder replacements, return binary string.
+     */
+    protected function renderDocx(string $templatePath, array $replacements): string
+    {
+        $tempFile = sys_get_temp_dir() . '/surat_' . uniqid('', true) . '.docx';
+        copy($templatePath, $tempFile);
 
         $zip = new ZipArchive();
         if ($zip->open($tempFile) === true) {

@@ -588,6 +588,9 @@
                         <button type="button" id="amBtnSurat" class="btn btn-primary btn-sm" style="display:none;" onclick="downloadSuratPenerimaan()" title="Unduh Surat Penerimaan (.docx)">
                             <i class="bi bi-file-earmark-word-fill"></i> Surat Penerimaan
                         </button>
+                        <button type="button" id="amBtnSelesai" class="btn btn-info btn-sm text-white" style="display:none;" onclick="downloadSuratSelesai()" title="Unduh Surat Keterangan Selesai (.docx)">
+                            <i class="bi bi-file-earmark-word-fill"></i> Surat Selesai
+                        </button>
                         <button type="button" class="btn btn-outline-danger btn-sm ms-auto" onclick="hapusData(currentModalId, true)">
                             <i class="bi bi-trash"></i> Hapus Data Ini
                         </button>
@@ -831,10 +834,12 @@
         const btnPdf = document.getElementById('amBtnPdf');
         const btnPptx = document.getElementById('amBtnPptx');
         const btnSurat = document.getElementById('amBtnSurat');
+        const btnSelesai = document.getElementById('amBtnSelesai');
         const isEligible = (item.status === 'Diterima' || item.status === 'Complete');
         if (btnPdf) btnPdf.style.display = isEligible ? '' : 'none';
         if (btnPptx) btnPptx.style.display = isEligible ? '' : 'none';
         if (btnSurat) btnSurat.style.display = isEligible ? '' : 'none';
+        if (btnSelesai) btnSelesai.style.display = isEligible ? '' : 'none';
 
         hideSubForms();
     }
@@ -854,6 +859,12 @@
     function downloadSuratPenerimaan() {
         if (currentModalId) {
             window.location.href = `<?= site_url('admin/surat/penerimaan') ?>/${currentModalId}`;
+        }
+    }
+
+    function downloadSuratSelesai() {
+        if (currentModalId) {
+            window.location.href = `<?= site_url('admin/surat/selesai') ?>/${currentModalId}`;
         }
     }
 
