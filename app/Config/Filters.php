@@ -19,6 +19,7 @@ class Filters extends BaseConfig
         'honeypot' => Honeypot::class,
         'adminauth' => \App\Filters\AdminAuth::class,
         'throttle' => \CodeIgniter\Filters\Throttle::class,
+        'autocomplete' => \App\Filters\AutoComplete::class,
     ];
 
     /**
@@ -46,5 +47,11 @@ class Filters extends BaseConfig
      * before or after URI patterns.
      */
 
-    public array $filters = [];
+    public array $filters = [
+        // AutoComplete jalan otomatis untuk semua route relevan (admin, progres, peserta)
+        // Tambahkan 'pendaftaran*' jika ingin juga di form pendaftaran, atau '*' untuk global
+        'autocomplete' => [
+            'before' => ['admin*', 'progres*', 'peserta*'],
+        ],
+    ];
 }

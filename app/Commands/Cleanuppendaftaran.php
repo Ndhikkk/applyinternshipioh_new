@@ -24,10 +24,24 @@ class Cleanuppendaftaran extends BaseCommand
     public function run(array $params)
     {
         $model = new PendaftaranModel();
+
+        // ---- TAHAP 0: otomatis Complete jika periode_selesai sudah lewat (Diterima -> Complete) ----
+        try {
+            $completed = $model->autoCompleteExpired();
+            if ($completed > 0) {
+                CLI::write("AutoComplete: {$completed} kandidat Diterima -> Complete (periode_selesai lewat).", 'yellow');
+            } else {
+                CLI::write("AutoComplete: tidak ada kandidat yang perlu di-Complete.", 'yellow');
+            }
+        } catch (\Throwable $e) {
+            CLI::error("AutoComplete error: " . $e->getMessage());
+        }
+
         $twoWeeksAgo   = date('Y-m-d H:i:s', strtotime('-14 days'));
         $threeWeeksAgo = date('Y-m-d H:i:s', strtotime('-21 days'));
 
         // ---- TAHAP 1: masuk arsip jika tidak ada perubahan selama 2 minggu ----
+        // NOTE: Diterima & Complete sudah dikecualikan di archive() sehingga tidak akan terarsip otomatis
         $inactive = $model->where('is_archived', 0)
             ->where('COALESCE(updated_at, created_at) <=', $twoWeeksAgo)
             ->findAll();

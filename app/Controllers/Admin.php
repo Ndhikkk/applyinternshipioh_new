@@ -80,6 +80,13 @@ class Admin extends BaseController
             return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
+        // Otomatis Complete jika periode_selesai sudah lewat (Diterima -> Complete)
+        try {
+            $this->runAutoComplete();
+        } catch (\Throwable $e) {
+            log_message('error', 'AutoComplete error: ' . $e->getMessage());
+        }
+
         // Hapus otomatis data yang sudah lewat tenggat waktu retensi
         try {
             $this->runRetentionCleanup();
@@ -174,10 +181,23 @@ class Admin extends BaseController
             return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
+        // Lazy auto-complete per-record: pastikan detail menampilkan status terbaru
+        try {
+            $this->pendaftaranModel->autoCompleteExpired();
+        } catch (\Throwable $e) {
+            log_message('error', 'AutoComplete detail error: ' . $e->getMessage());
+        }
+
         $data['item'] = $this->pendaftaranModel->find($id);
 
         if (!$data['item']) {
             return redirect()->back()->with('error', 'Data pendaftaran tidak ditemukan.');
+        }
+
+        // Jika record ini sendiri sudah lewat periode tapi bulk tadi belum commit (race), cek satu per satu
+        if (PendaftaranModel::shouldBeComplete($data['item'])) {
+            $this->pendaftaranModel->update($id, ['status' => 'Complete', 'status_changed_at' => date('Y-m-d H:i:s')]);
+            $data['item'] = $this->pendaftaranModel->find($id);
         }
 
         return view('admin/detail', $data);
@@ -187,6 +207,13 @@ class Admin extends BaseController
     {
         if (!session()->get('admin_logged_in')) {
             return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Pastikan data yang diekspor sudah auto-Complete jika periode habis
+        try {
+            $this->pendaftaranModel->autoCompleteExpired();
+        } catch (\Throwable $e) {
+            log_message('error', 'AutoComplete exportExcel error: ' . $e->getMessage());
         }
 
         $isArsip = $this->request->getGet('arsip') == '1';
@@ -623,6 +650,12 @@ class Admin extends BaseController
             return $this->jsonOrRedirect(false, 'Data tidak ditemukan.', 404);
         }
 
+        // Lazy auto-complete per-record: jika periode_selesai sudah lewat, ubah dulu sebelum aksi lain
+        if (PendaftaranModel::shouldBeComplete($pendaftaran)) {
+            $this->pendaftaranModel->update($id, ['status' => 'Complete', 'status_changed_at' => date('Y-m-d H:i:s')]);
+            $pendaftaran = $this->pendaftaranModel->find($id);
+        }
+
         $action = urldecode($action);
 
         if ($action === 'info') {
@@ -904,6 +937,18 @@ class Admin extends BaseController
                     @unlink($path);
                 }
             }
+        }
+    }
+
+    /**
+     * Otomatis ubah Diterima -> Complete jika periode_selesai sudah lewat.
+     * Dijalankan setiap dashboard dibuka + via cron, jadi tidak perlu manual.
+     */
+    private function runAutoComplete(): void
+    {
+        $affected = $this->pendaftaranModel->autoCompleteExpired();
+        if ($affected > 0) {
+            log_message('info', "AutoComplete: {$affected} kandidat Diterima -> Complete (periode_selesai lewat).");
         }
     }
 

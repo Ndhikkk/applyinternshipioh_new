@@ -28,6 +28,7 @@ class Progres extends BaseController
 
     /**
      * Cek status berdasarkan TOKEN pendaftaran
+     * + lazy auto-complete: Diterima -> Complete jika periode_selesai sudah lewat
      */
     public function cek()
     {
@@ -38,8 +39,30 @@ class Progres extends BaseController
             return redirect()->back()->with('error', 'Token pendaftaran harus diisi');
         }
 
+        $cleanToken = trim($token);
+
+        // Lazy auto-complete per-token sebelum fetch, juga bulk untuk semua yang expired (1 query)
+        try {
+            $this->pendaftaranModel->autoCompleteExpired();
+        } catch (\Throwable $e) {
+            log_message('error', 'AutoComplete Progres::cek bulk error: ' . $e->getMessage());
+        }
+
         // Cari data pendaftaran berdasarkan token_pendaftaran secara presisi
-        $pendaftaran = $this->pendaftaranModel->where('token_pendaftaran', trim($token))->first();
+        $pendaftaran = $this->pendaftaranModel->where('token_pendaftaran', $cleanToken)->first();
+
+        // Jika record ditemukan tapi masih Diterima dan periode_selesai sudah lewat (race / baru terlewat setelah bulk), update per-record
+        if ($pendaftaran && PendaftaranModel::shouldBeComplete($pendaftaran)) {
+            try {
+                $this->pendaftaranModel->update($pendaftaran['id'], [
+                    'status'            => 'Complete',
+                    'status_changed_at' => date('Y-m-d H:i:s'),
+                ]);
+                $pendaftaran = $this->pendaftaranModel->find($pendaftaran['id']);
+            } catch (\Throwable $e) {
+                log_message('error', 'AutoComplete Progres per-record error: ' . $e->getMessage());
+            }
+        }
 
         if ($pendaftaran) {
             $data = [
@@ -265,7 +288,18 @@ class Progres extends BaseController
             return "Token tidak valid.";
         }
 
+        // Pastikan status Complete jika periode sudah lewat sebelum cetak
+        try {
+            $this->pendaftaranModel->autoCompleteExpired();
+        } catch (\Throwable $e) {
+            log_message('error', 'AutoComplete cetakPdf error: ' . $e->getMessage());
+        }
+
         $pendaftaran = $this->pendaftaranModel->where('token_pendaftaran', $token)->first();
+        if ($pendaftaran && PendaftaranModel::shouldBeComplete($pendaftaran)) {
+            $this->pendaftaranModel->update($pendaftaran['id'], ['status' => 'Complete', 'status_changed_at' => date('Y-m-d H:i:s')]);
+            $pendaftaran = $this->pendaftaranModel->find($pendaftaran['id']);
+        }
 
         if (!$pendaftaran) {
             return "Data pendaftaran tidak ditemukan.";

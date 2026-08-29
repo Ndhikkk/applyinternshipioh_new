@@ -75,4 +75,64 @@ class PendaftaranModel extends Model
             'Ditolak'
         ];
     }
+
+    /**
+     * Otomatis ubah status Diterima -> Complete jika periode_selesai sudah lewat.
+     * Dipanggil di Admin::dashboard, Progres::cek, Filter global, dan cron.
+     *
+     * Logic: status = 'Diterima' AND periode_selesai IS NOT NULL/valid
+     *        AND periode_selesai <= $today  => set jadi 'Complete'
+     *
+     * @param string|null $today Override tanggal Y-m-d (default hari ini Asia/Jakarta)
+     * @return int Jumlah row yang diupdate
+     */
+    public function autoCompleteExpired(?string $today = null): int
+    {
+        if ($today === null) {
+            // pakai timezone app (Asia/Jakarta) supaya selaras dengan config App.php
+            $tz = function_exists('app_timezone') ? (app_timezone() ?: 'Asia/Jakarta') : 'Asia/Jakarta';
+            $today = (new \DateTime('now', new \DateTimeZone($tz)))->format('Y-m-d');
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        // Bulk UPDATE via Query Builder langsung ke table - paling efisien (1 query)
+        $builder = $this->db->table($this->table);
+        $builder->where('status', 'Diterima')
+                ->groupStart()
+                    ->where('periode_selesai IS NOT NULL', null, false)
+                    ->where('periode_selesai !=', '')
+                    ->where('periode_selesai !=', '0000-00-00')
+                ->groupEnd()
+                ->where('periode_selesai <=', $today)
+                ->set([
+                    'status'            => 'Complete',
+                    'status_changed_at' => $now,
+                    'updated_at'        => $now,
+                ]);
+
+        $builder->update();
+
+        return (int) $this->db->affectedRows();
+    }
+
+    /**
+     * Helper: apakah kandidat sudah lewat periode_selesai dan harus Complete?
+     */
+    public static function shouldBeComplete(array $row, ?string $today = null): bool
+    {
+        if (($row['status'] ?? null) !== 'Diterima') {
+            return false;
+        }
+        $selesai = $row['periode_selesai'] ?? null;
+        if (empty($selesai) || $selesai === '0000-00-00') {
+            return false;
+        }
+        if ($today === null) {
+            $tz = function_exists('app_timezone') ? (app_timezone() ?: 'Asia/Jakarta') : 'Asia/Jakarta';
+            $today = (new \DateTime('now', new \DateTimeZone($tz)))->format('Y-m-d');
+        }
+        // bandingkan sebagai DATE string Y-m-d (lexicographically comparable)
+        return $selesai <= $today;
+    }
 }
