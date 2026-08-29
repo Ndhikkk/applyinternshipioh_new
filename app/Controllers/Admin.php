@@ -1291,4 +1291,30 @@ class Admin extends BaseController
 
         return $this->response->setJSON($result);
     }
+
+    /**
+     * Download single certificate as PPTX
+     */
+    public function downloadCertificatePptx($id)
+    {
+        if (!session()->get('admin_logged_in')) {
+            return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $candidate = $this->pendaftaranModel->find($id);
+        if (!$candidate) {
+            return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
+        }
+
+        $service = new \App\Services\CertificateService();
+        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+        $cleanName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $nama);
+        $pptxPath = $service->generatePptx($candidate);
+
+        if (!file_exists($pptxPath)) {
+            return redirect()->back()->with('error', 'Gagal membuat file PPTX sertifikat.');
+        }
+
+        return $this->response->download($pptxPath, null)->setFileName('Sertifikat-' . $cleanName . '.pptx');
+    }
 }

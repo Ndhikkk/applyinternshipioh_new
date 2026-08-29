@@ -60,6 +60,7 @@ $routes->group('admin', function ($routes) {
         $routes->get('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
         $routes->post('process-interview/(:num)/(:segment)', 'Admin::processInterview/$1/$2');
         $routes->get('hapus/(:num)', 'Admin::delete/$1');
+        $routes->get('certificate/pptx/(:num)', 'Admin::downloadCertificatePptx/$1');
         $routes->get('testform', 'Testform::index');
     });
 });

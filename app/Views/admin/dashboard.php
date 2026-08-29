@@ -36,7 +36,7 @@
                 <button type="button" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-xl-grow-0" id="btnExportExcel" onclick="openExportModal()">
                     <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </button>
-                
+
                 <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
                     <i class="bi bi-file-earmark-pdf"></i> Generate CV
                 </a>
@@ -570,6 +570,9 @@
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="openWaLink(currentModalId)">
                             <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                         </button>
+                        <a id="amBtnPptx" href="#" class="btn btn-warning btn-sm text-dark" style="display:none;" title="Generate Sertifikat PowerPoint (.pptx)">
+                            <i class="bi bi-file-earmark-ppt-fill"></i> Generate Sertifikat (PPTX)
+                        </a>
                         <button type="button" class="btn btn-outline-danger btn-sm ms-auto" onclick="hapusData(currentModalId, true)">
                             <i class="bi bi-trash"></i> Hapus Data Ini
                         </button>
@@ -803,6 +806,17 @@
             proposalInfo.innerHTML = item.proposal_magang
                 ? `<span class="text-success"><i class="bi bi-file-earmark-check"></i> Proposal saat ini tersedia</span>`
                 : `<span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada proposal yang diunggah</span>`;
+        }
+
+        // Tombol Generate Sertifikat PPTX di Modal
+        const btnPptx = document.getElementById('amBtnPptx');
+        if (item.status === 'Diterima' || item.status === 'Complete') {
+            if (btnPptx) {
+                btnPptx.href = `<?= site_url('admin/certificate/pptx/') ?>${item.id}`;
+                btnPptx.style.display = '';
+            }
+        } else {
+            if (btnPptx) btnPptx.style.display = 'none';
         }
 
         hideSubForms();

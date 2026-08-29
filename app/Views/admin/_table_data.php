@@ -157,6 +157,11 @@
                                     <button type="button" class="btn btn-primary btn-sm btn-aksi-label" onclick="openActionModal(<?= $data['id'] ?>, '<?= esc($data['nama_lengkap'], 'js') ?>')" title="Lihat Detail & Kelola Status">
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
+                                    <?php if ($isFinal || in_array($currentStatus, ['Diterima', 'Complete'], true)): ?>
+                                        <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Generate Sertifikat (PPTX)">
+                                            <i class="bi bi-file-earmark-ppt"></i>
+                                        </a>
+                                    <?php endif; ?>
                                     <button type="button" class="btn btn-success btn-sm px-2" onclick="openWaLink(<?= $data['id'] ?>)" title="Hubungi Kandidat (WA)">
                                         <i class="bi bi-whatsapp"></i>
                                     </button>
