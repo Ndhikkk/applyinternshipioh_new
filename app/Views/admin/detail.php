@@ -40,7 +40,20 @@
 <body>
     <div class="container py-5">
         <h3>Detail Pendaftar</h3>
-        <a href="/admin/dashboard" class="btn btn-secondary mb-3">Kembali</a>
+        <div class="d-flex gap-2 flex-wrap mb-3">
+            <a href="<?= site_url('admin/dashboard') ?>" class="btn btn-secondary">Kembali</a>
+            <?php if (in_array($item['status'], ['Diterima', 'Complete'], true)): ?>
+                <a href="<?= site_url('admin/certificate/pdf/' . $item['id']) ?>" target="_blank" class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Sertifikat PDF
+                </a>
+                <a href="<?= site_url('admin/certificate/pptx/' . $item['id']) ?>" class="btn btn-warning text-dark">
+                    <i class="bi bi-file-earmark-ppt"></i> Sertifikat PPTX
+                </a>
+                <a href="<?= site_url('admin/surat/penerimaan/' . $item['id']) ?>" class="btn btn-primary">
+                    <i class="bi bi-file-earmark-word"></i> Surat Penerimaan
+                </a>
+            <?php endif; ?>
+        </div>
 
         <table class="table table-bordered">
             <tr>

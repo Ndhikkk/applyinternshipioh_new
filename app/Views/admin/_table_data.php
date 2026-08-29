@@ -168,6 +168,9 @@
                                         <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
                                             <i class="bi bi-file-earmark-ppt"></i>
                                         </a>
+                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
+                                            <i class="bi bi-file-earmark-word"></i>
+                                        </a>
                                     <?php endif; ?>
                                     <button type="button" class="btn btn-success btn-sm px-2" onclick="openWaLink(<?= $data['id'] ?>)" title="Hubungi Kandidat (WA)">
                                         <i class="bi bi-whatsapp"></i>

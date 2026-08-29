@@ -62,6 +62,7 @@ $routes->group('admin', function ($routes) {
         $routes->get('hapus/(:num)', 'Admin::delete/$1');
         $routes->get('certificate/pptx/(:num)', 'Admin::downloadCertificatePptx/$1');
         $routes->get('certificate/pdf/(:num)', 'Admin::downloadCertificatePdf/$1');
+        $routes->get('surat/penerimaan/(:num)', 'Admin::downloadSuratPenerimaan/$1');
         $routes->get('testform', 'Testform::index');
     });
 });

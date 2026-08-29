@@ -91,13 +91,19 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-5 mb-3">
                                 <label class="form-label">Program Studi *</label>
                                 <input type="text" name="program_studi" class="form-control"
                                     value="<?= old('program_studi') ?>" placeholder="Program studi" required>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">NIM</label>
+                                <input type="text" name="nim" class="form-control"
+                                    value="<?= old('nim') ?>" placeholder="Nomor Induk Mahasiswa">
+                            </div>
+
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Semester *</label>
                                 <input type="number" name="semester" class="form-control" value="<?= old('semester') ?>"
                                     min="1" max="14" placeholder="Semester saat ini" required>
@@ -119,8 +125,8 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="small fw-bold text-secondary">Regional Interview *</label>
-                                <select name="regional_interview" class="form-select form-select-sm" required>
+                                <label class="form-label">Regional Interview *</label>
+                                <select name="regional_interview" class="form-select" required>
                                     <option value="">Pilih Kota</option>
                                     <option value="Semarang" <?= old('regional_interview') === 'Semarang' ? 'selected' : '' ?>>Semarang</option>
                                     <option value="Surabaya" <?= old('regional_interview') === 'Surabaya' ? 'selected' : '' ?>>Surabaya</option>
@@ -128,10 +134,12 @@
                                 </select>
                                 <div class="form-text">Pilih kota untuk interview.</div>
                             </div>
+                        </div>
 
+                        <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="small fw-bold text-secondary">Kota Pilihan *</label>
-                                <select name="kota_pilihan" class="form-select form-select-sm" required>
+                                <label class="form-label">Kota Pilihan *</label>
+                                <select name="kota_pilihan" class="form-select" required>
                                     <option value="">Pilih Kota/Kabupaten Pilihan</option>
                                     <?php $options = $kota_pilihan_options ?? $kota_magang_options; ?>
                                     <?php foreach ($options as $provinsi => $kotaList): ?>
@@ -145,10 +153,10 @@
                                 <div class="form-text">Pilih kota atau kabupaten pilihan pelaksanaan program.</div>
                             </div>
 
-                           <div class="col-md-6 mb-3">
-                                <label class="small fw-bold text-secondary">Divisi Pilihan *</label>
-                                <select name="divisi_pilihan" id="form_divisi" class="form-control form-control-sm" style="border-radius: 6px;" required>
-                                    <option value="">Pilih Divisi </option>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Divisi Pilihan *</label>
+                                <select name="divisi_pilihan" id="form_divisi" class="form-select" required>
+                                    <option value="">Pilih Divisi</option>
                                     <option value="Direct Sales Executive" <?= old('divisi_pilihan') == 'Direct Sales Executive' ? 'selected' : '' ?>>Direct Sales Executive</option>
                                     <option value="Markom" <?= old('divisi_pilihan') == 'Markom' ? 'selected' : '' ?>>Markom</option>
                                     <option value="IT / Elang IT" <?= old('divisi_pilihan') == 'IT / Elang IT' ? 'selected' : '' ?>>IT / Elang IT</option>

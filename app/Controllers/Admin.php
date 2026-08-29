@@ -1351,4 +1351,30 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Download Surat Penerimaan as Word (.docx)
+     */
+    public function downloadSuratPenerimaan($id)
+    {
+        if (!session()->get('admin_logged_in')) {
+            return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $candidate = $this->pendaftaranModel->find($id);
+        if (!$candidate) {
+            return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
+        }
+
+        try {
+            $service = new \App\Services\SuratService();
+            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
+            $binary = $service->generateSuratPenerimaanString($candidate);
+            $fileName = "_Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
+            return $this->response->download($fileName, $binary);
+        } catch (\Throwable $e) {
+            log_message('error', 'Surat Penerimaan Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+        }
+    }
 }

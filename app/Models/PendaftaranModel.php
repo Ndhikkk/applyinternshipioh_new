@@ -23,6 +23,7 @@ class PendaftaranModel extends Model
     protected $allowedFields = [
         'token_pendaftaran',
         'nama_lengkap',
+        'nim',
         'email',
         'nomor_whatsapp',
         'asal_kampus',

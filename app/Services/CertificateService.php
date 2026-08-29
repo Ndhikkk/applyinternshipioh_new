@@ -20,9 +20,9 @@ class CertificateService
         // 1. Template PPTX path resolution
         $pptxCandidates = [
             APPPATH . 'ThirdParty/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
-            WRITEPATH . 'templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
-            ROOTPATH . 'writable/templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
-            APPPATH . '../writable/templates/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            WRITEPATH . 'templates/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            ROOTPATH . 'writable/templates/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
+            APPPATH . '../writable/templates/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx',
         ];
         $this->pptxTemplatePath = '';
         foreach ($pptxCandidates as $p) {
@@ -32,7 +32,7 @@ class CertificateService
             }
         }
         if (!$this->pptxTemplatePath) {
-            $this->pptxTemplatePath = APPPATH . 'ThirdParty/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx';
+            $this->pptxTemplatePath = WRITEPATH . 'templates/certificate/Sertifikat Selesai Industry-Academia Collaboration Program.pptx';
         }
 
         // 2. Image Assets path resolution

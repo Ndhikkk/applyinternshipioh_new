@@ -133,6 +133,7 @@ class Pendaftaran extends Controller
         $data = [
             'token_pendaftaran' => $token,
             'nama_lengkap'    => trim((string)$this->request->getPost('nama_lengkap')),
+            'nim'             => trim((string)($this->request->getPost('nim') ?? '')),
             'email'           => $email,
             'nomor_whatsapp'  => $nomorWhatsapp,
             'nomor_darurat'   => trim((string)$this->request->getPost('nomor_darurat')),

@@ -1,0 +1,104 @@
+/Users/mac/Web Development/indosat/applyinternshipioh_new/.serena/project.yml
+/Users/mac/Web Development/indosat/applyinternshipioh_new/README.md
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fonts/unifont/DejaVu_LICENSE.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/README.md
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/install.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/license.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/tutorial/20k_c1.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/tutorial/20k_c2.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/tutorial/CevicheOne-Regular-Licence.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/tutorial/countries.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/fonts/unifont/DejaVu_LICENSE.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/robots.txt
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/tests/README.md
+/Users/mac/Web Development/indosat/applyinternshipioh_new/tests/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/debugbar/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/logs/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/uploads/index.html
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762318168_4036fde8342179deb93b.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762443257_3b5f3e5dba40b7d746ea.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762443307_d32b9f6cd83f476ef07f.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762444512_2967cd08a59675aa268c.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762446174_a616ad94d6f8f22b20d2.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762531084_94e9071d823eb89004f6.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762538558_a6522414327d7a49ff96.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762539577_57d783866fb58c277208.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762569315_808b14619d6f7141f671.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762571891_89d899decd456879a5e8.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1762573432_da28c06465d02703fb23.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1763002570_4c17d9fc34b621146f15.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/1763009180_ef2a5371a035ab321ec4.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/Akhdan Syauqi.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/Akhdan Syauqi_1.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Akhdan Syauqi 2025.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Humam Nasywa Fawazi.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Reisya Aurelya Yusfandira.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Reisya Aurelya Yusfandira_1.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Reisya Aurelya Yusfandira_2.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV Reisya Aurelya Yusfandira_3.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV_Nabiel ilyasa (5).pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV_Stevany Syarofatul Aini.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/CV_Stevany Syarofatul Aini_1.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/Proposal_Dana_Taktis_SEMNAS.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/cv/najwaa.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/dummy_cv.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/dummy_surat.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/1762318168_b72c6fb6e4849d5bd3ac.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1762318168_c2a6d0c229c6d64d3d27.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1762443257_daaab245934e5ce50e79.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1762443307_e2b6ee0302025bb5c2d0.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1762444512_9d85706ff6a95a809c91.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1762446174_a616ad94d6f8f22b20d2.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/1763009180_10d23e8ff09db791b3c0.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/DomaiNesia - Invoice #1958014.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Kartu_JKN_0001234567890.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Laporan_Keuangan_BPJS_2025-11-21.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/PROPOSAL PAK BAGUS 3.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/PROPOSAL PAK BAGUS 3_1.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Proposal_Dana_Taktis_SEMNAS.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Surat Peringatan 1 Nabiel Ilyasa Pradana.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Surat Peringatan 1 Nabiel Ilyasa Pradana_1.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Surat Peringatan 1 Nabiel Ilyasa Pradana_2.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/surat/Surat Peringatan 1 Nabiel Ilyasa Pradana_3.pdf
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/bg_certificate.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/image1.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/image2.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/image3.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/image4.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/line_accent.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/logo_badge.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/certificate/signature_micha.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/app/ThirdParty/fpdf/tutorial/logo.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/bg_certificate.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/image1.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/image2.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/image3.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/image4.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/line_accent.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/logo_badge.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/certificate/signature_micha.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/indosat-logo.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/logo-ioh.svg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/assets/img/tone-indosat.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/dummy_ktm.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/1763009180_c4c44ab8b67a34fc4f70.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/1763009180_c4c44ab8b67a34fc4f70_1.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/1763009180_c4c44ab8b67a34fc4f70_2.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/KTM_Nabiel ilyasa.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-11-13 at 19.40.01.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-16 at 12.26.49.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 14.09.09.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 14.09.09_1.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 15.14.38.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 15.14.38_1.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 15.14.39 (1).jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/WhatsApp Image 2025-12-18 at 15.14.39 (1)_1.jpeg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/public/uploads/ktm/c471425ca5d06acd2d0f1cbed18acb35.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/templates/extracted/image1.jpg
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/templates/extracted/image2.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/templates/extracted/image3.png
+/Users/mac/Web Development/indosat/applyinternshipioh_new/writable/templates/extracted/image4.png
