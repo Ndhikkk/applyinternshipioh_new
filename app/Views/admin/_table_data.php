@@ -126,24 +126,28 @@
                         <td data-label="Berkas">
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/cv') ?>"
+                                target="_blank" rel="noopener"
                                 class="btn btn-outline-primary <?= empty($data['cv']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['cv']) ? 'CV tidak tersedia' : 'Download CV' ?>"
                                 <?= empty($data['cv']) ? 'onclick="return false;"' : '' ?>>
                                     <i class="bi bi-file-earmark-pdf"></i>
                                 </a>
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/surat') ?>"
+                                target="_blank" rel="noopener"
                                 class="btn btn-outline-success <?= empty($data['surat_pengantar']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['surat_pengantar']) ? 'Surat tidak tersedia' : 'Download Surat Pengantar' ?>"
                                 <?= empty($data['surat_pengantar']) ? 'onclick="return false;"' : '' ?>>
                                     <i class="bi bi-file-earmark-text"></i>
                                 </a>
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/proposal') ?>"
+                                target="_blank" rel="noopener"
                                 class="btn btn-outline-warning <?= empty($data['proposal_magang']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['proposal_magang']) ? 'Proposal tidak tersedia' : 'Download Proposal Magang' ?>"
                                 <?= empty($data['proposal_magang']) ? 'onclick="return false;"' : '' ?>>
                                     <i class="bi bi-journal-text"></i>
                                 </a>
                                 <a href="<?= site_url('admin/download/' . $data['id'] . '/ktm') ?>"
+                                target="_blank" rel="noopener"
                                 class="btn btn-outline-info <?= empty($data['ktm']) ? 'disabled' : '' ?>"
                                 title="<?= empty($data['ktm']) ? 'KTM tidak tersedia' : 'Download KTM' ?>"
                                 <?= empty($data['ktm']) ? 'onclick="return false;"' : '' ?>>
