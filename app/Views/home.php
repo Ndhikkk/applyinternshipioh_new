@@ -344,7 +344,7 @@
 
                         <div class="cta-statistics">
                             <div class="stat-item">
-                                <div class="stat-number">100+</div>
+                                <div class="stat-number">600+</div>
                                 <div class="stat-label">Pendaftar</div>
                             </div>
                             <div class="stat-item">
@@ -352,7 +352,7 @@
                                 <div class="stat-label">Kepuasan</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-number">10</div>
+                                <div class="stat-number">11</div>
                                 <div class="stat-label">Divisi</div>
                             </div>
                             <div class="stat-item">
