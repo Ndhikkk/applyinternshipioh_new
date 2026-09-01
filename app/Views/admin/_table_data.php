@@ -6,7 +6,58 @@
                 <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
                 <th class="fw-bold text-nowrap">Regional Interview</th>
                 <th class="fw-bold text-nowrap">Kota Pilihan</th>
-                <th class="fw-bold text-nowrap">Divisi / Jenis</th>
+                <th class="fw-bold text-nowrap" style="cursor:pointer;">
+                    <div class="dropdown d-inline-block">
+                        <span class="divisi-filter-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-display="dynamic" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                            Divisi / Jenis
+                            <?php if (!empty($divisi_filter)): ?>
+                                <span class="badge bg-primary ms-1" style="font-size:.65em;"><?= esc($divisi_filter) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($jenis_filter)): ?>
+                                <span class="badge bg-info ms-1" style="font-size:.65em;"><?= esc($jenis_filter) ?></span>
+                            <?php endif; ?>
+                            <i class="bi bi-funnel<?= (!empty($divisi_filter) || !empty($jenis_filter)) ? '-fill text-primary' : '' ?> ms-1" style="font-size:.75em;"></i>
+                        </span>
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:480px; min-width:480px; max-width:95vw; z-index:1060; white-space:normal;">
+                            <div class="row g-3">
+                                <!-- Kolom Kiri: Divisi -->
+                                <div class="col-6 border-end pe-3">
+                                    <h6 class="dropdown-header px-1 text-primary fw-bold mb-2"><i class="bi bi-diagram-3 me-1"></i>Pilih Divisi</h6>
+                                    <div style="max-height:280px; overflow-y:auto;" class="pe-1">
+                                        <a class="dropdown-item small rounded py-1.5 px-2 mb-1 text-truncate <?= empty($divisi_filter) ? 'active fw-bold' : '' ?>" href="#" data-divisi="" title="Semua Divisi">Semua Divisi</a>
+                                        <?php
+                                            $divisiList = [
+                                                'Direct Sales Executive', 'Markom', 'IT / Elang IT', 'Technical',
+                                                'Finance', 'B2B', 'Social Media 3ID & IM3', 'Daily Project',
+                                                'Project Post Paid', 'Capability Building', 'SnD'
+                                            ];
+                                            foreach ($divisiList as $div):
+                                        ?>
+                                        <a class="dropdown-item small rounded py-1.5 px-2 mb-1 text-truncate <?= ($divisi_filter ?? '') === $div ? 'active fw-bold' : '' ?>" href="#" data-divisi="<?= esc($div, 'attr') ?>" title="<?= esc($div) ?>"><?= esc($div) ?></a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <!-- Kolom Kanan: Jenis Magang (Setelah Divisi) -->
+                                <div class="col-6 ps-3">
+                                    <h6 class="dropdown-header px-1 text-info fw-bold mb-2"><i class="bi bi-tag me-1"></i>Jenis Magang</h6>
+                                    <div class="d-flex flex-column gap-1">
+                                        <a class="dropdown-item small rounded py-2 px-2 <?= empty($jenis_filter) ? 'active fw-bold' : '' ?>" href="#" data-jenis="">
+                                            <i class="bi bi-asterisk me-1 text-muted"></i> Semua Jenis
+                                        </a>
+                                        <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= ($jenis_filter ?? '') === 'Wajib' ? 'active fw-bold' : '' ?>" href="#" data-jenis="Wajib">
+                                            <span class="badge bg-info me-2">Wajib</span>
+                                            <span>Magang Wajib</span>
+                                        </a>
+                                        <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= ($jenis_filter ?? '') === 'Tidak Wajib' ? 'active fw-bold' : '' ?>" href="#" data-jenis="Tidak Wajib">
+                                            <span class="badge bg-secondary me-2">Tidak Wajib</span>
+                                            <span>Tidak Wajib</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th>
                 <th class="fw-bold text-center" style="min-width:140px;">Status</th>
                 <th class="fw-bold text-nowrap">Periode</th>
                 <th class="fw-bold text-nowrap">Tanggal Daftar</th>
@@ -174,12 +225,6 @@
                                         </a>
                                         <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
                                             <i class="bi bi-file-earmark-ppt"></i>
-                                        </a>
-                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
-                                            <i class="bi bi-file-earmark-word"></i>
-                                        </a>
-                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
-                                            <i class="bi bi-file-earmark-word-fill"></i>
                                         </a>
                                     <?php endif; ?>
                                     <button type="button" class="btn btn-success btn-sm px-2" onclick="openWaLink(<?= $data['id'] ?>)" title="Hubungi Kandidat (WA)">

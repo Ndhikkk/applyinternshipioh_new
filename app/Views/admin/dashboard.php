@@ -579,17 +579,17 @@
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="openWaLink(currentModalId)">
                             <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                         </button>
-                        <button type="button" id="amBtnPdf" class="btn btn-danger btn-sm" style="display:none;" onclick="downloadCertPdf()" title="Unduh Sertifikat PDF">
-                            <i class="bi bi-file-earmark-pdf-fill"></i> Sertifikat PDF
-                        </button>
-                        <button type="button" id="amBtnPptx" class="btn btn-warning btn-sm text-dark" style="display:none;" onclick="downloadCertPptx()" title="Unduh Sertifikat PowerPoint (.pptx)">
-                            <i class="bi bi-file-earmark-ppt-fill"></i> Sertifikat PPTX
-                        </button>
                         <button type="button" id="amBtnSurat" class="btn btn-primary btn-sm" style="display:none;" onclick="downloadSuratPenerimaan()" title="Unduh Surat Penerimaan (.docx)">
                             <i class="bi bi-file-earmark-word-fill"></i> Surat Penerimaan
                         </button>
                         <button type="button" id="amBtnSelesai" class="btn btn-info btn-sm text-white" style="display:none;" onclick="downloadSuratSelesai()" title="Unduh Surat Keterangan Selesai (.docx)">
                             <i class="bi bi-file-earmark-word-fill"></i> Surat Selesai
+                        </button>
+                        <button type="button" id="amBtnPdf" class="btn btn-danger btn-sm" style="display:none;" onclick="downloadCertPdf()" title="Unduh Sertifikat PDF">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> Sertifikat PDF
+                        </button>
+                        <button type="button" id="amBtnPptx" class="btn btn-warning btn-sm text-dark" style="display:none;" onclick="downloadCertPptx()" title="Unduh Sertifikat PowerPoint (.pptx)">
+                            <i class="bi bi-file-earmark-ppt-fill"></i> Sertifikat PPTX
                         </button>
                         <button type="button" class="btn btn-outline-danger btn-sm ms-auto" onclick="hapusData(currentModalId, true)">
                             <i class="bi bi-trash"></i> Hapus Data Ini
@@ -1219,11 +1219,19 @@
         if (!searchInput || !tableContainer) return;
 
         let debounceTimer = null;
+        let activeDivisiFilter = '<?= esc($divisi_filter ?? '', 'js') ?>';
+        let activeJenisFilter = '<?= esc($jenis_filter ?? '', 'js') ?>';
         const baseUrl = '<?= site_url('admin/dashboard') ?>';
+
+        function hasActiveFilters() {
+            return searchInput.value.trim() || activeDivisiFilter || activeJenisFilter;
+        }
 
         function buildSearchUrl(keyword) {
             const url = new URL(baseUrl);
             if (keyword) url.searchParams.set('keyword', keyword);
+            if (activeDivisiFilter) url.searchParams.set('divisi', activeDivisiFilter);
+            if (activeJenisFilter) url.searchParams.set('jenis', activeJenisFilter);
             if (arsipParam) url.searchParams.set('arsip', '1');
             return url.toString();
         }
@@ -1254,14 +1262,14 @@
 
         function handleSearch() {
             const val = searchInput.value.trim();
-            resetBtn.style.display = val ? 'block' : 'none';
+            resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
             loadData(buildSearchUrl(val));
         }
 
         // Handle typing (debounce)
         searchInput.addEventListener('input', function () {
             clearTimeout(debounceTimer);
-            resetBtn.style.display = this.value.trim() ? 'block' : 'none';
+            resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
             debounceTimer = setTimeout(handleSearch, 600);
         });
 
@@ -1277,21 +1285,46 @@
             }
         });
 
-        // Handle reset button
+        // Handle reset button — clears all filters
         if (resetBtn) {
             resetBtn.addEventListener('click', function () {
                 searchInput.value = '';
+                activeDivisiFilter = '';
+                activeJenisFilter = '';
                 this.style.display = 'none';
                 loadData(buildSearchUrl(''));
             });
         }
 
-        // Handle pagination links clicks via event delegation
+        // Handle pagination, divisi filter, and jenis filter clicks via event delegation
         tableContainer.addEventListener('click', function(e) {
             const paginationLink = e.target.closest('.ajax-pagination a');
             if (paginationLink) {
                 e.preventDefault();
                 loadData(paginationLink.href);
+                return;
+            }
+
+            // Handle divisi filter dropdown clicks
+            const divisiItem = e.target.closest('[data-divisi]');
+            if (divisiItem) {
+                e.preventDefault();
+                activeDivisiFilter = divisiItem.getAttribute('data-divisi');
+                const keyword = searchInput.value.trim();
+                resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
+                loadData(buildSearchUrl(keyword));
+                return;
+            }
+
+            // Handle jenis filter dropdown clicks
+            const jenisItem = e.target.closest('[data-jenis]');
+            if (jenisItem) {
+                e.preventDefault();
+                activeJenisFilter = jenisItem.getAttribute('data-jenis');
+                const keyword = searchInput.value.trim();
+                resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
+                loadData(buildSearchUrl(keyword));
+                return;
             }
         });
     })();
