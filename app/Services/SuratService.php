@@ -82,16 +82,27 @@ class SuratService
             }
         }
 
+        $rawKota = !empty($data['kota_pilihan']) 
+            ? trim($data['kota_pilihan']) 
+            : (!empty($data['kota_magang']) 
+                ? trim($data['kota_magang']) 
+                : (!empty($data['regional_interview']) 
+                    ? trim($data['regional_interview']) 
+                    : 'Semarang'));
+        $kotaPilihan = $this->cleanKotaName($rawKota);
+
         $replacements = [
-            '[nama_lengkap]'       => !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : '-',
-            '[nim]'                => !empty($data['nim']) ? trim($data['nim']) : '-',
-            '[asal_kampus]'        => !empty($data['asal_kampus']) ? trim($data['asal_kampus']) : '-',
-            '[program_studi]'      => !empty($data['program_studi']) ? trim($data['program_studi']) : '-',
-            '[durasi]'             => $durasi,
-            '[periode_mulai]'      => $periodeMulaiStr,
-            '[periode_selesai]'    => $periodeSelesaiStr,
-            '[divisi_pilihan]'     => !empty($data['divisi_pilihan']) ? trim($data['divisi_pilihan']) : '-',
-            '[tanggal penerbitan]' => $tanggalTerbit,
+            '[nama_lengkap]'        => !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : '-',
+            '[nim]'                 => !empty($data['nim']) ? trim($data['nim']) : '-',
+            '[asal_kampus]'         => !empty($data['asal_kampus']) ? trim($data['asal_kampus']) : '-',
+            '[program_studi]'       => !empty($data['program_studi']) ? trim($data['program_studi']) : '-',
+            '[durasi]'              => $durasi,
+            '[periode_mulai]'       => $periodeMulaiStr,
+            '[periode_selesai]'     => $periodeSelesaiStr,
+            '[divisi_pilihan]'      => !empty($data['divisi_pilihan']) ? trim($data['divisi_pilihan']) : '-',
+            '[kota_pilihan]'        => $kotaPilihan,
+            '[tanggal penerbitan]'  => $tanggalTerbit,
+            '[tanggal_penerbitan]'  => $tanggalTerbit,
         ];
 
         return $this->renderDocx($this->suratPenerimaanTemplatePath, $replacements);
@@ -110,6 +121,15 @@ class SuratService
         $periodeSelesaiStr = $this->formatIndonesianDate($data['periode_selesai'] ?? null, '-');
         $tanggalTerbit     = $this->formatIndonesianDate(date('Y-m-d'), date('d F Y'));
 
+        $rawKota = !empty($data['kota_pilihan']) 
+            ? trim($data['kota_pilihan']) 
+            : (!empty($data['kota_magang']) 
+                ? trim($data['kota_magang']) 
+                : (!empty($data['regional_interview']) 
+                    ? trim($data['regional_interview']) 
+                    : 'Semarang'));
+        $kotaPilihan = $this->cleanKotaName($rawKota);
+
         $replacements = [
             '[nama_lengkap]'        => !empty($data['nama_lengkap']) ? trim($data['nama_lengkap']) : '-',
             '[nim]'                 => !empty($data['nim']) ? trim($data['nim']) : '-',
@@ -118,7 +138,9 @@ class SuratService
             '[divisi_pilihan]'      => !empty($data['divisi_pilihan']) ? trim($data['divisi_pilihan']) : '-',
             '[periode_mulai]'       => $periodeMulaiStr,
             '[periode_selesai]'     => $periodeSelesaiStr,
+            '[kota_pilihan]'        => $kotaPilihan,
             '[tanggal_penerbitan]'  => $tanggalTerbit,
+            '[tanggal penerbitan]'  => $tanggalTerbit,
         ];
 
         return $this->renderDocx($this->suratKeteranganSelesaiTemplatePath, $replacements);
@@ -233,5 +255,21 @@ class SuratService
         ];
 
         return date('j', $time) . ' ' . ($months[(int) date('n', $time)] ?? date('F', $time)) . ' ' . date('Y', $time);
+    }
+
+    /**
+     * Clean city name by stripping prefixes like "Kota", "Kabupaten", "Kab.", "Kab"
+     */
+    public function cleanKotaName(?string $kota): string
+    {
+        if (empty($kota)) {
+            return 'Semarang';
+        }
+
+        // Strip prefixes: "Kota Administrasi ", "Kota Adm. ", "Kota ", "Kabupaten ", "Kab. ", "Kab "
+        $cleaned = preg_replace('/^(?:kota\s+administrasi\s+|kota\s+adm\.?\s+|kota\s+|kabupaten\s+|kab\.?\s+)/iu', '', trim($kota));
+        $cleaned = trim($cleaned);
+
+        return !empty($cleaned) ? $cleaned : trim($kota);
     }
 }
