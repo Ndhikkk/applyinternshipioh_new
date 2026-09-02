@@ -249,8 +249,7 @@
     </div>
 </div>
 
-<!-- SweetAlert2 Library CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SweetAlert2 loaded globally via layout/main.php -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -268,52 +267,36 @@
                     
                     if (waVal !== '' && daruratVal !== '' && waVal === daruratVal) {
                         e.preventDefault();
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Nomor Tidak Valid',
-                            text: 'Nomor Darurat tidak boleh sama dengan Nomor WhatsApp utama Anda!',
-                            confirmButtonColor: '#E6007E'
-                        });
+                        IOH.alert('warning', 'Nomor Tidak Valid', 'Nomor Darurat tidak boleh sama dengan Nomor WhatsApp utama Anda.');
                         return;
                     }
                 }
 
-                // Prevent double submit
+                // Prevent double submit safely without aborting browser submission
                 if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mengirim Pendaftaran...';
+                    setTimeout(function() {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mengirim Pendaftaran...';
+                    }, 10);
                 }
             });
         }
         <?php if (session()->getFlashdata('errors')): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Validasi Gagal',
+            IOH.alert('error', 'Validasi Gagal', {
                 html: `<div style="text-align: left;">
                         <?php foreach (session()->getFlashdata('errors') as $error): ?>
                             <li><?= esc($error) ?></li>
                         <?php endforeach; ?>
-                       </div>`,
-                confirmButtonColor: '#3085d6'
+                       </div>`
             });
         <?php endif; ?>
 
         <?php if (session()->getFlashdata('error')): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Terjadi Kesalahan',
-                text: '<?= esc(session()->getFlashdata("error")) ?>',
-                confirmButtonColor: '#d33'
-            });
+            IOH.alert('error', 'Terjadi Kesalahan', '<?= esc(session()->getFlashdata("error")) ?>');
         <?php endif; ?>
 
         <?php if (session()->getFlashdata('success')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Pendaftaran Berhasil',
-                text: '<?= esc(session()->getFlashdata("success")) ?>',
-                confirmButtonColor: '#3085d6'
-            });
+            IOH.alert('success', 'Pendaftaran Berhasil! \ud83c\udf89', '<?= esc(session()->getFlashdata("success")) ?>');
         <?php endif; ?>
     });
 </script>

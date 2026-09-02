@@ -512,6 +512,189 @@
             background: linear-gradient(90deg, rgba(230, 0, 126, 0.75), rgba(255, 79, 163, 0.75));
         }
     </style>
+
+    <!-- SweetAlert2 (Global) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* ── SweetAlert2 Modern Theme (IOH Brand) ── */
+        .swal2-popup.ioh-popup {
+            border-radius: 20px !important;
+            padding: 2rem 1.5rem !important;
+            font-family: 'Poppins', sans-serif !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid rgba(230, 0, 126, 0.08);
+        }
+        .swal2-popup.ioh-popup .swal2-title {
+            font-size: 1.35rem !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+        }
+        .swal2-popup.ioh-popup .swal2-html-container,
+        .swal2-popup.ioh-popup .swal2-content {
+            font-size: 0.95rem !important;
+            color: #6B7280 !important;
+            line-height: 1.6 !important;
+        }
+        .swal2-popup.ioh-popup .swal2-confirm {
+            background: linear-gradient(135deg, #E6007E, #FF4FA3) !important;
+            border: none !important;
+            border-radius: 999px !important;
+            padding: 10px 28px !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            box-shadow: 0 4px 15px rgba(230, 0, 126, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+        .swal2-popup.ioh-popup .swal2-confirm:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 6px 20px rgba(230, 0, 126, 0.4) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-cancel {
+            background: #F3F4F6 !important;
+            color: #374151 !important;
+            border: none !important;
+            border-radius: 999px !important;
+            padding: 10px 28px !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+        }
+        .swal2-popup.ioh-popup .swal2-cancel:hover {
+            background: #E5E7EB !important;
+            transform: translateY(-1px) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-deny {
+            border-radius: 999px !important;
+            padding: 10px 28px !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+        }
+        .swal2-popup.ioh-popup .swal2-actions {
+            gap: 0.5rem !important;
+        }
+        /* Danger variant for delete confirmations */
+        .swal2-popup.ioh-popup .swal2-confirm.swal2-confirm--danger {
+            background: linear-gradient(135deg, #dc3545, #e74c5e) !important;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-confirm.swal2-confirm--danger:hover {
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        /* Icon pulse animation */
+        .swal2-popup.ioh-popup .swal2-icon {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .swal2-popup.ioh-popup .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(34, 197, 94, 0.3) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-icon.swal2-success [class^=swal2-success-line] {
+            background-color: #22C55E !important;
+        }
+        /* Toast override */
+        .swal2-popup.ioh-toast {
+            border-radius: 14px !important;
+            padding: 12px 18px !important;
+            font-family: 'Poppins', sans-serif !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+            border-left: 4px solid transparent;
+        }
+        .swal2-popup.ioh-toast .swal2-title {
+            font-size: 0.88rem !important;
+            font-weight: 500 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .swal2-popup.ioh-toast.toast-success {
+            border-left-color: #22C55E !important;
+        }
+        .swal2-popup.ioh-toast.toast-error {
+            border-left-color: #EF4444 !important;
+        }
+        .swal2-popup.ioh-toast.toast-warning {
+            border-left-color: #F59E0B !important;
+        }
+        .swal2-popup.ioh-toast.toast-info {
+            border-left-color: #3B82F6 !important;
+        }
+        .swal2-popup.ioh-toast.toast-question {
+            border-left-color: #8B5CF6 !important;
+        }
+        /* Timer progress bar */
+        .swal2-popup.ioh-toast .swal2-timer-progress-bar {
+            background: linear-gradient(90deg, #E6007E, #FF4FA3) !important;
+            height: 4px !important;
+        }
+    </style>
+    <script>
+    /**
+     * IOH Global Notification Helpers
+     * ─────────────────────────────────
+     * IOH.toast(icon, text)          → Toast pojok kanan atas (3 detik, auto-dismiss)
+     * IOH.confirm({...})             → Modal konfirmasi modern
+     * IOH.alert(icon, title, text)   → Modal alert modern
+     */
+    window.IOH = window.IOH || {};
+
+    IOH.toast = function(icon, text, timer) {
+        timer = timer || 3000;
+        Swal.fire({
+            icon: icon,
+            title: text,
+            toast: true,
+            position: 'top-end',
+            timer: timer,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            showCloseButton: true,
+            customClass: { popup: 'ioh-toast toast-' + icon },
+            didOpen: function(toast) {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+        });
+    };
+
+    IOH.confirm = function(opts) {
+        opts = opts || {};
+        var swalOpts = {
+            icon: opts.icon || 'question',
+            title: opts.title || 'Konfirmasi',
+            showCancelButton: true,
+            confirmButtonText: opts.confirmText || 'Ya, lanjutkan',
+            cancelButtonText: opts.cancelText || 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: {
+                popup: 'ioh-popup',
+                confirmButton: opts.danger ? 'swal2-confirm--danger' : ''
+            },
+            showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
+            hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' }
+        };
+        if (opts.text) swalOpts.text = opts.text;
+        if (opts.html) swalOpts.html = opts.html;
+        return Swal.fire(swalOpts);
+    };
+
+    IOH.alert = function(icon, title, textOrOpts) {
+        var swalOpts = {
+            icon: icon,
+            title: title,
+            customClass: { popup: 'ioh-popup' },
+            confirmButtonText: 'Mengerti',
+            showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
+            hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' }
+        };
+        if (typeof textOrOpts === 'string') {
+            swalOpts.text = textOrOpts;
+        } else if (textOrOpts && typeof textOrOpts === 'object') {
+            if (textOrOpts.text) swalOpts.text = textOrOpts.text;
+            if (textOrOpts.html) swalOpts.html = textOrOpts.html;
+        }
+        return Swal.fire(swalOpts);
+    };
+    </script>
 </head>
 
 <body>
@@ -633,8 +816,10 @@
                 this.dataset.submitting = 'true';
                 const submitBtn = this.querySelector('button[type="submit"]');
                 if (submitBtn) {
-                    submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Memproses...';
-                    submitBtn.disabled = true;
+                    setTimeout(function() {
+                        submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Memproses...';
+                        submitBtn.disabled = true;
+                    }, 10);
                 }
                 });
             });
