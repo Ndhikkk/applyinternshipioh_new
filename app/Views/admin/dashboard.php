@@ -673,7 +673,7 @@
 /* ── Pagination overrides (ensures consistency) ── */
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SweetAlert2 loaded globally via layout/main.php -->
 
 <script>
     let currentModalId = null;
@@ -724,7 +724,7 @@
     }
 
     function toast(icon, text) {
-        Swal.fire({ icon, text, toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+        IOH.toast(icon, text);
     }
 
     function formatStatusLabel(status) {
@@ -772,7 +772,7 @@
             document.getElementById('amLoading').style.display = 'none';
             if (!json.success) {
                 getActionModal().hide();
-                Swal.fire('Gagal', json.message || 'Tidak dapat memuat data kandidat.', 'error');
+                IOH.alert('error', 'Gagal Memuat Data', json.message || 'Tidak dapat memuat data kandidat.');
                 return;
             }
             currentModalItem = json.item;
@@ -1039,12 +1039,17 @@
         apiPost(buildUrl(id, targetStatus), params).then(json => {
             if (!json.success) {
                 resetButtonLoading(saveButton);
-                Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
+                IOH.alert('error', 'Gagal Menyimpan', json.message || 'Terjadi kesalahan saat menyimpan perubahan.');
                 return;
             }
 
             const statusCell = document.getElementById('status-cell-' + id);
-            if (statusCell && json.badge_html !== undefined) statusCell.innerHTML = json.badge_html;
+            if (statusCell) {
+                if (json.badge_html !== undefined) statusCell.innerHTML = json.badge_html;
+                const norm = formatStatusLabel(targetStatus);
+                statusCell.setAttribute('data-status-label', norm);
+                if (window.applyStatusFilter) window.applyStatusFilter();
+            }
 
             // The modal is reused. Restore button labels/states before hiding
             // it so the spinner or faded action never leaks into the next
@@ -1070,13 +1075,12 @@
         let chain = Promise.resolve();
 
         if (hasEmail) {
-            chain = chain.then(() => Swal.fire({
+            chain = chain.then(() => IOH.confirm({
                 icon: 'question',
                 title: 'Kirim Notifikasi Email?',
-                text: 'Kirim email otomatis ke kandidat sekarang?',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, kirim',
-                cancelButtonText: 'Tidak'
+                text: 'Kirim email pemberitahuan otomatis ke kandidat sekarang?',
+                confirmText: 'Ya, kirim email',
+                cancelText: 'Tidak, nanti saja'
             })).then(res => {
                 if (res.isConfirmed) {
                     return apiGet(buildUrl(id, 'email')).then(j => {
@@ -1086,13 +1090,12 @@
             });
         }
 
-        chain.then(() => Swal.fire({
+        chain.then(() => IOH.confirm({
             icon: 'question',
             title: 'Kirim Pengingat WhatsApp?',
             text: 'Buka WhatsApp dengan pesan siap-kirim untuk kandidat ini?',
-            showCancelButton: true,
-            confirmButtonText: 'Buka WhatsApp',
-            cancelButtonText: 'Nanti saja'
+            confirmText: 'Buka WhatsApp',
+            cancelText: 'Nanti saja'
         })).then(res => {
             if (res.isConfirmed) openWaLink(id);
         });
@@ -1108,7 +1111,7 @@
     function openWaLink(id) {
         apiGet(buildUrl(id, 'wa')).then(json => {
             if (!json.success || !json.url) {
-                Swal.fire('Info', json.message || 'Nomor WhatsApp tidak valid / tidak tersedia.', 'info');
+                IOH.alert('info', 'Informasi', json.message || 'Nomor WhatsApp tidak valid atau tidak tersedia.');
                 return;
             }
             window.open(json.url, '_blank');
@@ -1117,14 +1120,13 @@
 
     // ===================== HAPUS DATA =====================
     function hapusData(id, fromModal) {
-        Swal.fire({
+        IOH.confirm({
             icon: 'warning',
-            title: 'Hapus data ini secara permanen?',
-            text: 'Data dan berkas terkait akan dihapus permanen dan tidak bisa dikembalikan.',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#dc3545'
+            title: 'Hapus Data Secara Permanen?',
+            text: 'Seluruh data dan berkas terkait akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.',
+            confirmText: 'Ya, hapus sekarang',
+            cancelText: 'Batal',
+            danger: true
         }).then(result => {
             if (!result.isConfirmed) return;
 
@@ -1135,7 +1137,7 @@
                 })
                 .then(json => {
                     if (!json.success) {
-                        Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
+                        IOH.alert('error', 'Gagal Menghapus', json.message || 'Terjadi kesalahan saat menghapus data.');
                         return;
                     }
                     if (fromModal) getActionModal().hide();
@@ -1143,7 +1145,7 @@
                     if (row) row.remove();
                     toast('success', 'Data berhasil dihapus.');
                 })
-                .catch(() => Swal.fire('Gagal', 'Tidak dapat menghubungi server.', 'error'));
+                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.'));
         });
     }
 
@@ -1151,7 +1153,7 @@
     function restoreData(id) {
         apiGet(buildUrl(id, 'restore')).then(json => {
             if (!json.success) {
-                Swal.fire('Gagal', json.message || 'Terjadi kesalahan.', 'error');
+                IOH.alert('error', 'Gagal Memulihkan', json.message || 'Terjadi kesalahan saat memulihkan data.');
                 return;
             }
             const row = document.getElementById('row-' + id);
@@ -1168,6 +1170,7 @@
         const isArsip = !!arsipParam;
 
         Swal.fire({
+            customClass: { popup: 'ioh-popup' },
             title: '<i class="bi bi-file-earmark-excel text-success me-2"></i>Pilihan Format Export Excel',
             html: `
                 <p class="text-muted small mb-3">Silakan pilih susunan kolom yang ingin Anda unduh ke file Excel:</p>
@@ -1221,10 +1224,11 @@
         let debounceTimer = null;
         let activeDivisiFilter = '<?= esc($divisi_filter ?? '', 'js') ?>';
         let activeJenisFilter = '<?= esc($jenis_filter ?? '', 'js') ?>';
+        let activeStatusFilter = ''; // Frontend-only status filter (no backend)
         const baseUrl = '<?= site_url('admin/dashboard') ?>';
 
         function hasActiveFilters() {
-            return searchInput.value.trim() || activeDivisiFilter || activeJenisFilter;
+            return searchInput.value.trim() || activeDivisiFilter || activeJenisFilter || activeStatusFilter;
         }
 
         function buildSearchUrl(keyword) {
@@ -1248,13 +1252,109 @@
                 tableContainer.innerHTML = html;
                 tableContainer.style.opacity = '1';
                 window.history.pushState({}, '', url);
+                applyStatusFilter(); // Re-apply frontend status filter after AJAX reload
             })
             .catch(err => {
                 console.error(err);
                 tableContainer.style.opacity = '1';
-                Swal.fire('Error', 'Gagal memuat data pencarian.', 'error');
+                IOH.alert('error', 'Gagal Memuat Data', 'Terjadi kesalahan saat memuat data pencarian.');
             });
         }
+
+        /**
+         * Frontend-only Status Filter.
+         * Hides/shows table rows based on data-status-label attribute.
+         * Runs after every AJAX table reload to persist filter state.
+         */
+        function applyStatusFilter() {
+            const rows = tableContainer.querySelectorAll('#dataTable tbody tr[id^="row-"]');
+            let visibleCount = 0;
+
+            rows.forEach(function(row) {
+                if (!activeStatusFilter) {
+                    row.style.display = '';
+                    visibleCount++;
+                    return;
+                }
+                const statusCell = row.querySelector('td[data-status-label]');
+                let rowStatus = statusCell ? statusCell.getAttribute('data-status-label') : '';
+                if (!rowStatus && statusCell) {
+                    const badge = statusCell.querySelector('.badge');
+                    rowStatus = badge ? badge.textContent.trim() : statusCell.textContent.trim();
+                }
+                rowStatus = (rowStatus || '').toUpperCase();
+
+                const isMatch = (rowStatus === activeStatusFilter) || 
+                    (activeStatusFilter === 'PROGRESS' && (rowStatus.includes('INTERVIEW') || rowStatus.includes('PROGRESS')));
+
+                if (isMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update filter icon: filled when active
+            const filterIcon = tableContainer.querySelector('#statusFilterIcon');
+            if (filterIcon) {
+                filterIcon.className = activeStatusFilter
+                    ? 'bi bi-funnel-fill text-primary ms-1'
+                    : 'bi bi-funnel ms-1';
+            }
+
+            // Update badge next to column title (matching Divisi/Jenis badges, but with dynamic status colors)
+            const filterBadge = tableContainer.querySelector('#statusFilterBadge');
+            if (filterBadge) {
+                if (activeStatusFilter) {
+                    const statusConfig = {
+                        'MENUNGGU': { label: 'Menunggu', class: 'bg-warning text-dark' },
+                        'PROGRESS': { label: 'Progress', class: 'bg-info text-dark' },
+                        'DITERIMA': { label: 'Diterima', class: 'bg-success text-white' },
+                        'COMPLETE': { label: 'Complete', class: 'bg-purple text-white' },
+                        'DITOLAK':  { label: 'Ditolak',  class: 'bg-danger text-white' }
+                    };
+                    const conf = statusConfig[activeStatusFilter] || { label: activeStatusFilter, class: 'bg-primary text-white' };
+                    filterBadge.textContent = conf.label;
+                    filterBadge.className = 'badge ms-1 ' + conf.class;
+                    filterBadge.style.fontSize = '.65em';
+                    filterBadge.style.display = 'inline-block';
+                } else {
+                    filterBadge.style.display = 'none';
+                    filterBadge.textContent = '';
+                    filterBadge.className = 'badge bg-primary ms-1';
+                }
+            }
+
+            // Update active state on dropdown items
+            tableContainer.querySelectorAll('[data-status-filter]').forEach(function(el) {
+                const val = el.getAttribute('data-status-filter');
+                if (val === activeStatusFilter) {
+                    el.classList.add('active', 'fw-bold');
+                } else {
+                    el.classList.remove('active', 'fw-bold');
+                }
+            });
+
+            // Show "no results" message if all rows hidden by status filter
+            var noResultRow = tableContainer.querySelector('#statusFilterNoResult');
+            if (activeStatusFilter && visibleCount === 0 && rows.length > 0) {
+                if (!noResultRow) {
+                    var tbody = tableContainer.querySelector('#dataTable tbody');
+                    if (tbody) {
+                        var tr = document.createElement('tr');
+                        tr.id = 'statusFilterNoResult';
+                        tr.innerHTML = '<td colspan="10" class="text-center py-4 text-muted"><i class="bi bi-filter-circle display-6 d-block mb-2 opacity-50"></i>Tidak ada data dengan status <strong>' + (activeStatusFilter === 'COMPLETE' ? 'Complete' : activeStatusFilter) + '</strong> di halaman ini.</td>';
+                        tbody.appendChild(tr);
+                    }
+                }
+            } else if (noResultRow) {
+                noResultRow.remove();
+            }
+        }
+
+        window.applyStatusFilter = applyStatusFilter;
+        applyStatusFilter();
 
         window.refreshDashboardTable = function () {
             loadData(window.location.href);
@@ -1291,6 +1391,7 @@
                 searchInput.value = '';
                 activeDivisiFilter = '';
                 activeJenisFilter = '';
+                activeStatusFilter = '';
                 this.style.display = 'none';
                 loadData(buildSearchUrl(''));
             });
@@ -1326,6 +1427,22 @@
                 loadData(buildSearchUrl(keyword));
                 return;
             }
+
+            // Handle status filter dropdown clicks (frontend-only, no server request)
+            const statusItem = e.target.closest('[data-status-filter]');
+            if (statusItem) {
+                e.preventDefault();
+                activeStatusFilter = statusItem.getAttribute('data-status-filter');
+                resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
+                applyStatusFilter();
+                // Close the dropdown after selection
+                var dropdownToggle = statusItem.closest('.dropdown');
+                if (dropdownToggle) {
+                    var toggleEl = dropdownToggle.querySelector('[data-bs-toggle="dropdown"]');
+                    if (toggleEl) bootstrap.Dropdown.getOrCreateInstance(toggleEl).hide();
+                }
+                return;
+            }
         });
     })();
 
@@ -1335,13 +1452,12 @@
             e.preventDefault();
             const url = this.getAttribute('href');
             const text = this.getAttribute('data-confirm-text');
-            Swal.fire({
+            IOH.confirm({
                 icon: 'question',
-                title: 'Konfirmasi',
+                title: 'Konfirmasi Perubahan',
                 text: text,
-                showCancelButton: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Batal'
+                confirmText: 'Ya, lanjutkan',
+                cancelText: 'Batal'
             }).then(result => {
                 if (result.isConfirmed) window.location.href = url;
             });

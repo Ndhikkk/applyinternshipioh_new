@@ -8,7 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .loading-overlay {
             position: fixed;
@@ -33,6 +38,38 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        /* SweetAlert2 IOH Theme */
+        .swal2-popup.ioh-popup {
+            border-radius: 20px !important;
+            padding: 2rem 1.5rem !important;
+            font-family: 'Poppins', sans-serif !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-title { font-size: 1.35rem !important; font-weight: 700 !important; color: #111827 !important; }
+        .swal2-popup.ioh-popup .swal2-html-container { font-size: 0.95rem !important; color: #6B7280 !important; }
+        .swal2-popup.ioh-popup .swal2-confirm {
+            background: linear-gradient(135deg, #E6007E, #FF4FA3) !important;
+            border: none !important; border-radius: 999px !important; padding: 10px 28px !important;
+            font-weight: 600 !important; box-shadow: 0 4px 15px rgba(230, 0, 126, 0.3) !important;
+        }
+        .swal2-popup.ioh-popup .swal2-cancel {
+            background: #F3F4F6 !important; color: #374151 !important; border: none !important;
+            border-radius: 999px !important; padding: 10px 28px !important; font-weight: 600 !important;
+        }
+        .swal2-popup.ioh-toast {
+            border-radius: 14px !important; padding: 12px 18px !important;
+            font-family: 'Poppins', sans-serif !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+            border-left: 4px solid transparent;
+        }
+        .swal2-popup.ioh-toast .swal2-title { font-size: 0.88rem !important; font-weight: 500 !important; margin: 0 !important; padding: 0 !important; }
+        .swal2-popup.ioh-toast.toast-success { border-left-color: #22C55E !important; }
+        .swal2-popup.ioh-toast.toast-error { border-left-color: #EF4444 !important; }
+        .swal2-popup.ioh-toast.toast-warning { border-left-color: #F59E0B !important; }
+        .swal2-popup.ioh-toast.toast-info { border-left-color: #3B82F6 !important; }
+        .swal2-popup.ioh-toast .swal2-timer-progress-bar {
+            background: linear-gradient(90deg, #E6007E, #FF4FA3) !important; height: 4px !important;
         }
     </style>
 </head>
@@ -241,12 +278,12 @@
                 .then(res => res.json())
                 .then(json => {
                     if (!json.success || !json.url) {
-                        Swal.fire('Info', json.message || 'Nomor WhatsApp tidak valid / tidak tersedia.', 'info');
+                        IOH.alert('info', 'Informasi', json.message || 'Nomor WhatsApp tidak valid atau tidak tersedia.');
                         return;
                     }
                     window.open(json.url, '_blank');
                 })
-                .catch(() => Swal.fire('Gagal', 'Tidak dapat menghubungi server.', 'error'));
+                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.'));
         }
 
         function analyzeCv(id) {
@@ -272,7 +309,7 @@
 
                     if (result.error) {
                          // Error logic dari backend
-                        Swal.fire('Gagal', result.error, 'error');
+                        IOH.alert('error', 'Analisis Gagal', result.error);
                         return;
                     }
 
@@ -287,7 +324,9 @@
                             toast: true,
                             position: 'top-end',
                             timer: 5000,
-                            showConfirmButton: false
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                            customClass: { popup: 'ioh-toast toast-info' }
                         });
                     } else if (data.is_mock) {
                         Swal.fire({
@@ -297,7 +336,9 @@
                             toast: true,
                             position: 'top-end',
                             timer: 5000,
-                            showConfirmButton: false
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                            customClass: { popup: 'ioh-toast toast-warning' }
                         });
                     }
                     
@@ -327,7 +368,7 @@
                 })
                 .catch(error => {
                     overlay.style.display = 'none';
-                    Swal.fire('Error', error.message, 'error');
+                    IOH.alert('error', 'Terjadi Kesalahan', error.message);
                     console.error(error);
                 });
         }
@@ -438,6 +479,33 @@
                 }
              });
         }
+    </script>
+
+    <!-- IOH Notification Helpers (standalone page) -->
+    <script>
+    window.IOH = window.IOH || {};
+    IOH.toast = function(icon, text, timer) {
+        Swal.fire({ icon: icon, title: text, toast: true, position: 'top-end',
+            timer: timer || 3000, timerProgressBar: true, showConfirmButton: false, showCloseButton: true,
+            customClass: { popup: 'ioh-toast toast-' + icon },
+            didOpen: function(t) { t.addEventListener('mouseenter', Swal.stopTimer); t.addEventListener('mouseleave', Swal.resumeTimer); }
+        });
+    };
+    IOH.confirm = function(o) {
+        o = o || {};
+        return Swal.fire({ icon: o.icon||'question', title: o.title||'Konfirmasi',
+            text: o.text, html: o.html, showCancelButton: true,
+            confirmButtonText: o.confirmText||'Ya, lanjutkan', cancelButtonText: o.cancelText||'Batal',
+            reverseButtons: true, focusCancel: true,
+            customClass: { popup: 'ioh-popup', confirmButton: o.danger ? 'swal2-confirm--danger' : '' }
+        });
+    };
+    IOH.alert = function(icon, title, textOrOpts) {
+        var opts = { icon: icon, title: title, customClass: { popup: 'ioh-popup' }, confirmButtonText: 'Mengerti' };
+        if (typeof textOrOpts === 'string') opts.text = textOrOpts;
+        else if (textOrOpts) { if (textOrOpts.text) opts.text = textOrOpts.text; if (textOrOpts.html) opts.html = textOrOpts.html; }
+        return Swal.fire(opts);
+    };
     </script>
 </body>
 

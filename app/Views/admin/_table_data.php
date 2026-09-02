@@ -58,7 +58,38 @@
                         </div>
                     </div>
                 </th>
-                <th class="fw-bold text-center" style="min-width:140px;">Status</th>
+                <th class="fw-bold text-center" style="min-width:140px; cursor:pointer;">
+                    <div class="dropdown d-inline-block">
+                        <span class="status-filter-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-display="dynamic" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                            Status
+                            <span id="statusFilterBadge" class="badge bg-primary ms-1" style="font-size:.65em; display:none;"></span>
+                            <i class="bi bi-funnel ms-1" style="font-size:.75em;" id="statusFilterIcon"></i>
+                        </span>
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; min-width:230px; max-width:95vw; z-index:1060; white-space:normal;">
+                            <h6 class="dropdown-header px-1 text-primary fw-bold mb-2"><i class="bi bi-filter-circle me-1"></i>Filter Status</h6>
+                            <div class="d-flex flex-column gap-1" style="max-height:280px; overflow-y:auto;">
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center active fw-bold" href="#" data-status-filter="">
+                                    <i class="bi bi-asterisk me-2 text-muted"></i> Semua Status
+                                </a>
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center" href="#" data-status-filter="MENUNGGU">
+                                    <span class="badge bg-warning text-dark me-2" style="min-width:14px; height:14px; padding:0; border-radius:50%;"></span> Menunggu
+                                </a>
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center" href="#" data-status-filter="PROGRESS">
+                                    <span class="badge bg-info me-2" style="min-width:14px; height:14px; padding:0; border-radius:50%;"></span> Progress
+                                </a>
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center" href="#" data-status-filter="DITERIMA">
+                                    <span class="badge bg-success me-2" style="min-width:14px; height:14px; padding:0; border-radius:50%;"></span> Diterima
+                                </a>
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center" href="#" data-status-filter="COMPLETE">
+                                    <span class="badge bg-purple text-white me-2" style="min-width:14px; height:14px; padding:0; border-radius:50%;"></span> Complete (Selesai Magang)
+                                </a>
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center" href="#" data-status-filter="DITOLAK">
+                                    <span class="badge bg-danger me-2" style="min-width:14px; height:14px; padding:0; border-radius:50%;"></span> Ditolak
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </th>
                 <th class="fw-bold text-nowrap">Periode</th>
                 <th class="fw-bold text-nowrap">Tanggal Daftar</th>
                 <th class="fw-bold text-center">Berkas</th>
@@ -135,7 +166,7 @@
                                 <?= esc($data['jenis_magang']) ?>
                             </span>
                         </td>
-                        <td class="text-center" data-label="Status" id="status-cell-<?= $data['id'] ?>">
+                        <td class="text-center" data-label="Status" data-status-label="<?= esc($statusLabel) ?>" id="status-cell-<?= $data['id'] ?>">
                             <span class="badge <?= $badgeClass ?>"><?= esc($statusLabel) ?></span>
 
                             <?php if ($step > 0 && !empty($data[$jadwalKey])): ?>
