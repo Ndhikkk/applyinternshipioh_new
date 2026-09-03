@@ -176,7 +176,7 @@ class Progres extends BaseController
         $iconPdfUrl = 'https://cdn-icons-png.flaticon.com/512/337/337946.png'; // Gambar ikon berkas PDF resmi
 
         // Nomor narahubung / kontak yang bisa dihubungi
-        $nomorKontak = '[NOMOR_WHATSAPP_ADMIN]'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
+        $nomorKontak = '0853-7849-1566'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
 
         // ==========================================================================
         // 3. DESAIN TEMPLATE EMAIL: DATA DITAMPILKAN DALAM TABEL HTML RAPI

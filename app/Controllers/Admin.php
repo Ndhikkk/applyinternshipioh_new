@@ -221,48 +221,75 @@ class Admin extends BaseController
             return redirect()->to('/admin/login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Pastikan data yang diekspor sudah auto-Complete jika periode habis
         try {
-            $this->pendaftaranModel->autoCompleteExpired();
-        } catch (\Throwable $e) {
-            log_message('error', 'AutoComplete exportExcel error: ' . $e->getMessage());
-        }
+            // Pastikan data yang diekspor sudah auto-Complete jika periode habis
+            try {
+                $this->pendaftaranModel->autoCompleteExpired();
+            } catch (\Throwable $e) {
+                log_message('error', 'AutoComplete exportExcel error: ' . $e->getMessage());
+            }
 
-        $isArsip = $this->request->getGet('arsip') == '1';
-        $keyword = $this->request->getGet('keyword');
-        $mode    = $this->request->getGet('mode') ?? 'custom'; // 'custom' or 'all'
+            $isArsip = $this->request->getGet('arsip') == '1';
+            $keyword = $this->request->getGet('keyword');
+            $mode    = $this->request->getGet('mode') ?? 'custom'; // 'custom' or 'all'
 
-        $builder = $this->pendaftaranModel
-            ->where('is_archived', $isArsip ? 1 : 0)
-            ->whereIn('status', ['Diterima', 'Complete']);
+            $builder = $this->pendaftaranModel
+                ->where('is_archived', $isArsip ? 1 : 0)
+                ->whereIn('status', ['Diterima', 'Complete']);
 
-        if (!empty($keyword)) {
-            $builder->groupStart()
-                ->like('nama_lengkap', $keyword)
-                ->orLike('email', $keyword)
-                ->orLike('asal_kampus', $keyword)
-                ->orLike('program_studi', $keyword)
-                ->orLike('nomor_whatsapp', $keyword)
-                ->orLike('token_pendaftaran', $keyword)
-                ->orLike('status', $keyword)
-                ->orLike('divisi_pilihan', $keyword)
-                ->orLike('regional_interview', $keyword)
-                ->orLike('kota_pilihan', $keyword)
-            ->groupEnd();
-        }
+            if (!empty($keyword)) {
+                $builder->groupStart()
+                    ->like('nama_lengkap', $keyword)
+                    ->orLike('email', $keyword)
+                    ->orLike('asal_kampus', $keyword)
+                    ->orLike('program_studi', $keyword)
+                    ->orLike('nomor_whatsapp', $keyword)
+                    ->orLike('token_pendaftaran', $keyword)
+                    ->orLike('status', $keyword)
+                    ->orLike('divisi_pilihan', $keyword);
 
-        $sortField = $isArsip ? 'archived_at' : 'created_at';
-        $pendaftaran = $builder->orderBy($sortField, 'DESC')->findAll();
+                // Cek kolom opsional agar tidak memicu error SQL jika kolom belum ada di DB production
+                try {
+                    $dbFields = $this->pendaftaranModel->db->getFieldNames('pendaftaran_magang');
+                    if (in_array('regional_interview', $dbFields, true)) {
+                        $builder->orLike('regional_interview', $keyword);
+                    }
+                    if (in_array('kota_pilihan', $dbFields, true)) {
+                        $builder->orLike('kota_pilihan', $keyword);
+                    } elseif (in_array('kota_magang', $dbFields, true)) {
+                        $builder->orLike('kota_magang', $keyword);
+                    }
+                } catch (\Throwable $ignored) {
+                    // Abaikan jika tidak bisa membaca field schema
+                }
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle($isArsip ? 'Data Arsip Diterima' : 'Data Peserta Diterima');
+                $builder->groupEnd();
+            }
 
-        // Tampilkan garis kisi (gridlines)
-        $sheet->setShowGridLines(true);
+            $sortField = $isArsip ? 'archived_at' : 'created_at';
+            $pendaftaran = $builder->orderBy($sortField, 'DESC')->findAll();
 
-        $rowIndex = 2;
-        $no = 1;
+            // Cek apakah PhpSpreadsheet dan ekstensi ZipArchive tersedia (wajib untuk format .xlsx).
+            // Jika salah satunya tidak tersedia di server hosting, fallback otomatis ke format CSV agar unduhan tetap berhasil.
+            if (!class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet') || !class_exists('ZipArchive')) {
+                log_message('warning', "PhpSpreadsheet atau ZipArchive tidak tersedia di server hosting. Menggunakan fallback format CSV untuk export.");
+                return $this->exportCsvFallback($pendaftaran, $mode, $isArsip);
+            }
+
+            // Pastikan temporary file PhpSpreadsheet tidak error di hosting dengan batasan open_basedir
+            if (is_dir(WRITEPATH . 'cache')) {
+                \PhpOffice\PhpSpreadsheet\Shared\File::setUseUploadTempDirectory(false);
+            }
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle($isArsip ? 'Data Arsip Diterima' : 'Data Peserta Diterima');
+
+            // Tampilkan garis kisi (gridlines)
+            $sheet->setShowGridLines(true);
+
+            $rowIndex = 2;
+            $no = 1;
 
         if ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') {
             // Mode SESUAI TAMPILAN DASHBOARD (Urutan Asli Dashboard)
@@ -530,9 +557,21 @@ class Admin extends BaseController
         // Aktifkan Filter dropdown pada baris header
         $sheet->setAutoFilter('A1:' . $highestColumn . $lastRow);
 
-        // Auto-fit lebar kolom
-        foreach (range('A', $highestColumn) as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
+        // Atur lebar kolom yang rapi & proporsional (aman di server Linux tanpa bergantung font FreeType GD)
+        if ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') {
+            $columnWidths = [
+                'A' => 6,  'B' => 16, 'C' => 28, 'D' => 28, 'E' => 18, 'F' => 18,
+                'G' => 28, 'H' => 24, 'I' => 10, 'J' => 20, 'K' => 20, 'L' => 24,
+                'M' => 14, 'N' => 14, 'O' => 15, 'P' => 15, 'Q' => 18, 'R' => 18, 'S' => 30
+            ];
+        } else {
+            $columnWidths = [
+                'A' => 6,  'B' => 16, 'C' => 28, 'D' => 24, 'E' => 28, 'F' => 24,
+                'G' => 15, 'H' => 15, 'I' => 18, 'J' => 20, 'K' => 20, 'L' => 20
+            ];
+        }
+        foreach ($columnWidths as $colLetter => $width) {
+            $sheet->getColumnDimension($colLetter)->setWidth($width);
         }
 
         $modeSuffix = ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') ? '_dashboard_' : '_kustom_';
@@ -551,6 +590,104 @@ class Admin extends BaseController
 
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
+        exit;
+        } catch (\Throwable $e) {
+            log_message('error', 'Export Excel Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return redirect()->to(site_url('admin/dashboard'))->with('error', 'Gagal export Excel: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Fallback otomatis ke format CSV jika server hosting belum mengaktifkan ekstensi ZipArchive.
+     */
+    private function exportCsvFallback(array $pendaftaran, string $mode, bool $isArsip)
+    {
+        $modeSuffix = ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') ? '_dashboard_' : '_kustom_';
+        $filename   = ($isArsip ? 'data_arsip_diterima' : 'data_peserta_diterima') . $modeSuffix . date('Y-m-d_His') . '.csv';
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $output = fopen('php://output', 'w');
+        // UTF-8 BOM agar Excel di Windows/Mac menampilkan teks & nomor dengan rapi
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        if ($mode === 'all' || $mode === 'dashboard' || $mode === 'original') {
+            fputcsv($output, [
+                'No', 'Token Pendaftaran', 'Nama Lengkap', 'Email', 'WhatsApp', 'Nomor Darurat',
+                'Asal Kampus', 'Program Studi', 'Semester', 'Regional Interview', 'Kota Pilihan',
+                'Divisi Pilihan', 'Jenis Magang', 'Status', 'Periode Mulai', 'Periode Selesai',
+                'Tanggal Daftar', 'Terakhir Diubah', 'Catatan Admin / Arsip'
+            ], ',', '"', "\\");
+
+            $no = 1;
+            foreach ($pendaftaran as $row) {
+                $periodeMulai   = !empty($row['periode_mulai']) ? date('d/m/Y', strtotime($row['periode_mulai'])) : '-';
+                $periodeSelesai = !empty($row['periode_selesai']) ? date('d/m/Y', strtotime($row['periode_selesai'])) : '-';
+                $tglDaftar      = !empty($row['created_at']) ? date('d/m/Y H:i', strtotime($row['created_at'])) : '-';
+                $tglUbah        = !empty($row['updated_at']) ? date('d/m/Y H:i', strtotime($row['updated_at'])) : '-';
+                $catatan        = $row['catatan_admin'] ?? $row['archived_reason'] ?? $row['catatan'] ?? '-';
+
+                fputcsv($output, [
+                    $no++,
+                    (string) ($row['token_pendaftaran'] ?? '-'),
+                    $row['nama_lengkap'] ?? '-',
+                    $row['email'] ?? '-',
+                    (string) ($row['nomor_whatsapp'] ?? '-'),
+                    (string) ($row['nomor_darurat'] ?? '-'),
+                    $row['asal_kampus'] ?? '-',
+                    $row['program_studi'] ?? '-',
+                    $row['semester'] ?? '-',
+                    $row['regional_interview'] ?? '-',
+                    $row['kota_pilihan'] ?? '-',
+                    $row['divisi_pilihan'] ?? '-',
+                    $row['jenis_magang'] ?? '-',
+                    $row['status'] ?? '-',
+                    $periodeMulai,
+                    $periodeSelesai,
+                    $tglDaftar,
+                    $tglUbah,
+                    $catatan
+                ], ',', '"', "\\");
+            }
+        } else {
+            fputcsv($output, [
+                'No', 'Token Pendaftaran', 'Nama Lengkap', 'Divisi Pilihan', 'Asal Kampus',
+                'Program Studi', 'Periode Mulai', 'Periode Selesai', 'Status Magang',
+                'Suket Penerimaan', 'Suket Selesai', 'Sertif Selesai'
+            ], ',', '"', "\\");
+
+            $no = 1;
+            foreach ($pendaftaran as $row) {
+                $periodeMulai   = !empty($row['periode_mulai']) ? date('d/m/Y', strtotime($row['periode_mulai'])) : '-';
+                $periodeSelesai = !empty($row['periode_selesai']) ? date('d/m/Y', strtotime($row['periode_selesai'])) : '-';
+                $currentStatus  = $row['status'] ?? '-';
+                $statusDisplay  = ($currentStatus === 'Diterima') ? 'Active' : (($currentStatus === 'Complete') ? 'Completed' : $currentStatus);
+
+                fputcsv($output, [
+                    $no++,
+                    (string) ($row['token_pendaftaran'] ?? '-'),
+                    $row['nama_lengkap'] ?? '-',
+                    $row['divisi_pilihan'] ?? '-',
+                    $row['asal_kampus'] ?? '-',
+                    $row['program_studi'] ?? '-',
+                    $periodeMulai,
+                    $periodeSelesai,
+                    $statusDisplay,
+                    'Belum Diproses',
+                    'Belum Diproses',
+                    'Belum Diproses'
+                ], ',', '"', "\\");
+            }
+        }
+
+        fclose($output);
         exit;
     }
 

@@ -478,6 +478,14 @@
     color: #1e293b;
     transform: translateY(3px);
 }
+.export-notice-banner {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #0284c7;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 14px;
+}
 </style>
 
 <div class="card border-0 shadow-sm" data-aos="fade-up">
@@ -1320,6 +1328,16 @@
                         <i class="bi bi-download export-card-action-icon"></i>
                     </button>
                 </div>
+
+                <div class="export-notice-banner">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-info-circle-fill text-info flex-shrink-0 mt-1" style="font-size: 0.95rem;"></i>
+                        <div class="text-start" style="font-size: 0.78rem; line-height: 1.45; color: #475569;">
+                            <strong class="text-dark d-block mb-1">Catatan Format Unduhan:</strong>
+                            Jika server mengunduh berkas format <code>.csv</code> (fallback hosting), berkas sudah dilengkapi <strong>BOM UTF-8</strong>. Saat membuka di Microsoft Excel (atau via menu <em>Data &gt; From Text/CSV</em>), pastikan pilihan encoding terdeteksi sebagai <strong>Unicode (UTF-8)</strong> agar kolom dan teks langsung rapi.
+                        </div>
+                    </div>
+                </div>
             `,
             showConfirmButton: false,
             showCancelButton: true,
@@ -1333,6 +1351,31 @@
                     url.searchParams.set('mode', mode);
                     window.location.href = url.toString();
                     Swal.close();
+
+                    // Tampilkan notifikasi panduan pembukaan file di Excel
+                    setTimeout(() => {
+                        Swal.fire({
+                            customClass: { popup: 'ioh-popup' },
+                            icon: 'info',
+                            title: 'Mengunduh Data Export',
+                            html: `
+                                <p class="mb-2">Permintaan unduhan file sedang diproses oleh server.</p>
+                                <div class="p-3 text-start rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0; font-size:0.83rem; color:#334155;">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-lightbulb-fill text-warning flex-shrink-0 mt-1"></i>
+                                        <div>
+                                            <strong class="text-dark d-block mb-1">Panduan Buka di Excel:</strong>
+                                            Jika berkas terunduh berformat <code>.csv</code>, berkas telah dilengkapi <strong>BOM UTF-8</strong>. Saat membuka di Excel (atau lewat menu <em>Data &gt; From Text/CSV</em>), pastikan pilihan format file / encoding adalah <strong>65001 : Unicode (UTF-8)</strong> agar tabel langsung rapi terpisah per kolom.
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            timer: 6000,
+                            timerProgressBar: true,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Siap, Mengerti'
+                        });
+                    }, 350);
                 }
 
                 document.getElementById('swalBtnExportCustom').addEventListener('click', () => runExport('custom'));
