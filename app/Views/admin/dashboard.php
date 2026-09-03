@@ -382,6 +382,102 @@
         flex-wrap: wrap !important;
     }
 }
+
+/* ── Export Excel Modal Custom Cards ── */
+.export-format-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    text-align: left;
+    width: 100%;
+    position: relative;
+    outline: none;
+}
+.export-format-card:hover, .export-format-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+.export-format-card.card-custom-format:hover, .export-format-card.card-custom-format:focus-visible {
+    border-color: #3b82f6;
+    background: #f8faff;
+}
+.export-format-card.card-dashboard-format:hover, .export-format-card.card-dashboard-format:focus-visible {
+    border-color: #10b981;
+    background: #f6fdf9;
+}
+.export-icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+.export-format-card:hover .export-icon-box {
+    transform: scale(1.08);
+}
+.export-icon-box.icon-box-blue {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+}
+.export-icon-box.icon-box-green {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #d1fae5;
+}
+.export-card-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    display: inline-block;
+}
+.badge-blue-subtle {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.badge-green-subtle {
+    background: #d1fae5;
+    color: #065f46;
+}
+.export-card-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.export-card-desc {
+    font-size: 0.825rem;
+    color: #64748b;
+    line-height: 1.45;
+    margin: 0;
+}
+.export-card-action-icon {
+    color: #94a3b8;
+    font-size: 1.25rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.export-format-card:hover .export-card-action-icon {
+    color: #1e293b;
+    transform: translateY(3px);
+}
 </style>
 
 <div class="card border-0 shadow-sm" data-aos="fade-up">
@@ -573,10 +669,10 @@
                     <hr>
 
                     <div class="d-flex gap-2 flex-wrap">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="sendEmailNow()">
+                        <button type="button" id="btnSendEmailModal" class="btn btn-outline-secondary btn-sm" onclick="sendEmailNow(this)">
                             <i class="bi bi-envelope"></i> Kirim Email Sekarang
                         </button>
-                        <button type="button" class="btn btn-outline-success btn-sm" onclick="openWaLink(currentModalId)">
+                        <button type="button" id="btnSendWaModal" class="btn btn-outline-success btn-sm" onclick="openWaLink(currentModalId, this)">
                             <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                         </button>
                         <button type="button" id="amBtnSurat" class="btn btn-primary btn-sm" style="display:none;" onclick="downloadSuratPenerimaan()" title="Unduh Surat Penerimaan (.docx)">
@@ -1101,21 +1197,41 @@
         });
     }
 
-    function sendEmailNow() {
-        apiGet(buildUrl(currentModalId, 'email')).then(j => {
-            toast(j.success ? 'success' : 'error', j.message);
-        });
+    function sendEmailNow(btn) {
+        const button = btn || document.getElementById('btnSendEmailModal');
+        if (button && !setButtonLoading(button, 'Mengirim Email...')) return;
+
+        apiGet(buildUrl(currentModalId, 'email'))
+            .then(j => {
+                toast(j.success ? 'success' : 'error', j.message);
+            })
+            .catch(() => {
+                toast('error', 'Gagal mengirim email.');
+            })
+            .finally(() => {
+                if (button) resetButtonLoading(button);
+            });
     }
 
     // ===================== WHATSAPP =====================
-    function openWaLink(id) {
-        apiGet(buildUrl(id, 'wa')).then(json => {
-            if (!json.success || !json.url) {
-                IOH.alert('info', 'Informasi', json.message || 'Nomor WhatsApp tidak valid atau tidak tersedia.');
-                return;
-            }
-            window.open(json.url, '_blank');
-        });
+    function openWaLink(id, btn) {
+        const button = btn || (id === currentModalId ? document.getElementById('btnSendWaModal') : null);
+        if (button && !setButtonLoading(button, 'Menyiapkan WA...')) return;
+
+        apiGet(buildUrl(id, 'wa'))
+            .then(json => {
+                if (!json.success || !json.url) {
+                    IOH.alert('info', 'Informasi', json.message || 'Nomor WhatsApp tidak valid atau tidak tersedia.');
+                    return;
+                }
+                window.open(json.url, '_blank');
+            })
+            .catch(() => {
+                IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.');
+            })
+            .finally(() => {
+                if (button) resetButtonLoading(button);
+            });
     }
 
     // ===================== HAPUS DATA =====================
@@ -1171,23 +1287,37 @@
 
         Swal.fire({
             customClass: { popup: 'ioh-popup' },
+            width: '620px',
             title: '<i class="bi bi-file-earmark-excel text-success me-2"></i>Pilihan Format Export Excel',
             html: `
-                <p class="text-muted small mb-3">Silakan pilih susunan kolom yang ingin Anda unduh ke file Excel:</p>
+                <p class="text-muted small mb-3">Pilih format susunan kolom yang ingin Anda unduh ke file Microsoft Excel:</p>
                 <div class="d-flex flex-column gap-2 text-start">
-                    <button type="button" id="swalBtnExportCustom" class="btn btn-outline-primary p-3 text-start d-flex align-items-center gap-3">
-                        <i class="bi bi-layout-text-window-reverse fs-3 text-primary flex-shrink-0"></i>
-                        <div>
-                            <strong class="d-block text-dark mb-1">Susunan Kolom Kustom (12 Kolom + Dropdown)</strong>
-                            <small class="text-muted">Profil, Periode, Status Magang (Active/Completed), Suket Penerimaan, Suket Selesai, & Sertif Selesai.</small>
+                    <button type="button" id="swalBtnExportCustom" class="export-format-card card-custom-format">
+                        <div class="export-icon-box icon-box-blue">
+                            <i class="bi bi-layout-text-window-reverse"></i>
                         </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="export-card-title">
+                                <span>Susunan Kolom Kustom</span>
+                                <span class="export-card-badge badge-blue-subtle">12 Kolom + Dropdown</span>
+                            </div>
+                            <p class="export-card-desc">Format rekap evaluasi: Profil, Periode, Status Magang (Active/Completed), Suket Penerimaan, Suket Selesai, & Sertifikat.</p>
+                        </div>
+                        <i class="bi bi-download export-card-action-icon"></i>
                     </button>
-                    <button type="button" id="swalBtnExportDashboard" class="btn btn-outline-secondary p-3 text-start d-flex align-items-center gap-3">
-                        <i class="bi bi-table fs-3 text-success flex-shrink-0"></i>
-                        <div>
-                            <strong class="d-block text-dark mb-1">Susunan Lengkap Sesuai Dashboard (19 Kolom)</strong>
-                            <small class="text-muted">Semua kolom tabel dashboard tanpa perubahan urutan: Kontak, Akademik, Lokasi, Divisi, Status, Periode, Tanggal, & Catatan.</small>
+
+                    <button type="button" id="swalBtnExportDashboard" class="export-format-card card-dashboard-format">
+                        <div class="export-icon-box icon-box-green">
+                            <i class="bi bi-table"></i>
                         </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="export-card-title">
+                                <span>Susunan Lengkap Dashboard</span>
+                                <span class="export-card-badge badge-green-subtle">19 Kolom Lengkap</span>
+                            </div>
+                            <p class="export-card-desc">Semua kolom database tabel: Kontak, Akademik, Lokasi Magang, Divisi, Status Terkini, Periode, Tanggal, & Catatan Admin.</p>
+                        </div>
+                        <i class="bi bi-download export-card-action-icon"></i>
                     </button>
                 </div>
             `,

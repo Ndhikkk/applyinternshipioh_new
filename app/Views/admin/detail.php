@@ -170,7 +170,7 @@
                         <span class="text-muted small">Belum ada riwayat interview. Atur jadwal lewat tombol Lolos/Tidak Lolos di halaman Dashboard.</span>
                     <?php endif; ?>
                     <br>
-                    <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="kirimWaPengingat(<?= $item['id'] ?>)">
+                    <button type="button" id="btnWaDetail" class="btn btn-sm btn-outline-success mt-1" onclick="kirimWaPengingat(<?= $item['id'] ?>, this)">
                         <i class="bi bi-whatsapp"></i> Kirim Pengingat WhatsApp
                     </button>
                 </td>
@@ -271,7 +271,15 @@
     <script>
         let divisionChart = null;
 
-        function kirimWaPengingat(id) {
+        function kirimWaPengingat(id, btn) {
+            const button = btn || document.getElementById('btnWaDetail');
+            let originalHtml = '';
+            if (button) {
+                originalHtml = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menyiapkan WA...';
+                button.disabled = true;
+            }
+
             fetch(`<?= site_url('admin/process-interview/') ?>${id}/wa`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
@@ -283,7 +291,13 @@
                     }
                     window.open(json.url, '_blank');
                 })
-                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.'));
+                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.'))
+                .finally(() => {
+                    if (button) {
+                        button.innerHTML = originalHtml;
+                        button.disabled = false;
+                    }
+                });
         }
 
         function analyzeCv(id) {
