@@ -175,6 +175,9 @@ class Progres extends BaseController
         $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png'; 
         $iconPdfUrl = 'https://cdn-icons-png.flaticon.com/512/337/337946.png'; // Gambar ikon berkas PDF resmi
 
+        // Nomor narahubung / kontak yang bisa dihubungi
+        $nomorKontak = '[NOMOR_WHATSAPP_ADMIN]'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
+
         // ==========================================================================
         // 3. DESAIN TEMPLATE EMAIL: DATA DITAMPILKAN DALAM TABEL HTML RAPI
         // ==========================================================================
@@ -198,14 +201,14 @@ class Progres extends BaseController
                         <p style='font-size: 15px; line-height: 1.6; color: #555;'>Berikut adalah rincian data pendaftaran lengkap Anda yang telah tersimpan secara resmi di dalam basis data sistem kami:</p>
                         
                         <!-- TABEL DATA FORMATED HTML -->
-                        <table style='width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 14px;'>
+                        <table border='0' cellpadding='0' cellspacing='0' width='100%' style='font-size: 14px;'>
                             <tr>
-                                <td style='padding: 10px 0; font-weight: bold; width: 40%; border-bottom: 1px solid #edf2f7; color: #475569;'>Token Pendaftaran</td>
-                                <td style='padding: 10px 0; color: #1e3a8a; font-weight: bold; border-bottom: 1px solid #edf2f7; font-family: monospace; font-size: 16px;'>" . esc($pendaftaran['token_pendaftaran']) . "</td>
+                                <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569; width: 35%;'>Nomor Token</td>
+                                <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7; font-family: monospace; font-weight: bold; color: #1e3a8a; font-size: 15px;'>" . esc($pendaftaran['token_pendaftaran']) . "</td>
                             </tr>
                             <tr>
                                 <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569;'>Nama Lengkap</td>
-                                <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7; font-weight: bold;'>" . esc($pendaftaran['nama_lengkap']) . "</td>
+                                <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7;'>" . esc($pendaftaran['nama_lengkap']) . "</td>
                             </tr>
                             <tr>
                                 <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569;'>Email Terdaftar</td>
@@ -250,11 +253,19 @@ class Progres extends BaseController
                         </table>
 
                         <!-- TOMBOL MERAH UNTUK CETAK PDF DENGAN IKON GAMBAR ASLI -->
-                        <div style='text-align: center; margin: 35px 0;'>
+                        <div style='text-align: center; margin: 35px 0 25px 0;'>
                             <a href='{$linkCetak}' target='_blank' style='background-color: #dc2626; color: #ffffff; padding: 14px 28px; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #b91c1c;'>
                                 <img src='{$iconPdfUrl}' alt='PDF Icon' style='width: 18px; height: 18px; margin-right: 8px; vertical-align: middle; display: inline-block;'>
                                 <span style='vertical-align: middle;'>CETAK / DOWNLOAD PDF BERKAS</span>
                             </a>
+                        </div>
+
+                        <!-- INFORMASI KONTAK / BANTUAN -->
+                        <div style='margin-top: 25px; padding: 16px; background-color: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; text-align: center;'>
+                            <p style='font-size: 13px; color: #64748b; margin: 0 0 6px 0;'>Jika ada ketidaksesuaian data atau pertanyaan, hubungi narahubung kami di:</p>
+                            <p style='font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 0;'>
+                                📞 {$nomorKontak}
+                            </p>
                         </div>
                     </td>
                 </tr>

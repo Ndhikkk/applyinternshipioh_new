@@ -1241,6 +1241,9 @@ class Admin extends BaseController
 
         $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png';
 
+        // Nomor narahubung / kontak yang bisa dihubungi
+        $nomorKontak = '0853-7849-1566'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
+
         $body = "
         <div style='background-color: #f4f6f9; padding: 30px 15px; font-family: Arial, sans-serif; color: #333;'>
             <table align='center' border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;'>
@@ -1264,6 +1267,14 @@ class Admin extends BaseController
                         {$extra}
 
                         <p style='font-size: 13px; line-height: 1.6; color: #888; margin-top: 25px;'>{$footerNote}</p>
+
+                        <!-- INFORMASI KONTAK / BANTUAN -->
+                        <div style='margin-top: 25px; padding: 16px; background-color: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; text-align: center;'>
+                            <p style='font-size: 13px; color: #64748b; margin: 0 0 6px 0;'>Butuh bantuan atau informasi lebih lanjut? Hubungi narahubung kami di:</p>
+                            <p style='font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 0;'>
+                                📞 {$nomorKontak}
+                            </p>
+                        </div>
                     </td>
                 </tr>
                 <tr>

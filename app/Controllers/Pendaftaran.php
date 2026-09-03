@@ -387,6 +387,9 @@ class Pendaftaran extends Controller
 
         $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png'; 
 
+        // Nomor narahubung / kontak yang bisa dihubungi
+        $nomorKontak = '0853-7849-1566'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
+
         // 2. Desain Template Email HTML (Responsive Card Layout)
         $message = "
         <div style='background-color: #f4f6f9; padding: 30px 15px; font-family: Arial, sans-serif; color: #333;'>
@@ -417,6 +420,14 @@ class Pendaftaran extends Controller
                         <!-- TOMBOL AKSI -->
                         <div style='text-align: center; margin-top: 35px;'>
                             <a href='" . base_url('progres') . "' style='background-color: #1e3a8a; color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>Cek Status Pendaftaran</a>
+                        </div>
+
+                        <!-- INFORMASI KONTAK / BANTUAN -->
+                        <div style='margin-top: 35px; padding: 16px; background-color: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; text-align: center;'>
+                            <p style='font-size: 13px; color: #64748b; margin: 0 0 6px 0;'>Ada pertanyaan atau kendala seputar pendaftaran? Hubungi narahubung kami di:</p>
+                            <p style='font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 0;'>
+                                📞 {$nomorKontak}
+                            </p>
                         </div>
                     </td>
                 </tr>
