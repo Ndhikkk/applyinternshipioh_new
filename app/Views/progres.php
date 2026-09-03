@@ -158,7 +158,7 @@
                         <input type="hidden" name="token_pendaftaran" value="<?= esc($pendaftaran['token_pendaftaran']) ?>">
                         
                         <div class="modal-body p-4">
-                            <p class="text-muted">Untuk alasan keamanan data, masukkan alamat email yang Anda gunakan saat mendaftar Pada Future Talent Program.</p>
+                            <p class="text-muted">Untuk alasan keamanan data, masukkan alamat email yang Anda gunakan saat mendaftar pada Industry-Academia Collaboration Program.</p>
                             <div class="mb-3">
                                 <label for="email_verifikasi" class="form-label fw-semibold">Email Terdaftar</label>
                                 <input type="email" class="form-control" id="email_verifikasi" name="email" placeholder="contoh@email.com" required>

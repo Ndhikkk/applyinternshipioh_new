@@ -381,9 +381,9 @@ class Pendaftaran extends Controller
 
         $emailService = \Config\Services::email($config);
 
-        $emailService->setFrom('farezaairo@gmail.com', 'Future Talent Program');
+        $emailService->setFrom('farezaairo@gmail.com', 'Industry-Academia Collaboration Program');
         $emailService->setTo($toEmail);
-        $emailService->setSubject('🔑 Token Pendaftaran - Future Talent Program');
+        $emailService->setSubject('🔑 Token Pendaftaran - Industry-Academia Collaboration Program');
 
         $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png'; 
 
@@ -395,8 +395,8 @@ class Pendaftaran extends Controller
                 <!-- HEADER LOGO -->
                 <tr>
                     <td align='center' style='background-color: #1e3a8a; padding: 30px 20px;'>
-                        <img src='{$logoUrl}' alt='Logo FTP' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
-                        <h2 style='color: #ffffff; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px;'>Future Talent Program</h2>
+                        <img src='{$logoUrl}' alt='Logo Program' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
+                        <h2 style='color: #ffffff; margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;'>Industry-Academia Collaboration Program</h2>
                     </td>
                 </tr>
                 
@@ -404,7 +404,7 @@ class Pendaftaran extends Controller
                 <tr>
                     <td style='padding: 40px 30px;'>
                         <p style='font-size: 16px; line-height: 1.6; margin-top: 0;'>Halo <strong>{$recipientName}</strong>,</p>
-                        <p style='font-size: 15px; line-height: 1.6; color: #555;'>Terima kasih telah mendaftar dalam program <strong>Future Talent Program</strong>. Kami sangat mengapresiasi minat dan antusiasme Anda untuk bertumbuh bersama kami.</p>
+                        <p style='font-size: 15px; line-height: 1.6; color: #555;'>Terima kasih telah mendaftar dalam program <strong>Industry-Academia Collaboration Program</strong>. Kami sangat mengapresiasi minat dan antusiasme Anda untuk bertumbuh bersama kami.</p>
                         
                         <!-- KOTAK TOKEN -->
                         <div style='background-color: #f0f4f8; border-left: 4px solid #1e3a8a; border-radius: 4px; padding: 20px; margin: 30px 0; text-align: center;'>
@@ -424,8 +424,8 @@ class Pendaftaran extends Controller
                 <!-- FOOTER -->
                 <tr>
                     <td align='center' style='background-color: #f8fafc; padding: 20px; border-top: 1px solid #edf2f7; font-size: 12px; color: #999;'>
-                        <p style='margin: 0 0 5px 0;'>Email ini dikirim otomatis oleh sistem rekrutmen FTP.</p>
-                        <p style='margin: 0;'>&copy; " . date('Y') . " Future Talent Program. All rights reserved.</p>
+                        <p style='margin: 0 0 5px 0;'>Email ini dikirim otomatis oleh sistem rekrutmen Industry-Academia Collaboration Program.</p>
+                        <p style='margin: 0;'>&copy; " . date('Y') . " Industry-Academia Collaboration Program. All rights reserved.</p>
                     </td>
                 </tr>
                 

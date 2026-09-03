@@ -14,7 +14,7 @@ class Email extends BaseConfig
     /**
      * @var string
      */
-    public string $fromName   = 'Future Talent Program';
+    public string $fromName   = 'Industry-Academia Collaboration Program';
 
     /**
      * The "user agent"

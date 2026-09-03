@@ -164,7 +164,7 @@ class Progres extends BaseController
 
         $emailService = \Config\Services::email($config);
 
-        $emailService->setFrom('farezaairo@gmail.com', 'Future Talent Program');
+        $emailService->setFrom('farezaairo@gmail.com', 'Industry-Academia Collaboration Program');
         $emailService->setTo($pendaftaran['email']);
         $emailService->setSubject('📋 Data Lengkap Pendaftaran - ' . $pendaftaran['nama_lengkap']);
         
@@ -185,8 +185,8 @@ class Progres extends BaseController
                 <!-- HEADER LOGO -->
                 <tr>
                     <td align='center' style='background-color: #1e3a8a; padding: 30px 20px;'>
-                        <img src='{$logoUrl}' alt='Logo FTP' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
-                        <h2 style='color: #ffffff; margin: 0; font-size: 22px; font-weight: 600;'>Future Talent Program</h2>
+                        <img src='{$logoUrl}' alt='Logo Program' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
+                        <h2 style='color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;'>Industry-Academia Collaboration Program</h2>
                         <p style='color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;'>Detail Informasi Resmi Pendaftaran Magang</p>
                     </td>
                 </tr>
@@ -262,7 +262,7 @@ class Progres extends BaseController
                 <!-- FOOTER EMAIL -->
                 <tr>
                     <td align='center' style='background-color: #f8fafc; padding: 20px; border-top: 1px solid #edf2f7; font-size: 12px; color: #999;'>
-                        <p style='margin: 0;'>&copy; " . date('Y') . " Future Talent Program. All rights reserved.</p>
+                        <p style='margin: 0;'>&copy; " . date('Y') . " Industry-Academia Collaboration Program. All rights reserved.</p>
                     </td>
                 </tr>
             </table>
@@ -315,7 +315,7 @@ class Progres extends BaseController
                 body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; padding: 40px; margin: 0; background-color: #fff; }
                 .container { max-width: 700px; margin: 0 auto; border: 1px solid #ddd; padding: 40px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
                 .header { text-align: center; border-bottom: 3px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 30px; }
-                .title { font-size: 22px; font-weight: bold; color: #1e3a8a; margin: 0; letter-spacing: 1px; }
+                .title { font-size: 20px; font-weight: bold; color: #1e3a8a; margin: 0; letter-spacing: 1px; }
                 .subtitle { font-size: 13px; color: #666; margin: 5px 0 0 0; text-transform: uppercase; }
                 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eaebd7; font-size: 14px; }
@@ -332,7 +332,7 @@ class Progres extends BaseController
         <body>
             <div class='container'>
                 <div class='header'>
-                    <div class='title'>FUTURE TALENT PROGRAM</div>
+                    <div class='title'>INDUSTRY-ACADEMIA COLLABORATION PROGRAM</div>
                     <div class='subtitle'>Manifes Resmi & Detail Data Pendaftaran Magang</div>
                 </div>
                 
@@ -390,7 +390,7 @@ class Progres extends BaseController
                 </table>
                 
                 <div class='footer'>
-                    <p>Dicetak pada: " . date('d-m-Y H:i:s') . " WIB - Hak Cipta Dilindungi Sistem Rekrutmen FTP.</p>
+                    <p>Dicetak pada: " . date('d-m-Y H:i:s') . " WIB - Hak Cipta Dilindungi Sistem Rekrutmen IOH.</p>
                     <p>Dokumen digital ini sah berkekuatan hukum sistem dan tidak memerlukan tanda tangan basah.</p>
                 </div>
             </div>

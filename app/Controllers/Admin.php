@@ -1144,7 +1144,7 @@ class Admin extends BaseController
             $email = Services::email($this->emailConfig());
             $tpl = $this->buildEmailTemplate($item);
 
-            $email->setFrom('farezaairo@gmail.com', 'Future Talent Program');
+            $email->setFrom('farezaairo@gmail.com', 'Industry-Academia Collaboration Program');
             $email->setTo($item['email']);
             $email->setSubject($tpl['subject']);
             $email->setMessage($tpl['body']);
@@ -1204,9 +1204,9 @@ class Admin extends BaseController
             $zoom = $item['link_zoom_' . $step] ?? null;
             $jadwalText = $jadwal ? date('l, d F Y \p\u\k\u\l H:i', strtotime($jadwal)) . ' WIB' : 'akan diinformasikan kemudian';
 
-            $subject = "Undangan Interview Tahap {$step} - Future Talent Program";
+            $subject = "Undangan Interview Tahap {$step} - Industry-Academia Collaboration Program";
             $headline = "Undangan Interview Tahap {$step}";
-            $intro = "Selamat! Anda dijadwalkan untuk mengikuti <strong>Interview Tahap {$step}</strong> pada program Future Talent Program.";
+            $intro = "Selamat! Anda dijadwalkan untuk mengikuti <strong>Interview Tahap {$step}</strong> pada program Industry-Academia Collaboration Program.";
             $boxLabel = "Jadwal Interview";
             $boxValue = esc($jadwalText);
             $extra = $zoom
@@ -1214,25 +1214,25 @@ class Admin extends BaseController
                 : "<p style='font-size:14px;color:#666;'>Link Zoom akan diinformasikan lebih lanjut oleh tim kami.</p>";
             $footerNote = "Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet Anda stabil.";
         } elseif (in_array($status, ['Diterima'], true)) {
-            $subject = "Selamat! Anda Diterima - Future Talent Program";
+            $subject = "Selamat! Anda Diterima - Industry-Academia Collaboration Program";
             $headline = "Selamat, Anda Diterima! 🎉";
-            $intro = "Selamat! Anda dinyatakan <strong>LOLOS</strong> dan diterima pada program <strong>Future Talent Program</strong>.";
+            $intro = "Selamat! Anda dinyatakan <strong>LOLOS</strong> dan diterima pada program <strong>Industry-Academia Collaboration Program</strong>.";
             $boxLabel = "Nomor Token Anda";
             $boxValue = $token;
             $extra = "<p style='font-size:14px;color:#666;'>Tim kami akan segera menghubungi Anda untuk informasi langkah selanjutnya.</p>";
             $footerNote = "Terima kasih atas partisipasi Anda dalam seluruh rangkaian seleksi.";
         } elseif (in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
-            $subject = "Informasi Status Pendaftaran - Future Talent Program";
+            $subject = "Informasi Status Pendaftaran - Industry-Academia Collaboration Program";
             $headline = "Informasi Status Pendaftaran";
-            $intro = "Terima kasih atas partisipasi Anda pada proses seleksi <strong>Future Talent Program</strong>.";
+            $intro = "Terima kasih atas partisipasi Anda pada proses seleksi <strong>Industry-Academia Collaboration Program</strong>.";
             $boxLabel = "Status";
             $boxValue = "Belum dapat melanjutkan ke tahap berikutnya";
             $extra = "<p style='font-size:14px;color:#666;'>Semoga sukses untuk kesempatan berikutnya. Jangan berkecil hati untuk mencoba kembali di kesempatan lain.</p>";
             $footerNote = "Terima kasih telah meluangkan waktu mengikuti proses seleksi kami.";
         } else {
-            $subject = "Informasi Pendaftaran - Future Talent Program";
+            $subject = "Informasi Pendaftaran - Industry-Academia Collaboration Program";
             $headline = "Pendaftaran Anda Sedang Diproses";
-            $intro = "Terima kasih telah mendaftar pada program <strong>Future Talent Program</strong>.";
+            $intro = "Terima kasih telah mendaftar pada program <strong>Industry-Academia Collaboration Program</strong>.";
             $boxLabel = "Nomor Token Anda";
             $boxValue = $token;
             $extra = "<p style='font-size:14px;color:#666;'>Pendaftaran Anda sedang kami proses. Mohon ditunggu informasi selanjutnya.</p>";
@@ -1246,8 +1246,8 @@ class Admin extends BaseController
             <table align='center' border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;'>
                 <tr>
                     <td align='center' style='background-color: #1e3a8a; padding: 30px 20px;'>
-                        <img src='{$logoUrl}' alt='Logo FTP' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
-                        <h2 style='color: #ffffff; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px;'>Future Talent Program</h2>
+                        <img src='{$logoUrl}' alt='Logo Program' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
+                        <h2 style='color: #ffffff; margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;'>Industry-Academia Collaboration Program</h2>
                     </td>
                 </tr>
                 <tr>
@@ -1268,8 +1268,8 @@ class Admin extends BaseController
                 </tr>
                 <tr>
                     <td align='center' style='background-color: #f8fafc; padding: 20px; border-top: 1px solid #edf2f7; font-size: 12px; color: #999;'>
-                        <p style='margin: 0 0 5px 0;'>Email ini dikirim otomatis oleh sistem rekrutmen FTP.</p>
-                        <p style='margin: 0;'>&copy; " . date('Y') . " Future Talent Program. All rights reserved.</p>
+                        <p style='margin: 0 0 5px 0;'>Email ini dikirim otomatis oleh sistem rekrutmen Industry-Academia Collaboration Program.</p>
+                        <p style='margin: 0;'>&copy; " . date('Y') . " Industry-Academia Collaboration Program. All rights reserved.</p>
                     </td>
                 </tr>
             </table>
