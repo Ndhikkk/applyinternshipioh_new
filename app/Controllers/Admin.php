@@ -1535,15 +1535,17 @@ class Admin extends BaseController
             }
         }
 
-        // Tampilkan halaman unduh di tab baru dengan opsi download
-        return view('admin/download_page', [
+        // Tampilkan halaman pratinjau di tab baru dengan opsi download
+        return view('admin/preview_page', [
             'docType'     => 'pptx',
             'docTitle'    => 'Sertifikat Selesai Program Magang',
-            'badgeTitle'  => 'PowerPoint Presentation (.pptx)',
-            'iconClass'   => 'bi-file-earmark-ppt-fill text-warning',
+            'badgeTitle'  => 'PowerPoint (.pptx)',
+            'badgeClass'  => 'bg-warning text-dark',
+            'iconClass'   => 'bi-file-earmark-ppt-fill',
             'btnClass'    => 'btn-warning text-dark',
             'fileName'    => $fileName,
             'downloadUrl' => site_url("admin/certificate/pptx/{$id}?download=1"),
+            'inlineUrl'   => site_url("admin/certificate/pdf/{$id}?inline=1"),
             'candidate'   => $candidate,
         ]);
     }
@@ -1593,12 +1595,13 @@ class Admin extends BaseController
             }
         }
 
-        // Tampilkan halaman unduh di tab baru dengan opsi download dan pratinjau browser
-        return view('admin/download_page', [
+        // Tampilkan halaman pratinjau di tab baru dengan opsi download
+        return view('admin/preview_page', [
             'docType'     => 'pdf',
             'docTitle'    => 'Sertifikat Selesai Program Magang',
             'badgeTitle'  => 'PDF Document (.pdf)',
-            'iconClass'   => 'bi-file-earmark-pdf-fill text-danger',
+            'badgeClass'  => 'bg-danger text-white',
+            'iconClass'   => 'bi-file-earmark-pdf-fill',
             'btnClass'    => 'btn-danger text-white',
             'fileName'    => $fileName,
             'downloadUrl' => site_url("admin/certificate/pdf/{$id}?download=1"),
@@ -1623,8 +1626,9 @@ class Admin extends BaseController
 
         $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
         $fileName = "Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
+        $pdfFileName = "Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.pdf";
 
-        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment Word (.docx)
         if ($this->request->getGet('download') === '1') {
             try {
                 $service = new \App\Services\SuratService();
@@ -1636,16 +1640,46 @@ class Admin extends BaseController
             }
         }
 
-        // Tampilkan halaman unduh di tab baru dengan opsi download
-        return view('admin/download_page', [
-            'docType'     => 'docx',
-            'docTitle'    => 'Surat Penerimaan Magang',
-            'badgeTitle'  => 'Microsoft Word (.docx)',
-            'iconClass'   => 'bi-file-earmark-word-fill text-primary',
-            'btnClass'    => 'btn-primary text-white',
-            'fileName'    => $fileName,
-            'downloadUrl' => site_url("admin/surat/penerimaan/{$id}?download=1"),
-            'candidate'   => $candidate,
+        // Jika parameter download_pdf=1 diset, kirim langsung sebagai attachment PDF (.pdf)
+        if ($this->request->getGet('download_pdf') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'penerimaan');
+                return $this->response->download($pdfFileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan PDF Download Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Jika parameter inline=1 diset, alirkan PDF secara native untuk preview di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'penerimaan');
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $pdfFileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan PDF Inline Error: ' . $e->getMessage());
+                return $this->response->setStatusCode(500)->setBody('Gagal membuat pratinjau: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman pratinjau terpadu di tab baru dengan viewer PDF native
+        return view('admin/preview_page', [
+            'docType'        => 'docx',
+            'docTitle'       => 'Surat Penerimaan Magang',
+            'badgeTitle'     => 'Microsoft Word (.docx)',
+            'badgeClass'     => 'bg-primary text-white',
+            'iconClass'      => 'bi-file-earmark-word-fill',
+            'btnClass'       => 'btn-primary text-white',
+            'fileName'       => $fileName,
+            'downloadUrl'    => site_url("admin/surat/penerimaan/{$id}?download=1"),
+            'downloadPdfUrl' => site_url("admin/surat/penerimaan/{$id}?download_pdf=1"),
+            'inlineUrl'      => site_url("admin/surat/penerimaan/{$id}?inline=1"),
+            'candidate'      => $candidate,
         ]);
     }
 
@@ -1665,8 +1699,9 @@ class Admin extends BaseController
 
         $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
         $fileName = "Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.docx";
+        $pdfFileName = "Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
 
-        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment Word (.docx)
         if ($this->request->getGet('download') === '1') {
             try {
                 $service = new \App\Services\SuratService();
@@ -1678,16 +1713,46 @@ class Admin extends BaseController
             }
         }
 
-        // Tampilkan halaman unduh di tab baru dengan opsi download
-        return view('admin/download_page', [
-            'docType'     => 'docx',
-            'docTitle'    => 'Surat Keterangan Selesai Magang',
-            'badgeTitle'  => 'Microsoft Word (.docx)',
-            'iconClass'   => 'bi-file-earmark-word-fill text-info',
-            'btnClass'    => 'btn-info text-white',
-            'fileName'    => $fileName,
-            'downloadUrl' => site_url("admin/surat/selesai/{$id}?download=1"),
-            'candidate'   => $candidate,
+        // Jika parameter download_pdf=1 diset, kirim langsung sebagai attachment PDF (.pdf)
+        if ($this->request->getGet('download_pdf') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'selesai');
+                return $this->response->download($pdfFileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Selesai PDF Download Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Jika parameter inline=1 diset, alirkan PDF secara native untuk preview di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'selesai');
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $pdfFileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Selesai PDF Inline Error: ' . $e->getMessage());
+                return $this->response->setStatusCode(500)->setBody('Gagal membuat pratinjau: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman pratinjau terpadu di tab baru dengan viewer PDF native
+        return view('admin/preview_page', [
+            'docType'        => 'docx',
+            'docTitle'       => 'Surat Keterangan Selesai Magang',
+            'badgeTitle'     => 'Microsoft Word (.docx)',
+            'badgeClass'     => 'bg-info text-white',
+            'iconClass'      => 'bi-file-earmark-word-fill',
+            'btnClass'       => 'btn-info text-white',
+            'fileName'       => $fileName,
+            'downloadUrl'    => site_url("admin/surat/selesai/{$id}?download=1"),
+            'downloadPdfUrl' => site_url("admin/surat/selesai/{$id}?download_pdf=1"),
+            'inlineUrl'      => site_url("admin/surat/selesai/{$id}?inline=1"),
+            'candidate'      => $candidate,
         ]);
     }
 }
