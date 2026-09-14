@@ -1519,18 +1519,33 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\CertificateService();
-            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
-            $binary = $service->generatePptxString($candidate);
+        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+        $fileName = "Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pptx";
 
-            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pptx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Certificate PPTX Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat PPTX: ' . $e->getMessage());
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePptxString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PPTX Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PPTX: ' . $e->getMessage());
+            }
         }
+
+        // Tampilkan halaman unduh di tab baru dengan opsi download
+        return view('admin/download_page', [
+            'docType'     => 'pptx',
+            'docTitle'    => 'Sertifikat Selesai Program Magang',
+            'badgeTitle'  => 'PowerPoint Presentation (.pptx)',
+            'iconClass'   => 'bi-file-earmark-ppt-fill text-warning',
+            'btnClass'    => 'btn-warning text-dark',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/certificate/pptx/{$id}?download=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 
     /**
@@ -1547,18 +1562,49 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\CertificateService();
-            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
-            $binary = $service->generatePdfString($candidate);
+        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+        $fileName = "Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
 
-            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePdfString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
         }
+
+        // Jika parameter inline=1 diset, tampilkan PDF secara native di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePdfString($candidate);
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman unduh di tab baru dengan opsi download dan pratinjau browser
+        return view('admin/download_page', [
+            'docType'     => 'pdf',
+            'docTitle'    => 'Sertifikat Selesai Program Magang',
+            'badgeTitle'  => 'PDF Document (.pdf)',
+            'iconClass'   => 'bi-file-earmark-pdf-fill text-danger',
+            'btnClass'    => 'btn-danger text-white',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/certificate/pdf/{$id}?download=1"),
+            'inlineUrl'   => site_url("admin/certificate/pdf/{$id}?inline=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 
     /**
@@ -1575,16 +1621,32 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\SuratService();
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
-            $binary = $service->generateSuratPenerimaanString($candidate);
-            $fileName = "_Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Surat Penerimaan Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
+        $fileName = "Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
+
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generateSuratPenerimaanString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+            }
         }
+
+        // Tampilkan halaman unduh di tab baru dengan opsi download
+        return view('admin/download_page', [
+            'docType'     => 'docx',
+            'docTitle'    => 'Surat Penerimaan Magang',
+            'badgeTitle'  => 'Microsoft Word (.docx)',
+            'iconClass'   => 'bi-file-earmark-word-fill text-primary',
+            'btnClass'    => 'btn-primary text-white',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/surat/penerimaan/{$id}?download=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 
     /**
@@ -1601,15 +1663,31 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\SuratService();
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
-            $binary = $service->generateSuratKeteranganSelesaiString($candidate);
-            $fileName = "_Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.docx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Surat Keterangan Selesai Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
+        $fileName = "Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.docx";
+
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generateSuratKeteranganSelesaiString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Keterangan Selesai Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+            }
         }
+
+        // Tampilkan halaman unduh di tab baru dengan opsi download
+        return view('admin/download_page', [
+            'docType'     => 'docx',
+            'docTitle'    => 'Surat Keterangan Selesai Magang',
+            'badgeTitle'  => 'Microsoft Word (.docx)',
+            'iconClass'   => 'bi-file-earmark-word-fill text-info',
+            'btnClass'    => 'btn-info text-white',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/surat/selesai/{$id}?download=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 }

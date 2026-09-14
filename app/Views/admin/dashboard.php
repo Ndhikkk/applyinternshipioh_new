@@ -956,19 +956,19 @@
 
     function downloadCertPptx() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/certificate/pptx') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/certificate/pptx') ?>/${currentModalId}`, '_blank');
         }
     }
 
     function downloadSuratPenerimaan() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/surat/penerimaan') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/surat/penerimaan') ?>/${currentModalId}`, '_blank');
         }
     }
 
     function downloadSuratSelesai() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/surat/selesai') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/surat/selesai') ?>/${currentModalId}`, '_blank');
         }
     }
 

@@ -251,16 +251,16 @@
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
                                     <?php if (in_array($currentStatus, ['Diterima', 'Complete'], true)): ?>
-                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
+                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
                                             <i class="bi bi-file-earmark-word"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
+                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
                                             <i class="bi bi-file-earmark-word-fill"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" target="_blank" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
+                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
                                             <i class="bi bi-file-earmark-pdf"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
+                                        <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
                                             <i class="bi bi-file-earmark-ppt"></i>
                                         </a>
                                     <?php endif; ?>
