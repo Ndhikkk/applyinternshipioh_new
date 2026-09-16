@@ -147,6 +147,25 @@ class Progres extends BaseController
         // Helper label status pendaftaran
         $statusLabel = strtoupper($pendaftaran['status']);
 
+        $step = \App\Services\InterviewNotificationService::getActiveInterviewStep($pendaftaran);
+        $interviewEmailRows = '';
+        if ($step > 0 && !in_array($pendaftaran['status'], ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
+            $jadwal = $pendaftaran['jadwal_interview_' . $step] ?? null;
+            $zoom = trim((string) ($pendaftaran['link_zoom_' . $step] ?? ''));
+            $jadwalText = $jadwal ? \App\Services\InterviewNotificationService::formatTanggalIndo($jadwal, true) : 'Menyusul';
+            $zoomHtml = $zoom !== '' ? "<a href='" . esc($zoom) . "' target='_blank' rel='noopener noreferrer' style='color:#1e3a8a;font-weight:bold;text-decoration:underline;'>" . esc($zoom) . "</a>" : '<span style=\"color:#888;\">Menyusul</span>';
+
+            $interviewEmailRows = "
+                            <tr>
+                                <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569;'>Jadwal Interview Tahap {$step}</td>
+                                <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7; color: #1e3a8a; font-weight: bold;'>{$jadwalText}</td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569;'>Link Zoom Interview Tahap {$step}</td>
+                                <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7; word-break: break-all;'>{$zoomHtml}</td>
+                            </tr>";
+        }
+
         // ==========================================================================
         // 2. KONFIGURASI SMTP
         // ==========================================================================
@@ -250,6 +269,7 @@ class Progres extends BaseController
                                 <td style='padding: 10px 0; font-weight: bold; border-bottom: 1px solid #edf2f7; color: #475569;'>Status Seleksi</td>
                                 <td style='padding: 10px 0; border-bottom: 1px solid #edf2f7;'><span style='background-color: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 12px; border: 1px solid #fef08a;'>{$statusLabel}</span></td>
                             </tr>
+                            {$interviewEmailRows}
                         </table>
 
                         <!-- TOMBOL MERAH UNTUK CETAK PDF DENGAN IKON GAMBAR ASLI -->
@@ -314,6 +334,24 @@ class Progres extends BaseController
 
         if (!$pendaftaran) {
             return "Data pendaftaran tidak ditemukan.";
+        }
+
+        $step = \App\Services\InterviewNotificationService::getActiveInterviewStep($pendaftaran);
+        $interviewPdfRows = '';
+        if ($step > 0 && !in_array($pendaftaran['status'], ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
+            $jadwal = $pendaftaran['jadwal_interview_' . $step] ?? null;
+            $zoom = trim((string) ($pendaftaran['link_zoom_' . $step] ?? ''));
+            $jadwalText = $jadwal ? \App\Services\InterviewNotificationService::formatTanggalIndo($jadwal, true) : 'Menyusul';
+            $zoomText = $zoom !== '' ? esc($zoom) : 'Menyusul';
+            $interviewPdfRows = "
+                    <tr>
+                        <th>Jadwal Interview Tahap {$step}</th>
+                        <td style='font-weight: bold; color: #1e3a8a;'>{$jadwalText}</td>
+                    </tr>
+                    <tr>
+                        <th>Link Zoom Interview Tahap {$step}</th>
+                        <td style='word-break: break-all;'>" . ($zoom !== '' ? "<a href='{$zoomText}' target='_blank'>{$zoomText}</a>" : $zoomText) . "</td>
+                    </tr>";
         }
 
         echo "
@@ -398,6 +436,7 @@ class Progres extends BaseController
                         <th>Status Seleksi</th>
                         <td><div class='status-box'>" . strtoupper($pendaftaran['status']) . "</div></td>
                     </tr>
+                    {$interviewPdfRows}
                 </table>
                 
                 <div class='footer'>
