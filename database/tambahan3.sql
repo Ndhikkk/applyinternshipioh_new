@@ -5,3 +5,6 @@ ALTER TABLE `pendaftaran_magang`
 
 ALTER TABLE `pendaftaran_magang`
   MODIFY COLUMN `status` VARCHAR(50) NOT NULL DEFAULT 'Menunggu';
+  
+  ALTER TABLE `pendaftaran_magang`
+ADD COLUMN `nim` VARCHAR(50) NULL AFTER `nama_lengkap`;
