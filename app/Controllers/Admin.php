@@ -118,6 +118,7 @@ class Admin extends BaseController
         $keyword = $this->request->getGet('keyword');
         $divisiFilter = $this->request->getGet('divisi');
         $jenisFilter = $this->request->getGet('jenis');
+        $regionalFilter = $this->request->getGet('regional');
         $modelQuery = $this->pendaftaranModel->where('is_archived', $isArsip ? 1 : 0);
 
         if (!empty($keyword)) {
@@ -141,12 +142,17 @@ class Admin extends BaseController
             $modelQuery = $modelQuery->where('jenis_magang', $jenisFilter);
         }
 
+        if (!empty($regionalFilter)) {
+            $modelQuery = $modelQuery->where('regional_interview', $regionalFilter);
+        }
+
         $sortField = $isArsip ? 'archived_at' : 'created_at';
         $data['pendaftaran'] = $modelQuery->orderBy($sortField, 'DESC')->paginate(15, 'pendaftaran');
         $data['pager'] = $this->pendaftaranModel->pager;
         $data['keyword'] = $keyword;
         $data['divisi_filter'] = $divisiFilter;
         $data['jenis_filter'] = $jenisFilter;
+        $data['regional_filter'] = $regionalFilter;
         $data['is_arsip'] = $isArsip;
         $data['registration_open'] = $this->settingsModel->getValue('registration_open') ?? '1';
         $data['kota_pilihan_options'] = (new \Config\InternshipLocations())->kotaPilihan;

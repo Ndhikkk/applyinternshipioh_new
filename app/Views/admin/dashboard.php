@@ -1397,11 +1397,12 @@
         let debounceTimer = null;
         let activeDivisiFilter = '<?= esc($divisi_filter ?? '', 'js') ?>';
         let activeJenisFilter = '<?= esc($jenis_filter ?? '', 'js') ?>';
+        let activeRegionalFilter = '<?= esc($regional_filter ?? '', 'js') ?>';
         let activeStatusFilter = ''; // Frontend-only status filter (no backend)
         const baseUrl = '<?= site_url('admin/dashboard') ?>';
 
         function hasActiveFilters() {
-            return searchInput.value.trim() || activeDivisiFilter || activeJenisFilter || activeStatusFilter;
+            return searchInput.value.trim() || activeDivisiFilter || activeJenisFilter || activeRegionalFilter || activeStatusFilter;
         }
 
         function buildSearchUrl(keyword) {
@@ -1409,6 +1410,7 @@
             if (keyword) url.searchParams.set('keyword', keyword);
             if (activeDivisiFilter) url.searchParams.set('divisi', activeDivisiFilter);
             if (activeJenisFilter) url.searchParams.set('jenis', activeJenisFilter);
+            if (activeRegionalFilter) url.searchParams.set('regional', activeRegionalFilter);
             if (arsipParam) url.searchParams.set('arsip', '1');
             return url.toString();
         }
@@ -1564,6 +1566,7 @@
                 searchInput.value = '';
                 activeDivisiFilter = '';
                 activeJenisFilter = '';
+                activeRegionalFilter = '';
                 activeStatusFilter = '';
                 this.style.display = 'none';
                 loadData(buildSearchUrl(''));
@@ -1595,6 +1598,17 @@
             if (jenisItem) {
                 e.preventDefault();
                 activeJenisFilter = jenisItem.getAttribute('data-jenis');
+                const keyword = searchInput.value.trim();
+                resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
+                loadData(buildSearchUrl(keyword));
+                return;
+            }
+
+            // Handle regional filter dropdown clicks
+            const regionalItem = e.target.closest('[data-regional]');
+            if (regionalItem) {
+                e.preventDefault();
+                activeRegionalFilter = regionalItem.getAttribute('data-regional');
                 const keyword = searchInput.value.trim();
                 resetBtn.style.display = hasActiveFilters() ? 'block' : 'none';
                 loadData(buildSearchUrl(keyword));

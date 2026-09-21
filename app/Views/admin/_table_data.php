@@ -4,7 +4,30 @@
             <tr>
                 <th class="fw-bold" style="min-width:220px;">Kandidat</th>
                 <th class="fw-bold text-nowrap" style="min-width:170px;">Akademik</th>
-                <th class="fw-bold text-nowrap">Regional Interview</th>
+                <th class="fw-bold text-nowrap" style="cursor:pointer;">
+                    <div class="dropdown d-inline-block">
+                        <span class="regional-filter-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-display="dynamic" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                            Regional Interview
+                            <?php if (!empty($regional_filter)): ?>
+                                <span class="badge bg-danger ms-1" style="font-size:.65em;"><?= esc($regional_filter) ?></span>
+                            <?php endif; ?>
+                            <i class="bi bi-funnel<?= !empty($regional_filter) ? '-fill text-danger' : '' ?> ms-1" style="font-size:.75em;"></i>
+                        </span>
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; min-width:230px; max-width:95vw; z-index:1060; white-space:normal;">
+                            <h6 class="dropdown-header px-1 text-danger fw-bold mb-2"><i class="bi bi-geo-alt-fill me-1"></i>Pilih Regional</h6>
+                            <div class="d-flex flex-column gap-1">
+                                <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= empty($regional_filter) ? 'active fw-bold' : '' ?>" href="#" data-regional="">
+                                    <i class="bi bi-asterisk me-2 text-muted"></i> Semua Regional
+                                </a>
+                                <?php foreach (['Semarang', 'Surabaya', 'Bali'] as $reg): ?>
+                                    <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= ($regional_filter ?? '') === $reg ? 'active fw-bold' : '' ?>" href="#" data-regional="<?= esc($reg, 'attr') ?>">
+                                        <i class="bi bi-geo-alt-fill text-danger me-2"></i> <?= esc($reg) ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                </th>
                 <th class="fw-bold text-nowrap">Kota Pilihan</th>
                 <th class="fw-bold text-nowrap" style="cursor:pointer;">
                     <div class="dropdown d-inline-block">
