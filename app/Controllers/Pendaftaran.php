@@ -54,6 +54,12 @@ class Pendaftaran extends Controller
             ],
             'asal_kampus'    => 'required|trim',
             'program_studi'  => 'required|trim',
+            'nim'            => [
+                'rules'  => 'required|trim',
+                'errors' => [
+                    'required' => 'NIM (Nomor Induk Mahasiswa) wajib diisi.'
+                ]
+            ],
             'regional_interview' => 'required|in_list[Semarang,Surabaya,Bali]',
             'kota_pilihan'   => 'required|max_length[100]',
             'divisi_pilihan' => 'required|trim',
@@ -64,7 +70,15 @@ class Pendaftaran extends Controller
             'cv'             => 'uploaded[cv]|max_size[cv,2048]|ext_in[cv,pdf]|mime_in[cv,application/pdf]',
             'surat_pengantar'=> 'permit_empty|max_size[surat_pengantar,2048]|ext_in[surat_pengantar,pdf]|mime_in[surat_pengantar,application/pdf]',
             'proposal_magang'=> 'permit_empty|max_size[proposal_magang,2048]|ext_in[proposal_magang,pdf]|mime_in[proposal_magang,application/pdf]',
-            'ktm'            => 'permit_empty|max_size[ktm,4096]|ext_in[ktm,pdf,jpg,jpeg,png]|mime_in[ktm,application/pdf,image/jpg,image/jpeg,image/png]',
+            'ktm'            => [
+                'rules'  => 'uploaded[ktm]|max_size[ktm,4096]|ext_in[ktm,pdf,jpg,jpeg,png]|mime_in[ktm,application/pdf,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    'uploaded' => 'Kartu Tanda Mahasiswa (KTM) wajib diunggah.',
+                    'max_size' => 'Ukuran file KTM maksimal 4MB.',
+                    'ext_in'   => 'Format file KTM harus berupa PDF, JPG, JPEG, atau PNG.',
+                    'mime_in'  => 'Format file KTM tidak valid.'
+                ]
+            ],
         ];
 
         if (!$this->validate($rules)) {
