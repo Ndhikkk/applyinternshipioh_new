@@ -199,8 +199,12 @@ class Pendaftaran extends Controller
             ['requestId' => $requestId, 'registrationId' => $insertId]
         );
 
-        // Panggil fungsi kirim email resmi
-        $this->sendEmailToken($newData['email'], $newData['nama_lengkap'], $token);
+        // Panggil fungsi kirim email resmi & catat statusnya ke database
+        $emailSent = $this->sendEmailToken($newData['email'], $newData['nama_lengkap'], $token);
+        $this->pendaftaranModel->update($insertId, [
+            'email_terkirim' => $emailSent ? 1 : 0,
+        ]);
+        $newData['email_terkirim'] = $emailSent ? 1 : 0;
 
         // Post/Redirect/Get prevents a browser refresh from posting the same
         // multipart form again after a successful registration.

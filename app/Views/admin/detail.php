@@ -79,6 +79,14 @@
         <h3>Detail Pendaftar</h3>
         <div class="d-flex gap-2 flex-wrap mb-3">
             <a href="<?= site_url('admin/dashboard') ?>" class="btn btn-secondary">Kembali</a>
+            <?php if (!empty($item['email'])): ?>
+                <button type="button" class="btn btn-outline-primary" onclick="kirimEmailToken(<?= $item['id'] ?>, this)" title="Kirim ulang email token pendaftaran awal ke pendaftar">
+                    <i class="bi bi-key-fill"></i> Kirim Email Token
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="kirimEmailStatus(<?= $item['id'] ?>, this)" title="Kirim email notifikasi status/jadwal saat ini">
+                    <i class="bi bi-envelope"></i> Kirim Email Status
+                </button>
+            <?php endif; ?>
             <?php if (in_array($item['status'], ['Diterima', 'Complete'], true)): ?>
                 <a href="<?= site_url('admin/surat/penerimaan/' . $item['id']) ?>" target="_blank" rel="noopener" class="btn btn-primary">
                     <i class="bi bi-file-earmark-word"></i> Surat Penerimaan
@@ -97,6 +105,22 @@
 
         <table class="table table-bordered">
             <tr>
+                <th>Token Pendaftaran</th>
+                <td>
+                    <?php
+                        $isEmailSent = (int) ($item['email_terkirim'] ?? 0) === 1;
+                        $tokenColor = $isEmailSent ? '#198754' : '#dc3545';
+                        $tokenTooltip = $isEmailSent ? 'Email token sudah terkirim' : 'Email token belum terkirim';
+                    ?>
+                    <span id="detailTokenIndicator" class="font-monospace fw-bold <?= $isEmailSent ? 'text-success' : 'text-danger' ?>" style="display: inline-block; border-bottom: 2px solid <?= $tokenColor ?>; padding-bottom: 1px;" title="<?= $tokenTooltip ?>" data-bs-toggle="tooltip">
+                        <?= esc($item['token_pendaftaran'] ?? '-') ?>
+                    </span>
+                    <span id="detailTokenStatusBadge" class="badge <?= $isEmailSent ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' ?> ms-2 align-middle">
+                        <i class="bi <?= $isEmailSent ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' ?>"></i> <?= $isEmailSent ? 'Email Token Terkirim' : 'Email Token Belum Terkirim' ?>
+                    </span>
+                </td>
+            </tr>
+            <tr>
                 <th>Nama</th>
                 <td><?= esc($item['nama_lengkap']) ?></td>
             </tr>
@@ -110,7 +134,19 @@
             </tr>
             <tr>
                 <th>Email</th>
-                <td><a href="mailto:<?= esc($item['email'] ?? '') ?>" class="text-decoration-none"><?= esc($item['email'] ?? '-') ?></a></td>
+                <td>
+                    <a href="mailto:<?= esc($item['email'] ?? '') ?>" class="text-decoration-none fw-semibold"><?= esc($item['email'] ?? '-') ?></a>
+                    <?php if (!empty($item['email'])): ?>
+                        <div class="mt-2 d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="kirimEmailToken(<?= $item['id'] ?>, this)" title="Kirim ulang email token pendaftaran awal">
+                                <i class="bi bi-key-fill"></i> Kirim Ulang Email Token
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="kirimEmailStatus(<?= $item['id'] ?>, this)" title="Kirim email notifikasi status/jadwal saat ini">
+                                <i class="bi bi-envelope"></i> Kirim Email Status
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                </td>
             </tr>
             <tr>
                 <th>Asal Kampus</th>
@@ -292,6 +328,70 @@
                     window.open(json.url, '_blank');
                 })
                 .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat menghubungi server. Silakan coba lagi.'))
+                .finally(() => {
+                    if (button) {
+                        button.innerHTML = originalHtml;
+                        button.disabled = false;
+                    }
+                });
+        }
+
+        function kirimEmailToken(id, btn) {
+            const button = btn;
+            let originalHtml = '';
+            if (button) {
+                originalHtml = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim Token...';
+                button.disabled = true;
+            }
+
+            fetch(`<?= site_url('admin/process-interview/') ?>${id}/email_token`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(res => res.json())
+                .then(json => {
+                    IOH.toast(json.success ? 'success' : 'error', json.message);
+                    if (json.success) {
+                        const el = document.getElementById('detailTokenIndicator');
+                        if (el) {
+                            el.style.borderBottom = '2px solid #198754';
+                            el.classList.remove('text-danger');
+                            el.classList.add('text-success');
+                            el.title = 'Email token sudah terkirim';
+                        }
+                        const badge = document.getElementById('detailTokenStatusBadge');
+                        if (badge) {
+                            badge.className = 'badge bg-success-subtle text-success border border-success-subtle ms-2 align-middle';
+                            badge.innerHTML = '<i class="bi bi-check-circle-fill"></i> Email Token Terkirim';
+                        }
+                    }
+                })
+                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat mengirim email token pendaftaran. Silakan coba lagi.'))
+                .finally(() => {
+                    if (button) {
+                        button.innerHTML = originalHtml;
+                        button.disabled = false;
+                    }
+                });
+        }
+
+        function kirimEmailStatus(id, btn) {
+            const button = btn;
+            let originalHtml = '';
+            if (button) {
+                originalHtml = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim Email...';
+                button.disabled = true;
+            }
+
+            fetch(`<?= site_url('admin/process-interview/') ?>${id}/email`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(res => res.json())
+                .then(json => {
+                    IOH.toast(json.success ? 'success' : 'error', json.message);
+                })
+                .catch(() => IOH.alert('error', 'Koneksi Gagal', 'Tidak dapat mengirim email status. Silakan coba lagi.'))
                 .finally(() => {
                     if (button) {
                         button.innerHTML = originalHtml;

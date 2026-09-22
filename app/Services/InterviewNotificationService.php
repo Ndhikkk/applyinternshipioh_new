@@ -408,4 +408,92 @@ class InterviewNotificationService
 
         return ['subject' => $subject, 'body' => $body];
     }
+
+    /**
+     * Konfigurasi standar SMTP Gmail aplikasi
+     */
+    public static function emailConfig(): \Config\Email
+    {
+        return config('Email') ?? new \Config\Email();
+    }
+
+    /**
+     * Kirim ulang email konfirmasi token pendaftaran awal ke kandidat
+     */
+    public static function sendRegistrationTokenEmail(array $candidate): array
+    {
+        $toEmail = trim((string) ($candidate['email'] ?? ''));
+        if ($toEmail === '') {
+            return ['sent' => false, 'error' => 'Kandidat tidak memiliki alamat email.'];
+        }
+
+        $recipientName = esc(trim($candidate['nama_lengkap'] ?? 'Kandidat'));
+        $token = esc(trim((string) ($candidate['token_pendaftaran'] ?? '-')));
+        $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png';
+        $nomorKontak = '0853-7849-1566';
+        $linkProgres = base_url('progres');
+
+        $message = "
+        <div style='background-color: #f4f6f9; padding: 30px 15px; font-family: Arial, sans-serif; color: #333;'>
+            <table align='center' border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;'>
+                <tr>
+                    <td align='center' style='background-color: #1e3a8a; padding: 30px 20px;'>
+                        <img src='{$logoUrl}' alt='Logo Program' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
+                        <h2 style='color: #ffffff; margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;'>Industry-Academia Collaboration Program</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td style='padding: 40px 30px;'>
+                        <p style='font-size: 16px; line-height: 1.6; margin-top: 0;'>Halo <strong>{$recipientName}</strong>,</p>
+                        <p style='font-size: 15px; line-height: 1.6; color: #555;'>Terima kasih telah mendaftar dalam program <strong>Industry-Academia Collaboration Program</strong>. Kami sangat mengapresiasi minat dan antusiasme Anda untuk bertumbuh bersama kami.</p>
+
+                        <div style='background-color: #f0f4f8; border-left: 4px solid #1e3a8a; border-radius: 4px; padding: 20px; margin: 30px 0; text-align: center;'>
+                            <span style='font-size: 13px; text-transform: uppercase; color: #666; display: block; margin-bottom: 5px;'>Nomor Token Pendaftaran Anda</span>
+                            <span style='font-size: 26px; font-weight: bold; color: #1e3a8a; letter-spacing: 3px; font-family: monospace;'>{$token}</span>
+                        </div>
+
+                        <p style='font-size: 14px; line-height: 1.6; color: #666;'>Simpan dan gunakan nomor token di atas untuk melacak status seleksi berkas Anda melalui menu <strong>Cek Progres</strong> pada website kami.</p>
+
+                        <div style='text-align: center; margin-top: 35px;'>
+                            <a href='{$linkProgres}' target='_blank' rel='noopener noreferrer' style='background-color: #1e3a8a; color: #ffffff; padding: 12px 30px; text-decoration: none; font-size: 15px; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>Cek Status Pendaftaran</a>
+                        </div>
+
+                        <div style='margin-top: 35px; padding: 16px; background-color: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; text-align: center;'>
+                            <p style='font-size: 13px; color: #64748b; margin: 0 0 6px 0;'>Ada pertanyaan atau kendala seputar pendaftaran? Hubungi narahubung kami di:</p>
+                            <p style='font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 0;'>
+                                📞 {$nomorKontak}
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td align='center' style='background-color: #f8fafc; padding: 20px; border-top: 1px solid #edf2f7; font-size: 12px; color: #999;'>
+                        <p style='margin: 0 0 5px 0;'>Email ini dikirim resmi oleh sistem rekrutmen Industry-Academia Collaboration Program.</p>
+                        <p style='margin: 0;'>&copy; " . date('Y') . " Industry-Academia Collaboration Program. All rights reserved.</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        ";
+
+        try {
+            $email = \Config\Services::email(self::emailConfig());
+            $email->setFrom('farezaairo@gmail.com', 'Industry-Academia Collaboration Program');
+            $email->setTo($toEmail);
+            $email->setSubject('🔑 Token Pendaftaran - Industry-Academia Collaboration Program');
+            $email->setMessage($message);
+
+            $sent = $email->send();
+            if (!$sent) {
+                $debug = $email->printDebugger(['headers']);
+                log_message('error', 'Gagal kirim ulang email token ke {email}: {debug}', ['email' => $toEmail, 'debug' => $debug]);
+                return ['sent' => false, 'error' => 'Gagal mengirim email token. Periksa log email.'];
+            }
+
+            return ['sent' => true, 'error' => ''];
+        } catch (\Throwable $e) {
+            log_message('error', 'Exception sendRegistrationTokenEmail: ' . $e->getMessage());
+            return ['sent' => false, 'error' => $e->getMessage()];
+        }
+    }
 }

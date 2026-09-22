@@ -840,6 +840,21 @@ class Admin extends BaseController
             ]);
         }
 
+        if ($action === 'email_token') {
+            if (empty($pendaftaran['email'])) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Kandidat tidak memiliki alamat email.']);
+            }
+            $result = InterviewNotificationService::sendRegistrationTokenEmail($pendaftaran);
+            $this->pendaftaranModel->update($id, ['email_terkirim' => $result['sent'] ? 1 : 0]);
+            return $this->response->setJSON([
+                'success' => $result['sent'],
+                'email_terkirim' => $result['sent'] ? 1 : 0,
+                'message' => $result['sent']
+                    ? 'Email token pendaftaran berhasil dikirim ke ' . $pendaftaran['email']
+                    : 'Gagal mengirim email token: ' . $result['error'],
+            ]);
+        }
+
         if ($action === 'restore') {
             $this->pendaftaranModel->update($id, [
                 'is_archived'     => 0,

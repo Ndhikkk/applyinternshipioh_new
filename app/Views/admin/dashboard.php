@@ -677,6 +677,9 @@
                     <hr>
 
                     <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" id="btnSendTokenEmailModal" class="btn btn-outline-primary btn-sm" onclick="sendTokenEmailNow(this)" title="Kirim ulang email token pendaftaran awal ke kandidat">
+                            <i class="bi bi-key-fill"></i> Kirim Email Token
+                        </button>
                         <button type="button" id="btnSendEmailModal" class="btn btn-outline-secondary btn-sm" onclick="sendEmailNow(this)">
                             <i class="bi bi-envelope"></i> Kirim Email Sekarang
                         </button>
@@ -1203,6 +1206,35 @@
         })).then(res => {
             if (res.isConfirmed) openWaLink(id);
         });
+    }
+
+    function sendTokenEmailNow(btn) {
+        const button = btn || document.getElementById('btnSendTokenEmailModal');
+        if (button && !setButtonLoading(button, 'Mengirim Token...')) return;
+
+        apiGet(buildUrl(currentModalId, 'email_token'))
+            .then(j => {
+                toast(j.success ? 'success' : 'error', j.message);
+                if (j.success) {
+                    const el = document.getElementById('token-indicator-' + currentModalId);
+                    if (el) {
+                        el.style.borderBottom = '2px solid #198754';
+                        el.classList.remove('text-danger');
+                        el.classList.add('text-success');
+                        el.title = 'Email token sudah terkirim';
+                        el.setAttribute('data-bs-original-title', 'Email token sudah terkirim');
+                    }
+                    if (currentModalItem) {
+                        currentModalItem.email_terkirim = 1;
+                    }
+                }
+            })
+            .catch(() => {
+                toast('error', 'Gagal mengirim email token pendaftaran.');
+            })
+            .finally(() => {
+                if (button) resetButtonLoading(button);
+            });
     }
 
     function sendEmailNow(btn) {

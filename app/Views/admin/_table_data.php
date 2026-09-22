@@ -153,7 +153,16 @@
                     ?>
                     <tr data-aos="fade-in" id="row-<?= $data['id'] ?>">
                         <td data-label="Kandidat">
-                            <div class="small text-muted font-monospace"><?= esc($data['token_pendaftaran'] ?? '-') ?></div>
+                            <?php
+                                $isEmailSent = (int) ($data['email_terkirim'] ?? 0) === 1;
+                                $tokenColor = $isEmailSent ? '#198754' : '#dc3545';
+                                $tokenTooltip = $isEmailSent ? 'Email token sudah terkirim' : 'Email token belum terkirim';
+                            ?>
+                            <div class="small font-monospace mb-1">
+                                <span id="token-indicator-<?= $data['id'] ?>" class="<?= $isEmailSent ? 'text-success' : 'text-danger' ?>" style="display: inline-block; border-bottom: 2px solid <?= $tokenColor ?>; font-weight: 600; padding-bottom: 1px;" title="<?= $tokenTooltip ?>" data-bs-toggle="tooltip">
+                                    <?= esc($data['token_pendaftaran'] ?? '-') ?>
+                                </span>
+                            </div>
                             <div class="fw-semibold mb-1"><?= esc($data['nama_lengkap']) ?></div>
                             <div class="small mb-1">
                                 <a href="mailto:<?= esc($data['email'] ?? '') ?>" class="text-decoration-none" title="Kirim Email">
