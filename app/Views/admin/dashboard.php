@@ -6,43 +6,47 @@
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="d-flex flex-column flex-xl-row justify-content-between align-items-start align-items-xl-center mb-4 gap-3" data-aos="fade-down">
-        <div class="me-xl-3">
-            <h1 class="h3 mb-1 text-gray-800 fw-bold text-nowrap">
-                <i class="bi bi-speedometer2 text-indosat"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
+        <div class="me-xl-3 w-100 w-xl-auto">
+            <h1 class="h3 mb-1 text-gray-800 fw-bold">
+                <i class="bi bi-speedometer2 text-indosat me-1"></i> <?= $is_arsip ? 'Arsip Data' : 'Dashboard Admin' ?>
             </h1>
-            <p class="text-muted mb-0 small text-nowrap"><?= $is_arsip ? 'Data yang akan dihapus permanen (3 minggu tanpa perubahan / 7 hari di arsip)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
+            <p class="text-muted mb-0 small"><?= $is_arsip ? 'Data yang akan dihapus permanen (3 minggu tanpa perubahan / 7 hari di arsip)' : 'Kelola pendaftaran Industry-Academia Collaboration Program IOH' ?></p>
         </div>
         
-        <div class="d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center w-100 w-xl-auto justify-content-start justify-content-xl-end">
+        <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 align-items-stretch align-items-sm-center w-100 w-xl-auto justify-content-start justify-content-xl-end">
             
-            <div class="d-flex align-items-center w-100 w-xl-auto mb-2 mb-xl-0 me-xl-2 justify-content-between justify-content-xl-start">
-                <span class="fw-bold me-2 text-nowrap">Status Pendaftaran:</span>
+            <div class="d-flex align-items-center justify-content-between justify-content-sm-start bg-light px-3 py-1.5 rounded-pill border">
+                <span class="fw-semibold small text-muted me-2 text-nowrap" style="font-size: 0.8rem;">Status Pendaftaran:</span>
                 <?php if (($registration_open ?? '1') == '1'): ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Tutup pendaftaran program?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-success btn-sm rounded-pill px-3 py-0.5 text-nowrap js-toggle-registration" style="font-size: 0.75rem;" data-confirm-text="Tutup pendaftaran program?">
                         <i class="bi bi-unlock-fill me-1"></i> DIBUKA
                     </a>
                 <?php else: ?>
-                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap js-toggle-registration" data-confirm-text="Buka pendaftaran program?">
+                    <a href="<?= site_url('admin/toggle-registration') ?>" class="btn btn-danger btn-sm rounded-pill px-3 py-0.5 text-nowrap js-toggle-registration" style="font-size: 0.75rem;" data-confirm-text="Buka pendaftaran program?">
                         <i class="bi bi-lock-fill me-1"></i> DITUTUP
                     </a>
                 <?php endif; ?>
             </div>
 
-            <div class="d-flex flex-wrap flex-xl-nowrap gap-2 w-100 w-xl-auto flex-grow-1 flex-xl-grow-0">
-                <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm text-nowrap flex-grow-1 flex-xl-grow-0 <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
+            <div class="d-flex flex-wrap gap-1 align-items-center flex-grow-1 flex-xl-grow-0">
+                <a href="<?= site_url('admin/dashboard' . (!empty($is_upcoming) ? '' : '?upcoming=1')) ?>" class="btn btn-sm flex-fill flex-sm-grow-0 <?= !empty($is_upcoming) ? 'btn-info text-white' : 'btn-outline-info' ?>" title="Pelamar dengan tanggal mulai magang > 90 hari dari sekarang">
+                    <i class="bi bi-clock-history"></i> <?= !empty($is_upcoming) ? 'Semua' : 'Upcoming (' . ($total_upcoming ?? 0) . ')' ?>
+                </a>
+
+                <a href="<?= site_url('admin/dashboard' . ($is_arsip ? '' : '?arsip=1')) ?>" class="btn btn-sm flex-fill flex-sm-grow-0 <?= $is_arsip ? 'btn-primary' : 'btn-outline-secondary' ?>">
                     <i class="bi bi-archive"></i> <?= $is_arsip ? 'Kembali' : 'Arsip (' . $total_arsip . ')' ?>
                 </a>
 
-                <button type="button" class="btn btn-success btn-sm text-nowrap flex-grow-1 flex-xl-grow-0" id="btnExportExcel" onclick="openExportModal()">
-                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                <button type="button" class="btn btn-success btn-sm flex-fill flex-sm-grow-0" id="btnExportExcel" onclick="openExportModal()">
+                    <i class="bi bi-file-earmark-excel"></i> Export
                 </button>
 
-                <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0">
-                    <i class="bi bi-file-earmark-pdf"></i> Generate CV
+                <a href="<?= site_url('admin/parsing-cv') ?>" class="btn btn-danger btn-sm flex-fill flex-sm-grow-0">
+                    <i class="bi bi-file-earmark-pdf"></i> CV
                 </a>
 
-                <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm text-nowrap flex-grow-1 flex-xl-grow-0" title="Logout">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                <a href="<?= site_url('admin/logout') ?>" class="btn btn-outline-danger btn-sm flex-fill flex-sm-grow-0" title="Logout">
+                    <i class="bi bi-box-arrow-right"></i>
                 </a>
             </div>
         </div>
@@ -64,67 +68,72 @@
     <?php endif; ?>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="100">
+    <div class="row g-2 g-md-3 mb-4">
+        <div class="col-6 col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
             <div class="card stats-card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pendaftar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_pendaftar ?></div>
-                            <div class="mt-2 mb-0 text-muted text-xs">
-                                <span class="text-primary me-2"><i class="bi bi-arrow-up"></i> Semua waktu</span>
-                            </div>
+                <div class="card-body p-2.5 p-sm-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1" style="font-size: 0.72rem;">Total Pendaftar</div>
+                            <div class="h5 mb-1 font-weight-bold text-gray-800"><?= $total_pendaftar ?></div>
                         </div>
-                        <div class="col-auto"><i class="bi bi-people display-6 text-indosat"></i></div>
+                        <div class="text-indosat fs-3 opacity-75"><i class="bi bi-people"></i></div>
+                    </div>
+                    <div class="mt-1 d-flex flex-wrap align-items-center gap-1 text-xs">
+                        <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-arrow-up text-primary"></i> Semua waktu</span>
+                        <?php if (!empty($total_upcoming)): ?>
+                            <a href="<?= site_url('admin/dashboard?upcoming=1') ?>" class="badge bg-info-subtle text-info-emphasis border border-info-subtle text-decoration-none" style="font-size: 0.65rem;" title="Klik untuk lihat kandidat Upcoming">
+                                <i class="bi bi-clock-history"></i> <?= $total_upcoming ?> Upcoming
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-6 col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
             <div class="card stats-card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Diterima</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_diterima ?></div>
-                            <div class="mt-2 mb-0 text-muted text-xs">
-                                <span class="text-success me-2"><i class="bi bi-check-circle"></i> Final</span>
-                            </div>
+                <div class="card-body p-2.5 p-sm-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1" style="font-size: 0.72rem;">Diterima</div>
+                            <div class="h5 mb-1 font-weight-bold text-gray-800"><?= $total_diterima ?></div>
                         </div>
-                        <div class="col-auto"><i class="bi bi-check-circle display-6 text-success"></i></div>
+                        <div class="text-success fs-3 opacity-75"><i class="bi bi-check-circle"></i></div>
+                    </div>
+                    <div class="mt-1 text-muted text-xs" style="font-size: 0.7rem;">
+                        <span class="text-success me-1"><i class="bi bi-check-circle"></i></span> Final
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-6 col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
             <div class="card stats-card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Menunggu</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_menunggu ?></div>
-                            <div class="mt-2 mb-0 text-muted text-xs">
-                                <span class="text-warning me-2"><i class="bi bi-clock"></i> Dalam proses</span>
-                            </div>
+                <div class="card-body p-2.5 p-sm-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1" style="font-size: 0.72rem;">Menunggu</div>
+                            <div class="h5 mb-1 font-weight-bold text-gray-800"><?= $total_menunggu ?></div>
                         </div>
-                        <div class="col-auto"><i class="bi bi-clock display-6 text-warning"></i></div>
+                        <div class="text-warning fs-3 opacity-75"><i class="bi bi-clock"></i></div>
+                    </div>
+                    <div class="mt-1 text-muted text-xs text-truncate" style="font-size: 0.7rem;">
+                        <span class="text-warning me-1"><i class="bi bi-clock"></i></span> Dalam proses
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-xl-3 mb-3 mb-xl-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-6 col-md-6 col-xl-3" data-aos="fade-up" data-aos-delay="400">
             <div class="card stats-card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ditolak</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_ditolak ?></div>
-                            <div class="mt-2 mb-0 text-muted text-xs">
-                                <span class="text-danger me-2"><i class="bi bi-x-circle"></i> Selesai</span>
-                            </div>
+                <div class="card-body p-2.5 p-sm-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1" style="font-size: 0.72rem;">Ditolak</div>
+                            <div class="h5 mb-1 font-weight-bold text-gray-800"><?= $total_ditolak ?></div>
                         </div>
-                        <div class="col-auto"><i class="bi bi-x-circle display-6 text-danger"></i></div>
+                        <div class="text-danger fs-3 opacity-75"><i class="bi bi-x-circle"></i></div>
+                    </div>
+                    <div class="mt-1 text-muted text-xs" style="font-size: 0.7rem;">
+                        <span class="text-danger me-1"><i class="bi bi-x-circle"></i></span> Selesai
                     </div>
                 </div>
             </div>
@@ -303,83 +312,107 @@
     box-shadow: none;
 }
 
+/* Container & Table Responsive Isolation */
+.container-fluid {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.table-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
 /* CSS Responsif Khusus Tabel di Mobile (Card Layout) */
 @media (max-width: 768px) {
-    .table-mobile-cards thead {
-        display: none;
+    .table-responsive {
+        overflow-x: visible !important;
     }
-    .table-mobile-cards, .table-mobile-cards tbody, .table-mobile-cards tr, .table-mobile-cards td {
-        display: block;
-        width: 100%;
+    .table-mobile-cards thead {
+        display: none !important;
+    }
+    .table-mobile-cards, 
+    .table-mobile-cards tbody, 
+    .table-mobile-cards tr, 
+    .table-mobile-cards td {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
     .table-mobile-cards tr {
-        margin-bottom: 1.5rem;
-        background-color: #fff;
-        border: 1px solid #e3e6f0;
-        border-radius: 0.75rem;
-        box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08);
-        padding: 0;
-        overflow: hidden;
+        margin-bottom: 1.25rem !important;
+        background-color: #fff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+        padding: 0 !important;
+        overflow: hidden !important;
     }
     .table-mobile-cards td {
-        position: relative;
-        text-align: right;
-        padding: 0.75rem 1rem 0.75rem 40%; /* 40% padding kiri untuk tempat label */
-        border: none;
-        border-bottom: 1px solid #f8f9fc;
-        min-height: 2.5rem;
+        position: relative !important;
+        text-align: right !important;
+        padding: 0.65rem 0.85rem 0.65rem 40% !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        min-height: 2.4rem !important;
     }
     /* Konten sel boleh turun baris (email/kampus panjang tidak meluber) */
     .table-mobile-cards td,
     .table-mobile-cards td .small,
     .table-mobile-cards td a {
-        word-break: break-word;
-        white-space: normal;
-    }
-    .table-mobile-cards td:last-child {
-        border-bottom: none;
-        background-color: #f8f9fc; /* Sedikit beda warna untuk kolom aksi */
+        word-break: break-word !important;
+        white-space: normal !important;
     }
     .table-mobile-cards td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        color: #4e73df;
-        font-size: 0.85rem;
-        position: absolute;
-        left: 1rem;
-        top: 0.75rem;
-        text-align: left;
-        width: 35%;
-        line-height: 1.4;
+        content: attr(data-label) !important;
+        font-weight: 700 !important;
+        color: #475569 !important;
+        font-size: 0.8rem !important;
+        position: absolute !important;
+        left: 0.85rem !important;
+        top: 0.65rem !important;
+        text-align: left !important;
+        width: 36% !important;
+        line-height: 1.3 !important;
+        white-space: normal !important;
     }
     /* Memastikan elemen div/p di dalam td tersusun vertikal di kanan */
     .table-mobile-cards td > div {
-        display: block;
-        margin-bottom: 0.25rem;
+        display: block !important;
+        margin-bottom: 0.25rem !important;
     }
     .table-mobile-cards td > div:last-child {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
     }
     /* Kolom Berkas: tombol rata kanan dan boleh turun baris bila sempit */
     .table-mobile-cards td .btn-group {
-        flex-wrap: wrap;
-        justify-content: flex-end;
+        flex-wrap: wrap !important;
+        justify-content: flex-end !important;
     }
-    /* Pengecualian untuk kolom aksi agar tombolnya sejajar atau terpusat dengan rapi */
+    /* Kolom Aksi */
+    .table-mobile-cards td:last-child,
     .table-mobile-cards td.mobile-col-flex {
-        padding-left: 1rem;
-        text-align: center;
+        padding-left: 0.85rem !important;
+        text-align: center !important;
+        background-color: #f8fafc !important;
+        border-bottom: none !important;
     }
+    .table-mobile-cards td:last-child::before,
     .table-mobile-cards td.mobile-col-flex::before {
-        position: static;
-        display: block;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 0.75rem;
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 0.5rem !important;
     }
-    .table-mobile-cards td.mobile-col-flex .d-flex {
+    .table-mobile-cards td.mobile-col-flex .d-flex,
+    .table-mobile-cards td:last-child .d-flex {
         justify-content: center !important;
         flex-wrap: wrap !important;
+        gap: 6px !important;
     }
 }
 
@@ -488,25 +521,40 @@
 }
 </style>
 
-<div class="card border-0 shadow-sm" data-aos="fade-up">
-    <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-md-between align-items-stretch align-items-md-center gap-2">
-        <h6 class="m-0 font-weight-bold text-primary">
-            <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : 'Data Pendaftar Program' ?>
+<?php if (!empty($is_upcoming)): ?>
+    <div class="alert alert-info border-0 shadow-sm py-2 px-3 mb-3 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="alert">
+        <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 0;">
+            <i class="bi bi-clock-history fs-5 text-info flex-shrink-0"></i>
+            <span class="small text-dark" style="font-size: 0.82rem; line-height: 1.3;">
+                <strong>Filter Upcoming:</strong> Pelamar masa magang > 90 hari (Aman dari auto-arsip).
+            </span>
+        </div>
+        <a href="<?= site_url('admin/dashboard') ?>" class="btn btn-sm btn-outline-primary py-0.5 px-2.5 rounded-pill text-nowrap ms-auto" style="font-size: 0.78rem;">
+            <i class="bi bi-x-circle me-1"></i> Reset Filter
+        </a>
+    </div>
+<?php endif; ?>
+
+<div class="card border-0 shadow-sm overflow-hidden" data-aos="fade-up">
+    <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2">
+        <h6 class="m-0 font-weight-bold text-primary" style="font-size: 0.95rem;">
+            <i class="bi bi-table"></i> <?= $is_arsip ? 'Data Arsip (menunggu hapus permanen)' : (!empty($is_upcoming) ? 'Data Pelamar Upcoming (> 90 Hari)' : 'Data Pendaftar Program') ?>
         </h6>
-        <div class="d-flex gap-2 ms-md-auto">
+        <div class="d-flex gap-2 w-100 w-md-auto">
             <!-- Diubah dari form menjadi div untuk menjamin tidak ada reload -->
-            <div class="input-group input-group-sm flex-grow-1 flex-md-grow-0" id="searchContainer" style="min-width: 0;">
+            <div class="input-group input-group-sm flex-grow-1" id="searchContainer" style="min-width: 0;">
                 <?php if ($is_arsip): ?><input type="hidden" name="arsip" id="arsipParam" value="1"><?php endif; ?>
+                <?php if (!empty($is_upcoming)): ?><input type="hidden" name="upcoming" id="upcomingParam" value="1"><?php endif; ?>
                 <input type="text" id="searchInput" class="form-control" placeholder="Cari nama, email, kampus..." value="<?= esc($keyword ?? '') ?>" autocomplete="off">
                 <button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="bi bi-search"></i></button>
                 <button class="btn btn-outline-danger" type="button" id="resetBtn" style="display: <?= !empty($keyword) ? 'block' : 'none' ?>;" title="Reset pencarian"><i class="bi bi-x"></i></button>
             </div>
-            <button class="btn btn-outline-primary btn-sm" onclick="location.reload()" title="Refresh">
+            <button class="btn btn-outline-primary btn-sm flex-shrink-0" onclick="location.reload()" title="Refresh">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>
         </div>
     </div>
-    <div class="card-body" id="tableContainer" style="position: relative; min-height: 400px;">
+    <div class="card-body p-0 p-md-3" id="tableContainer" style="position: relative; min-height: 400px; overflow-x: auto;">
         <?= $this->include('admin/_table_data') ?>
     </div>
 </div>
@@ -1426,6 +1474,7 @@
         const resetBtn = document.getElementById('resetBtn');
         const tableContainer = document.getElementById('tableContainer');
         const arsipParam = document.getElementById('arsipParam');
+        const upcomingParam = document.getElementById('upcomingParam');
         
         if (!searchInput || !tableContainer) return;
 
@@ -1447,6 +1496,7 @@
             if (activeJenisFilter) url.searchParams.set('jenis', activeJenisFilter);
             if (activeRegionalFilter) url.searchParams.set('regional', activeRegionalFilter);
             if (arsipParam) url.searchParams.set('arsip', '1');
+            if (upcomingParam) url.searchParams.set('upcoming', '1');
             return url.toString();
         }
 

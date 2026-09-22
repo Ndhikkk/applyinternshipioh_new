@@ -60,12 +60,16 @@
         /* Smooth Scroll & Base Styles */
         html {
             scroll-behavior: smooth;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--indosat-bg);
             color: var(--text-dark);
+            max-width: 100%;
+            overflow-x: hidden;
         }
         
         h1, h2, h3, h4, h5, h6 {

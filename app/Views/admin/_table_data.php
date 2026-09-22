@@ -13,7 +13,7 @@
                             <?php endif; ?>
                             <i class="bi bi-funnel<?= !empty($regional_filter) ? '-fill text-danger' : '' ?> ms-1" style="font-size:.75em;"></i>
                         </span>
-                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; min-width:230px; max-width:95vw; z-index:1060; white-space:normal;">
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; max-width:92vw; z-index:1060; white-space:normal;">
                             <h6 class="dropdown-header px-1 text-danger fw-bold mb-2"><i class="bi bi-geo-alt-fill me-1"></i>Pilih Regional</h6>
                             <div class="d-flex flex-column gap-1">
                                 <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= empty($regional_filter) ? 'active fw-bold' : '' ?>" href="#" data-regional="">
@@ -41,7 +41,7 @@
                             <?php endif; ?>
                             <i class="bi bi-funnel<?= (!empty($divisi_filter) || !empty($jenis_filter)) ? '-fill text-primary' : '' ?> ms-1" style="font-size:.75em;"></i>
                         </span>
-                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:480px; min-width:480px; max-width:95vw; z-index:1060; white-space:normal;">
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:480px; max-width:92vw; z-index:1060; white-space:normal;">
                             <div class="row g-3">
                                 <!-- Kolom Kiri: Divisi -->
                                 <div class="col-6 border-end pe-3">
@@ -88,7 +88,7 @@
                             <span id="statusFilterBadge" class="badge bg-primary ms-1" style="font-size:.65em; display:none;"></span>
                             <i class="bi bi-funnel ms-1" style="font-size:.75em;" id="statusFilterIcon"></i>
                         </span>
-                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; min-width:230px; max-width:95vw; z-index:1060; white-space:normal;">
+                        <div class="dropdown-menu dropdown-menu-start shadow-lg border p-3" style="width:230px; max-width:92vw; z-index:1060; white-space:normal;">
                             <h6 class="dropdown-header px-1 text-primary fw-bold mb-2"><i class="bi bi-filter-circle me-1"></i>Filter Status</h6>
                             <div class="d-flex flex-column gap-1" style="max-height:280px; overflow-y:auto;">
                                 <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center active fw-bold" href="#" data-status-filter="">
@@ -220,9 +220,23 @@
                             <small class="d-block mb-1">
                                 <span class="text-muted">Mulai:</span> <?= !empty($data['periode_mulai']) ? date('d/m/Y', strtotime($data['periode_mulai'])) : '-' ?>
                             </small>
-                            <small class="d-block">
+                            <small class="d-block mb-1">
                                 <span class="text-muted">Selesai:</span> <?= !empty($data['periode_selesai']) ? date('d/m/Y', strtotime($data['periode_selesai'])) : '-' ?>
                             </small>
+                            <?php
+                            if (!empty($data['periode_mulai'])) {
+                                $daysDiff = (int) floor((strtotime($data['periode_mulai']) - strtotime(date('Y-m-d'))) / 86400);
+                                if ($daysDiff >= 90) {
+                                    echo '<span class="badge bg-info text-dark d-inline-flex align-items-center gap-1 mt-1" style="font-size:0.7rem;" title="Masa onboarding masih ' . $daysDiff . ' hari lagi (Upcoming > 90 hari)">'
+                                        . '<i class="bi bi-clock-history"></i> Upcoming (' . $daysDiff . ' hr)'
+                                        . '</span>';
+                                } elseif ($daysDiff > 0) {
+                                    echo '<span class="badge bg-light text-muted border d-inline-flex align-items-center gap-1 mt-1" style="font-size:0.7rem;" title="Mulai dalam ' . $daysDiff . ' hari">'
+                                        . '<i class="bi bi-calendar-check"></i> ' . $daysDiff . ' hr lagi'
+                                        . '</span>';
+                                }
+                            }
+                            ?>
                         </td>
                         <td data-label="Tanggal Daftar">
                             <small>
