@@ -414,7 +414,10 @@ class InterviewNotificationService
      */
     public static function emailConfig(): \Config\Email
     {
-        return config('Email') ?? new \Config\Email();
+        $config = config('Email') ?? new \Config\Email();
+        $config->CRLF = "\r\n";
+        $config->newline = "\r\n";
+        return $config;
     }
 
     /**

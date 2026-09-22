@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Detail Pendaftar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
@@ -358,6 +360,13 @@
                             el.classList.remove('text-danger');
                             el.classList.add('text-success');
                             el.title = 'Email token sudah terkirim';
+                            el.setAttribute('data-bs-original-title', 'Email token sudah terkirim');
+                            if (window.bootstrap && bootstrap.Tooltip) {
+                                const tip = bootstrap.Tooltip.getInstance(el);
+                                if (tip && tip.setContent) {
+                                    tip.setContent({ '.tooltip-inner': 'Email token sudah terkirim' });
+                                }
+                            }
                         }
                         const badge = document.getElementById('detailTokenStatusBadge');
                         if (badge) {
@@ -620,7 +629,18 @@
         else if (textOrOpts) { if (textOrOpts.text) opts.text = textOrOpts.text; if (textOrOpts.html) opts.html = textOrOpts.html; }
         return Swal.fire(opts);
     };
+
+    // Inisialisasi Bootstrap Tooltip
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.bootstrap && bootstrap.Tooltip) {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+                new bootstrap.Tooltip(el);
+            });
+        }
+    });
     </script>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
