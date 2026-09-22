@@ -95,6 +95,8 @@ class Admin extends BaseController
         }
 
         $isArsip = $this->request->getGet('arsip') == '1';
+        $isUpcoming = $this->request->getGet('upcoming') == '1';
+        $upcomingThreshold = date('Y-m-d', strtotime('+90 days'));
 
         $data['total_pendaftar'] = $this->pendaftaranModel->where('is_archived', 0)->countAll();
 
@@ -115,11 +117,21 @@ class Admin extends BaseController
 
         $data['total_arsip'] = $this->pendaftaranModel->where('is_archived', 1)->countAllResults();
 
+        // Total kandidat Upcoming (periode_mulai >= 90 hari dari hari ini)
+        $data['total_upcoming'] = $this->pendaftaranModel
+            ->where('is_archived', 0)
+            ->where('periode_mulai >=', $upcomingThreshold)
+            ->countAllResults();
+
         $keyword = $this->request->getGet('keyword');
         $divisiFilter = $this->request->getGet('divisi');
         $jenisFilter = $this->request->getGet('jenis');
         $regionalFilter = $this->request->getGet('regional');
         $modelQuery = $this->pendaftaranModel->where('is_archived', $isArsip ? 1 : 0);
+
+        if ($isUpcoming) {
+            $modelQuery = $modelQuery->where('periode_mulai >=', $upcomingThreshold);
+        }
 
         if (!empty($keyword)) {
             $modelQuery = $modelQuery->groupStart()
@@ -146,14 +158,25 @@ class Admin extends BaseController
             $modelQuery = $modelQuery->where('regional_interview', $regionalFilter);
         }
 
-        $sortField = $isArsip ? 'archived_at' : 'created_at';
-        $data['pendaftaran'] = $modelQuery->orderBy($sortField, 'DESC')->paginate(15, 'pendaftaran');
+        if ($isArsip) {
+            $sortField = 'archived_at';
+            $sortDir   = 'DESC';
+        } elseif ($isUpcoming) {
+            $sortField = 'periode_mulai';
+            $sortDir   = 'ASC';
+        } else {
+            $sortField = 'created_at';
+            $sortDir   = 'DESC';
+        }
+        $data['pendaftaran'] = $modelQuery->orderBy($sortField, $sortDir)->paginate(15, 'pendaftaran');
         $data['pager'] = $this->pendaftaranModel->pager;
         $data['keyword'] = $keyword;
         $data['divisi_filter'] = $divisiFilter;
         $data['jenis_filter'] = $jenisFilter;
         $data['regional_filter'] = $regionalFilter;
         $data['is_arsip'] = $isArsip;
+        $data['is_upcoming'] = $isUpcoming;
+        $data['upcoming_threshold'] = $upcomingThreshold;
         $data['registration_open'] = $this->settingsModel->getValue('registration_open') ?? '1';
         $data['kota_pilihan_options'] = (new \Config\InternshipLocations())->kotaPilihan;
         $data['kota_magang_options']  = $data['kota_pilihan_options'];
@@ -1121,11 +1144,19 @@ class Admin extends BaseController
     {
         $twoWeeksAgo   = date('Y-m-d H:i:s', strtotime('-14 days'));
         $threeWeeksAgo = date('Y-m-d H:i:s', strtotime('-21 days'));
+        $today         = date('Y-m-d');
 
         // ---- TAHAP 1: masuk arsip jika tidak ada perubahan selama 2 minggu ----
+        // PROTEKSI UPCOMING: kandidat yang periode_mulai-nya masih di masa depan (> hari ini / > 90 hari)
+        // DILINDUNGI agar tidak masuk arsip otomatis hanya karena mendaftar jauh-jauh hari.
         $inactive = $this->pendaftaranModel
             ->where('is_archived', 0)
             ->where('COALESCE(updated_at, created_at) <=', $twoWeeksAgo)
+            ->whereNotIn('status', ['Diterima', 'Complete'])
+            ->groupStart()
+                ->where('periode_mulai IS NULL', null, false)
+                ->orWhere('periode_mulai <=', $today)
+            ->groupEnd()
             ->findAll();
         $this->archiveCandidates($inactive, 'Tidak ada perubahan (2 minggu)');
 
@@ -1142,9 +1173,15 @@ class Admin extends BaseController
 
     private function archiveCandidates(array $rows, string $reason): void
     {
+        $today = date('Y-m-d');
         foreach ($rows as $row) {
             if (in_array($row['status'], ['Diterima', 'Complete'], true)) {
                 log_message('info', "Auto-arsip dilewati untuk kandidat #{$row['id']} ({$row['nama_lengkap']}) karena status {$row['status']}.");
+                continue;
+            }
+            // Proteksi Upcoming ganda: jika periode_mulai masih di masa depan, lewati arsip
+            if (!empty($row['periode_mulai']) && $row['periode_mulai'] > $today) {
+                log_message('info', "Auto-arsip dilewati untuk kandidat #{$row['id']} ({$row['nama_lengkap']}) karena periode magang belum mulai (Upcoming: {$row['periode_mulai']}).");
                 continue;
             }
             $this->pendaftaranModel->update($row['id'], [
