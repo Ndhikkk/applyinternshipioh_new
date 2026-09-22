@@ -1612,6 +1612,11 @@
             const paginationLink = e.target.closest('.ajax-pagination a');
             if (paginationLink) {
                 e.preventDefault();
+                const tableCard = tableContainer.closest('.card');
+                if (tableCard) {
+                    const y = tableCard.getBoundingClientRect().top + window.pageYOffset - 20;
+                    window.scrollTo(0, y);
+                }
                 loadData(paginationLink.href);
                 return;
             }
