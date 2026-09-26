@@ -159,7 +159,7 @@
                                 $tokenTooltip = $isEmailSent ? 'Email token sudah terkirim' : 'Email token belum terkirim';
                             ?>
                             <div class="small font-monospace mb-1">
-                                <span id="token-indicator-<?= $data['id'] ?>" style="display: inline-block; border-bottom: 1px solid <?= $tokenColor ?>; font-weight: 600; padding-bottom: 0px; line-height: 1.15;" title="<?= $tokenTooltip ?>" data-bs-toggle="tooltip">
+                                <span id="token-indicator-<?= $data['id'] ?>" style="display: inline-block; border-bottom: 2px solid <?= $tokenColor ?>; font-weight: 600; padding-bottom: 2px; line-height: 1.2;" title="<?= $tokenTooltip ?>" data-bs-toggle="tooltip">
                                     <?= esc($data['token_pendaftaran'] ?? '-') ?>
                                 </span>
                             </div>

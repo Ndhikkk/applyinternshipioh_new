@@ -1266,7 +1266,7 @@
                 if (j.success) {
                     const el = document.getElementById('token-indicator-' + currentModalId);
                     if (el) {
-                        el.style.borderBottom = '1px solid #198754';
+                        el.style.borderBottom = '2px solid #198754';
                         el.classList.remove('text-danger', 'text-success');
                         el.title = 'Email token sudah terkirim';
                         el.setAttribute('data-bs-original-title', 'Email token sudah terkirim');
