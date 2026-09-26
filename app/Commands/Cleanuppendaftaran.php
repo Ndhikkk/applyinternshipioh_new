@@ -39,11 +39,17 @@ class Cleanuppendaftaran extends BaseCommand
 
         $twoWeeksAgo   = date('Y-m-d H:i:s', strtotime('-14 days'));
         $threeWeeksAgo = date('Y-m-d H:i:s', strtotime('-21 days'));
+        $today         = date('Y-m-d');
 
         // ---- TAHAP 1: masuk arsip jika tidak ada perubahan selama 2 minggu ----
-        // NOTE: Diterima & Complete sudah dikecualikan di archive() sehingga tidak akan terarsip otomatis
+        // Proteksi: jangan arsipkan kandidat Diterima/Complete ATAU yang periode_mulai-nya masih di masa depan (Upcoming)
         $inactive = $model->where('is_archived', 0)
             ->where('COALESCE(updated_at, created_at) <=', $twoWeeksAgo)
+            ->whereNotIn('status', ['Diterima', 'Complete'])
+            ->groupStart()
+                ->where('periode_mulai IS NULL', null, false)
+                ->orWhere('periode_mulai <=', $today)
+            ->groupEnd()
             ->findAll();
         $archivedCount = $this->archive($model, $inactive, 'Tidak ada perubahan (2 minggu)');
 
@@ -61,15 +67,24 @@ class Cleanuppendaftaran extends BaseCommand
 
     private function archive(PendaftaranModel $model, array $rows, string $reason): int
     {
+        $today = date('Y-m-d');
+        $archived = 0;
         foreach ($rows as $row) {
+            if (in_array($row['status'], ['Diterima', 'Complete'], true)) {
+                continue;
+            }
+            if (!empty($row['periode_mulai']) && $row['periode_mulai'] > $today) {
+                continue;
+            }
             $model->update($row['id'], [
                 'is_archived'     => 1,
                 'archived_at'     => date('Y-m-d H:i:s'),
                 'archived_reason' => $reason,
             ]);
             CLI::write("- Arsip #{$row['id']} {$row['nama_lengkap']} ({$reason})");
+            $archived++;
         }
-        return count($rows);
+        return $archived;
     }
 
     private function purge(PendaftaranModel $model, array $rows, string $reason): int
