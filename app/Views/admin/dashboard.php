@@ -79,13 +79,8 @@
                         </div>
                         <div class="text-indosat fs-3 opacity-75"><i class="bi bi-people"></i></div>
                     </div>
-                    <div class="mt-1 d-flex flex-wrap align-items-center gap-1 text-xs">
-                        <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-arrow-up text-primary"></i> Semua waktu</span>
-                        <?php if (!empty($total_upcoming)): ?>
-                            <a href="<?= site_url('admin/dashboard?upcoming=1') ?>" class="badge bg-info-subtle text-info-emphasis border border-info-subtle text-decoration-none" style="font-size: 0.65rem;" title="Klik untuk lihat kandidat Upcoming">
-                                <i class="bi bi-clock-history"></i> <?= $total_upcoming ?> Upcoming
-                            </a>
-                        <?php endif; ?>
+                    <div class="mt-1 text-muted text-xs" style="font-size: 0.7rem;">
+                        <span class="text-muted"><i class="bi bi-arrow-up text-primary"></i> Semua waktu</span>
                     </div>
                 </div>
             </div>
