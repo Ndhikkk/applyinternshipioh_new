@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\AdminModel;
 use App\Models\PendaftaranModel;
 use App\Models\AppSettingsModel;
+use App\Services\InterviewNotificationService;
 use Config\Services;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -862,6 +863,21 @@ class Admin extends BaseController
             ]);
         }
 
+        if ($action === 'email_token') {
+            if (empty($pendaftaran['email'])) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Kandidat tidak memiliki alamat email.']);
+            }
+            $result = InterviewNotificationService::sendRegistrationTokenEmail($pendaftaran);
+            $this->pendaftaranModel->update($id, ['email_terkirim' => $result['sent'] ? 1 : 0]);
+            return $this->response->setJSON([
+                'success' => $result['sent'],
+                'email_terkirim' => $result['sent'] ? 1 : 0,
+                'message' => $result['sent']
+                    ? 'Email token pendaftaran berhasil dikirim ke ' . $pendaftaran['email']
+                    : 'Gagal mengirim email token: ' . $result['error'],
+            ]);
+        }
+
         if ($action === 'restore') {
             $this->pendaftaranModel->update($id, [
                 'is_archived'     => 0,
@@ -920,7 +936,7 @@ class Admin extends BaseController
                 'id'                          => (int) $id,
                 'status'                      => $updated['status'],
                 'badge_html'                  => $this->renderStatusBadge($updated),
-                'should_prompt_notifications' => false,
+                'should_prompt_notifications' => true,
             ], $this->itemPayload($updated)));
         }
 
@@ -1044,9 +1060,7 @@ class Admin extends BaseController
             'aksi_html'    => $this->renderAksiCell($updated),
         ], $this->itemPayload($updated));
 
-        if ($targetStatus !== $pendaftaran['status']) {
-            $this->sendStatusEmail(array_merge($pendaftaran, $data));
-        }
+        // Pengiriman email status dari admin dilakukan manual (via pop-up konfirmasi atau tombol email)
 
         if ($this->request->isAJAX()) {
             return $this->response->setJSON($payload);
@@ -1374,141 +1388,12 @@ class Admin extends BaseController
 
     private function buildEmailTemplate(array $item): array
     {
-        $nama = esc($item['nama_lengkap']);
-        $status = $item['status'];
-        $step = $this->getInterviewStep($status);
-        $token = esc($item['token_pendaftaran'] ?? '-');
-
-        if (str_starts_with($status, 'Lolos_Interview_')) {
-            $jadwal = $item['jadwal_interview_' . $step] ?? null;
-            $zoom = $item['link_zoom_' . $step] ?? null;
-            $jadwalText = $jadwal ? date('l, d F Y \p\u\k\u\l H:i', strtotime($jadwal)) . ' WIB' : 'akan diinformasikan kemudian';
-
-            $subject = "Undangan Interview Tahap {$step} - Industry-Academia Collaboration Program";
-            $headline = "Undangan Interview Tahap {$step}";
-            $intro = "Selamat! Anda dijadwalkan untuk mengikuti <strong>Interview Tahap {$step}</strong> pada program Industry-Academia Collaboration Program.";
-            $boxLabel = "Jadwal Interview";
-            $boxValue = esc($jadwalText);
-            $extra = $zoom
-                ? "<div style='text-align:center;margin-top:20px;'><a href='" . esc($zoom) . "' style='background-color:#1e3a8a;color:#ffffff;padding:12px 30px;text-decoration:none;font-size:15px;font-weight:bold;border-radius:5px;display:inline-block;'>Gabung Link Zoom / Meet</a></div>"
-                : "<p style='font-size:14px;color:#666;'>Link Zoom akan diinformasikan lebih lanjut oleh tim kami.</p>";
-            $footerNote = "Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet Anda stabil.";
-        } elseif (in_array($status, ['Diterima'], true)) {
-            $subject = "Selamat! Anda Diterima - Industry-Academia Collaboration Program";
-            $headline = "Selamat, Anda Diterima! 🎉";
-            $intro = "Selamat! Anda dinyatakan <strong>LOLOS</strong> dan diterima pada program <strong>Industry-Academia Collaboration Program</strong>.";
-            $boxLabel = "Nomor Token Anda";
-            $boxValue = $token;
-            $extra = "<p style='font-size:14px;color:#666;'>Tim kami akan segera menghubungi Anda untuk informasi langkah selanjutnya.</p>";
-            $footerNote = "Terima kasih atas partisipasi Anda dalam seluruh rangkaian seleksi.";
-        } elseif (in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
-            $subject = "Informasi Status Pendaftaran - Industry-Academia Collaboration Program";
-            $headline = "Informasi Status Pendaftaran";
-            $intro = "Terima kasih atas partisipasi Anda pada proses seleksi <strong>Industry-Academia Collaboration Program</strong>.";
-            $boxLabel = "Status";
-            $boxValue = "Belum dapat melanjutkan ke tahap berikutnya";
-            $extra = "<p style='font-size:14px;color:#666;'>Semoga sukses untuk kesempatan berikutnya. Jangan berkecil hati untuk mencoba kembali di kesempatan lain.</p>";
-            $footerNote = "Terima kasih telah meluangkan waktu mengikuti proses seleksi kami.";
-        } else {
-            $subject = "Informasi Pendaftaran - Industry-Academia Collaboration Program";
-            $headline = "Pendaftaran Anda Sedang Diproses";
-            $intro = "Terima kasih telah mendaftar pada program <strong>Industry-Academia Collaboration Program</strong>.";
-            $boxLabel = "Nomor Token Anda";
-            $boxValue = $token;
-            $extra = "<p style='font-size:14px;color:#666;'>Pendaftaran Anda sedang kami proses. Mohon ditunggu informasi selanjutnya.</p>";
-            $footerNote = "Simpan token Anda untuk keperluan pelacakan status pendaftaran.";
-        }
-
-        $logoUrl = 'https://cdn-icons-png.flaticon.com/512/3135/3135665.png';
-
-        // Nomor narahubung / kontak yang bisa dihubungi
-        $nomorKontak = '0853-7849-1566'; // <-- SILAKAN GANTI DENGAN NOMOR ANDA (Contoh: +62 812-3456-7890)
-
-        $body = "
-        <div style='background-color: #f4f6f9; padding: 30px 15px; font-family: Arial, sans-serif; color: #333;'>
-            <table align='center' border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;'>
-                <tr>
-                    <td align='center' style='background-color: #1e3a8a; padding: 30px 20px;'>
-                        <img src='{$logoUrl}' alt='Logo Program' style='width: 80px; height: auto; margin-bottom: 10px; display: block;'>
-                        <h2 style='color: #ffffff; margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;'>Industry-Academia Collaboration Program</h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td style='padding: 40px 30px;'>
-                        <h3 style='margin-top:0;color:#1e3a8a;'>{$headline}</h3>
-                        <p style='font-size: 16px; line-height: 1.6; margin-top: 0;'>Halo <strong>{$nama}</strong>,</p>
-                        <p style='font-size: 15px; line-height: 1.6; color: #555;'>{$intro}</p>
-
-                        <div style='background-color: #f0f4f8; border-left: 4px solid #1e3a8a; border-radius: 4px; padding: 20px; margin: 30px 0; text-align: center;'>
-                            <span style='font-size: 13px; text-transform: uppercase; color: #666; display: block; margin-bottom: 5px;'>{$boxLabel}</span>
-                            <span style='font-size: 20px; font-weight: bold; color: #1e3a8a; font-family: monospace;'>{$boxValue}</span>
-                        </div>
-
-                        {$extra}
-
-                        <p style='font-size: 13px; line-height: 1.6; color: #888; margin-top: 25px;'>{$footerNote}</p>
-
-                        <!-- INFORMASI KONTAK / BANTUAN -->
-                        <div style='margin-top: 25px; padding: 16px; background-color: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1; text-align: center;'>
-                            <p style='font-size: 13px; color: #64748b; margin: 0 0 6px 0;'>Butuh bantuan atau informasi lebih lanjut? Hubungi narahubung kami di:</p>
-                            <p style='font-size: 15px; font-weight: bold; color: #1e3a8a; margin: 0;'>
-                                📞 {$nomorKontak}
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td align='center' style='background-color: #f8fafc; padding: 20px; border-top: 1px solid #edf2f7; font-size: 12px; color: #999;'>
-                        <p style='margin: 0 0 5px 0;'>Email ini dikirim otomatis oleh sistem rekrutmen Industry-Academia Collaboration Program.</p>
-                        <p style='margin: 0;'>&copy; " . date('Y') . " Industry-Academia Collaboration Program. All rights reserved.</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        ";
-
-        return ['subject' => $subject, 'body' => $body];
+        return InterviewNotificationService::buildEmailTemplate($item);
     }
 
     private function buildWaTemplate(array $item): array
     {
-        $nama = $item['nama_lengkap'];
-        $status = $item['status'];
-        $step = $this->getInterviewStep($status);
-
-        if (str_starts_with($status, 'Lolos_Interview_')) {
-            $jadwal = $item['jadwal_interview_' . $step] ?? null;
-            $zoom = $item['link_zoom_' . $step] ?? null;
-            $jadwalText = $jadwal ? date('l, d F Y', strtotime($jadwal)) : '(menyusul)';
-            $jamText = $jadwal ? date('H:i', strtotime($jadwal)) . ' WIB' : '(menyusul)';
-
-            $message = "Halo *{$nama}*,\n\n"
-                . "Selamat! Anda dijadwalkan mengikuti *Interview Tahap {$step}* program magang IOH Semarang.\n\n"
-                . "🗓️ Hari/Tanggal: {$jadwalText}\n"
-                . "⏰ Waktu: {$jamText}\n"
-                . "💻 Link Zoom: " . ($zoom ?: '-') . "\n\n"
-                . "Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet stabil ya. Sampai jumpa!\n\n"
-                . "Salam,\nTim Rekrutmen Magang IOH Semarang";
-        } elseif (in_array($status, ['Diterima'], true)) {
-            $message = "Halo *{$nama}*,\n\n"
-                . "Selamat! Anda dinyatakan *LOLOS* dan diterima pada program magang IOH Semarang.\n"
-                . "Tim kami akan segera menghubungi Anda untuk info langkah selanjutnya.\n\n"
-                . "Salam,\nTim Rekrutmen Magang IOH Semarang";
-        } elseif (in_array($status, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true)) {
-            $message = "Halo *{$nama}*,\n\n"
-                . "Terima kasih atas partisipasi Anda pada seleksi magang IOH Semarang.\n"
-                . "Untuk saat ini kami belum dapat melanjutkan proses Anda ke tahap berikutnya. Semoga sukses di kesempatan berikutnya!\n\n"
-                . "Salam,\nTim Rekrutmen Magang IOH Semarang";
-        } else {
-            $message = "Halo *{$nama}*,\n\n"
-                . "Terima kasih telah mendaftar program magang IOH Semarang. Pendaftaran Anda sedang kami proses, mohon ditunggu ya.\n\n"
-                . "Salam,\nTim Rekrutmen Magang IOH Semarang";
-        }
-
-        $number = $this->normalizeWaNumber($item['nomor_whatsapp'] ?? '');
-        $url = $number ? 'https://wa.me/' . $number . '?text=' . rawurlencode($message) : null;
-
-        return ['message' => $message, 'url' => $url];
+        return InterviewNotificationService::buildWaTemplate($item);
     }
 
     private function normalizeWaNumber(string $number): ?string
@@ -1562,18 +1447,35 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\CertificateService();
-            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
-            $binary = $service->generatePptxString($candidate);
+        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+        $fileName = "Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pptx";
 
-            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pptx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Certificate PPTX Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat PPTX: ' . $e->getMessage());
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePptxString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PPTX Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PPTX: ' . $e->getMessage());
+            }
         }
+
+        // Tampilkan halaman pratinjau di tab baru dengan opsi download
+        return view('admin/preview_page', [
+            'docType'     => 'pptx',
+            'docTitle'    => 'Sertifikat Selesai Program Magang',
+            'badgeTitle'  => 'PowerPoint (.pptx)',
+            'badgeClass'  => 'bg-warning text-dark',
+            'iconClass'   => 'bi-file-earmark-ppt-fill',
+            'btnClass'    => 'btn-warning text-dark',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/certificate/pptx/{$id}?download=1"),
+            'inlineUrl'   => site_url("admin/certificate/pdf/{$id}?inline=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 
     /**
@@ -1590,18 +1492,50 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\CertificateService();
-            $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
-            $binary = $service->generatePdfString($candidate);
+        $nama = !empty($candidate['nama_lengkap']) ? trim($candidate['nama_lengkap']) : ('Peserta_' . $candidate['id']);
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $nama);
+        $fileName = "Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
 
-            $fileName = "_Sertifikat Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment file
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePdfString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
         }
+
+        // Jika parameter inline=1 diset, tampilkan PDF secara native di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\CertificateService();
+                $binary = $service->generatePdfString($candidate);
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Certificate PDF Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman pratinjau di tab baru dengan opsi download
+        return view('admin/preview_page', [
+            'docType'     => 'pdf',
+            'docTitle'    => 'Sertifikat Selesai Program Magang',
+            'badgeTitle'  => 'PDF Document (.pdf)',
+            'badgeClass'  => 'bg-danger text-white',
+            'iconClass'   => 'bi-file-earmark-pdf-fill',
+            'btnClass'    => 'btn-danger text-white',
+            'fileName'    => $fileName,
+            'downloadUrl' => site_url("admin/certificate/pdf/{$id}?download=1"),
+            'inlineUrl'   => site_url("admin/certificate/pdf/{$id}?inline=1"),
+            'candidate'   => $candidate,
+        ]);
     }
 
     /**
@@ -1618,16 +1552,63 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\SuratService();
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
-            $binary = $service->generateSuratPenerimaanString($candidate);
-            $fileName = "_Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Surat Penerimaan Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
+        $fileName = "Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.docx";
+        $pdfFileName = "Surat Penerimaan Industry-Academia Collaboration Program_{$cleanName}.pdf";
+
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment Word (.docx)
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generateSuratPenerimaanString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+            }
         }
+
+        // Jika parameter download_pdf=1 diset, kirim langsung sebagai attachment PDF (.pdf)
+        if ($this->request->getGet('download_pdf') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'penerimaan');
+                return $this->response->download($pdfFileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan PDF Download Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Jika parameter inline=1 diset, alirkan PDF secara native untuk preview di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'penerimaan');
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $pdfFileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Penerimaan PDF Inline Error: ' . $e->getMessage());
+                return $this->response->setStatusCode(500)->setBody('Gagal membuat pratinjau: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman pratinjau terpadu di tab baru dengan viewer PDF native
+        return view('admin/preview_page', [
+            'docType'        => 'docx',
+            'docTitle'       => 'Surat Penerimaan Magang',
+            'badgeTitle'     => 'Microsoft Word (.docx)',
+            'badgeClass'     => 'bg-primary text-white',
+            'iconClass'      => 'bi-file-earmark-word-fill',
+            'btnClass'       => 'btn-primary text-white',
+            'fileName'       => $fileName,
+            'downloadUrl'    => site_url("admin/surat/penerimaan/{$id}?download=1"),
+            'downloadPdfUrl' => site_url("admin/surat/penerimaan/{$id}?download_pdf=1"),
+            'inlineUrl'      => site_url("admin/surat/penerimaan/{$id}?inline=1"),
+            'candidate'      => $candidate,
+        ]);
     }
 
     /**
@@ -1644,15 +1625,62 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        try {
-            $service = new \App\Services\SuratService();
-            $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
-            $binary = $service->generateSuratKeteranganSelesaiString($candidate);
-            $fileName = "_Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.docx";
-            return $this->response->download($fileName, $binary);
-        } catch (\Throwable $e) {
-            log_message('error', 'Surat Keterangan Selesai Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_\-]/u', '', $candidate['nama_lengkap'] ?? ('Peserta_' . $id));
+        $fileName = "Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.docx";
+        $pdfFileName = "Surat Keterangan Selesai Industry-Academia Collaboration Program_{$cleanName}.pdf";
+
+        // Jika parameter download=1 diset, kirim langsung sebagai attachment Word (.docx)
+        if ($this->request->getGet('download') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generateSuratKeteranganSelesaiString($candidate);
+                return $this->response->download($fileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Keterangan Selesai Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat surat: ' . $e->getMessage());
+            }
         }
+
+        // Jika parameter download_pdf=1 diset, kirim langsung sebagai attachment PDF (.pdf)
+        if ($this->request->getGet('download_pdf') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'selesai');
+                return $this->response->download($pdfFileName, $binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Selesai PDF Download Error: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Gagal membuat PDF: ' . $e->getMessage());
+            }
+        }
+
+        // Jika parameter inline=1 diset, alirkan PDF secara native untuk preview di browser
+        if ($this->request->getGet('inline') === '1') {
+            try {
+                $service = new \App\Services\SuratService();
+                $binary = $service->generatePdfString($candidate, 'selesai');
+                return $this->response
+                    ->setContentType('application/pdf')
+                    ->setHeader('Content-Disposition', 'inline; filename="' . $pdfFileName . '"')
+                    ->setBody($binary);
+            } catch (\Throwable $e) {
+                log_message('error', 'Surat Selesai PDF Inline Error: ' . $e->getMessage());
+                return $this->response->setStatusCode(500)->setBody('Gagal membuat pratinjau: ' . $e->getMessage());
+            }
+        }
+
+        // Tampilkan halaman pratinjau terpadu di tab baru dengan viewer PDF native
+        return view('admin/preview_page', [
+            'docType'        => 'docx',
+            'docTitle'       => 'Surat Keterangan Selesai Magang',
+            'badgeTitle'     => 'Microsoft Word (.docx)',
+            'badgeClass'     => 'bg-info text-white',
+            'iconClass'      => 'bi-file-earmark-word-fill',
+            'btnClass'       => 'btn-info text-white',
+            'fileName'       => $fileName,
+            'downloadUrl'    => site_url("admin/surat/selesai/{$id}?download=1"),
+            'downloadPdfUrl' => site_url("admin/surat/selesai/{$id}?download_pdf=1"),
+            'inlineUrl'      => site_url("admin/surat/selesai/{$id}?inline=1"),
+            'candidate'      => $candidate,
+        ]);
     }
 }

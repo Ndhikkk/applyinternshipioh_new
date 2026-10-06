@@ -121,6 +121,75 @@
                                             <?= $labelText ?>
                                         </span>
                                     </div>
+
+                                    <?php
+                                    $activeStep = \App\Services\InterviewNotificationService::getActiveInterviewStep($pendaftaran);
+                                    $isRejected = in_array($currentStatus, ['Ditolak', 'Tidak_Lolos_Interview_1', 'Tidak_Lolos_Interview_2', 'Tidak_Lolos_Interview_3'], true);
+                                    $isFinished = in_array($currentStatus, ['Diterima', 'Complete'], true);
+
+                                    if ($activeStep > 0 && !$isRejected && !$isFinished):
+                                        $jadwal = $pendaftaran['jadwal_interview_' . $activeStep] ?? null;
+                                        $zoom = trim((string) ($pendaftaran['link_zoom_' . $activeStep] ?? ''));
+                                        $catatan = trim((string) ($pendaftaran['catatan_interview_' . $activeStep] ?? ''));
+                                        $jadwalFormatted = \App\Services\InterviewNotificationService::formatTanggalIndo($jadwal, true);
+                                    ?>
+                                        <div class="mt-4 p-4 rounded-4 text-start bg-white border border-primary border-opacity-25 shadow-sm">
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">
+                                                        <i class="bi bi-camera-video me-1"></i> Interview Tahap <?= $activeStep ?>
+                                                    </span>
+                                                    <span class="fw-semibold text-dark">Informasi Wawancara</span>
+                                                </div>
+                                                <span class="badge bg-light text-secondary border">Online Meeting</span>
+                                            </div>
+
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="text-muted small mb-1"><i class="bi bi-calendar-event me-1"></i> Jadwal Wawancara</div>
+                                                    <div class="fw-bold text-dark fs-6"><?= esc($jadwalFormatted) ?></div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="text-muted small mb-1"><i class="bi bi-link-45deg me-1"></i> Tautan Zoom / Google Meet</div>
+                                                    <?php if ($zoom !== ''): ?>
+                                                        <div>
+                                                            <a href="<?= esc($zoom) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                                                                <i class="bi bi-box-arrow-up-right me-1"></i> Masuk Ruang Zoom
+                                                            </a>
+                                                        </div>
+                                                        <div class="mt-1">
+                                                            <small class="text-muted text-break" style="font-size: 0.8rem;"><?= esc($zoom) ?></small>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-muted fst-italic">Link Zoom akan segera diinformasikan oleh tim rekrutmen.</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <?php if ($catatan !== ''): ?>
+                                                <div class="p-3 bg-light rounded-3 border-start border-3 border-primary mb-3">
+                                                    <div class="fw-semibold small text-dark mb-1"><i class="bi bi-info-circle me-1"></i> Catatan Khusus:</div>
+                                                    <div class="text-secondary small mb-0"><?= nl2br(esc($catatan)) ?></div>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <div class="text-muted small fst-italic">
+                                                <i class="bi bi-clock me-1"></i> Mohon hadir 10 menit sebelum jadwal dan pastikan koneksi internet stabil.
+                                            </div>
+                                        </div>
+                                    <?php elseif (($currentStatus === 'Progress' || $currentStatus === 'Progress Diterima') && !$isRejected && !$isFinished): ?>
+                                        <div class="mt-4 p-4 rounded-4 text-start bg-white border border-success border-opacity-25 shadow-sm">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Lolos Interview Tahap 1
+                                                </span>
+                                                <span class="fw-semibold text-dark">Tahap Selanjutnya: Interview Tahap 2</span>
+                                            </div>
+                                            <p class="text-secondary small mb-0">
+                                                Selamat! Anda dinyatakan lolos pada Interview Tahap 1. Tim rekrutmen kami saat ini sedang menyusun jadwal untuk Interview Tahap 2. Mohon pantau halaman ini atau email/WhatsApp Anda secara berkala untuk jadwal dan link Zoom berikutnya.
+                                            </p>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

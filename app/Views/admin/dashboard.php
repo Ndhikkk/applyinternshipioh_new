@@ -721,6 +721,9 @@
                     <hr>
 
                     <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" id="btnSendTokenEmailModal" class="btn btn-outline-primary btn-sm" onclick="sendTokenEmailNow(this)" title="Kirim ulang email token pendaftaran awal ke kandidat">
+                            <i class="bi bi-key-fill"></i> Kirim Email Token
+                        </button>
                         <button type="button" id="btnSendEmailModal" class="btn btn-outline-secondary btn-sm" onclick="sendEmailNow(this)">
                             <i class="bi bi-envelope"></i> Kirim Email Sekarang
                         </button>
@@ -1000,19 +1003,19 @@
 
     function downloadCertPptx() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/certificate/pptx') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/certificate/pptx') ?>/${currentModalId}`, '_blank');
         }
     }
 
     function downloadSuratPenerimaan() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/surat/penerimaan') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/surat/penerimaan') ?>/${currentModalId}`, '_blank');
         }
     }
 
     function downloadSuratSelesai() {
         if (currentModalId) {
-            window.location.href = `<?= site_url('admin/surat/selesai') ?>/${currentModalId}`;
+            window.open(`<?= site_url('admin/surat/selesai') ?>/${currentModalId}`, '_blank');
         }
     }
 
@@ -1249,6 +1252,34 @@
         });
     }
 
+    function sendTokenEmailNow(btn) {
+        const button = btn || document.getElementById('btnSendTokenEmailModal');
+        if (button && !setButtonLoading(button, 'Mengirim Token...')) return;
+
+        apiGet(buildUrl(currentModalId, 'email_token'))
+            .then(j => {
+                toast(j.success ? 'success' : 'error', j.message);
+                if (j.success) {
+                    const el = document.getElementById('token-indicator-' + currentModalId);
+                    if (el) {
+                        el.style.borderBottom = '2px solid #198754';
+                        el.classList.remove('text-danger', 'text-success');
+                        el.title = 'Email token sudah terkirim';
+                        el.setAttribute('data-bs-original-title', 'Email token sudah terkirim');
+                    }
+                    if (currentModalItem) {
+                        currentModalItem.email_terkirim = 1;
+                    }
+                }
+            })
+            .catch(() => {
+                toast('error', 'Gagal mengirim email token pendaftaran.');
+            })
+            .finally(() => {
+                if (button) resetButtonLoading(button);
+            });
+    }
+
     function sendEmailNow(btn) {
         const button = btn || document.getElementById('btnSendEmailModal');
         if (button && !setButtonLoading(button, 'Mengirim Email...')) return;
@@ -1396,28 +1427,31 @@
                     window.location.href = url.toString();
                     Swal.close();
 
-                    // Tampilkan notifikasi panduan pembukaan file di Excel
+                    // Tampilkan notifikasi panduan pembukaan file di Excel (tanpa timer agar tidak tertutup otomatis)
                     setTimeout(() => {
                         Swal.fire({
                             customClass: { popup: 'ioh-popup' },
-                            icon: 'info',
-                            title: 'Mengunduh Data Export',
+                            icon: 'success',
+                            title: 'Permintaan Unduhan Diproses',
                             html: `
-                                <p class="mb-2">Permintaan unduhan file sedang diproses oleh server.</p>
-                                <div class="p-3 text-start rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0; font-size:0.83rem; color:#334155;">
-                                    <div class="d-flex align-items-start gap-2">
+                                <p class="text-muted small mb-3">File sedang dipersiapkan dan diunduh oleh browser Anda.</p>
+                                <div class="p-3 text-start rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0; font-size:0.84rem; color:#334155; line-height:1.55;">
+                                    <div class="d-flex align-items-start gap-2 mb-2">
                                         <i class="bi bi-lightbulb-fill text-warning flex-shrink-0 mt-1"></i>
                                         <div>
-                                            <strong class="text-dark d-block mb-1">Panduan Buka di Excel:</strong>
-                                            Jika berkas terunduh berformat <code>.csv</code>, berkas telah dilengkapi <strong>BOM UTF-8</strong>. Saat membuka di Excel (atau lewat menu <em>Data &gt; From Text/CSV</em>), pastikan pilihan format file / encoding adalah <strong>65001 : Unicode (UTF-8)</strong> agar tabel langsung rapi terpisah per kolom.
+                                            <strong class="text-dark d-block">Panduan Membuka di Microsoft Excel:</strong>
+                                            Jika file yang terunduh berformat <code>.csv</code>, berkas sudah diinjeksi <strong>BOM UTF-8</strong> agar huruf dan nomor rapi.
                                         </div>
+                                    </div>
+                                    <div class="ps-4 small text-secondary">
+                                        <div class="mb-1"><strong>Cara 1:</strong> Klik dua kali (double-click) file <code>.csv</code> untuk langsung membukanya di Excel.</div>
+                                        <div><strong>Cara 2 (Jika ingin memastikan pemisah kolom):</strong> Buka Excel &rarr; tab <strong>Data</strong> &rarr; <strong>From Text/CSV</strong> &rarr; pilih file &rarr; pilih <em>File Origin: 65001 Unicode (UTF-8)</em> &rarr; klik <strong>Load</strong>.</div>
                                     </div>
                                 </div>
                             `,
-                            timer: 6000,
-                            timerProgressBar: true,
                             showConfirmButton: true,
-                            confirmButtonText: 'Siap, Mengerti'
+                            confirmButtonText: 'Siap, Mengerti',
+                            allowOutsideClick: true
                         });
                     }, 350);
                 }
@@ -1624,6 +1658,11 @@
             const paginationLink = e.target.closest('.ajax-pagination a');
             if (paginationLink) {
                 e.preventDefault();
+                const tableCard = tableContainer.closest('.card');
+                if (tableCard) {
+                    const y = tableCard.getBoundingClientRect().top + window.pageYOffset - 20;
+                    window.scrollTo(0, y);
+                }
                 loadData(paginationLink.href);
                 return;
             }

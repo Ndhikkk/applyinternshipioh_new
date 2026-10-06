@@ -153,7 +153,16 @@
                     ?>
                     <tr data-aos="fade-in" id="row-<?= $data['id'] ?>">
                         <td data-label="Kandidat">
-                            <div class="small text-muted font-monospace"><?= esc($data['token_pendaftaran'] ?? '-') ?></div>
+                            <?php
+                                $isEmailSent = (int) ($data['email_terkirim'] ?? 0) === 1;
+                                $tokenColor = $isEmailSent ? '#198754' : '#dc3545';
+                                $tokenTooltip = $isEmailSent ? 'Email token sudah terkirim' : 'Email token belum terkirim';
+                            ?>
+                            <div class="small font-monospace mb-1">
+                                <span id="token-indicator-<?= $data['id'] ?>" style="display: inline-block; border-bottom: 2px solid <?= $tokenColor ?>; font-weight: 600; padding-bottom: 2px; line-height: 1.2;" title="<?= $tokenTooltip ?>" data-bs-toggle="tooltip">
+                                    <?= esc($data['token_pendaftaran'] ?? '-') ?>
+                                </span>
+                            </div>
                             <div class="fw-semibold mb-1"><?= esc($data['nama_lengkap']) ?></div>
                             <div class="small mb-1">
                                 <a href="mailto:<?= esc($data['email'] ?? '') ?>" class="text-decoration-none" title="Kirim Email">
@@ -288,16 +297,16 @@
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
                                     <?php if (in_array($currentStatus, ['Diterima', 'Complete'], true)): ?>
-                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
+                                        <a href="<?= site_url('admin/surat/penerimaan/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm px-2" title="Unduh Surat Penerimaan (Word)">
                                             <i class="bi bi-file-earmark-word"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
+                                        <a href="<?= site_url('admin/surat/selesai/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-info btn-sm px-2 text-white" title="Unduh Surat Keterangan Selesai (Word)">
                                             <i class="bi bi-file-earmark-word-fill"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" target="_blank" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
+                                        <a href="<?= site_url('admin/certificate/pdf/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm px-2" title="Unduh Sertifikat (PDF)">
                                             <i class="bi bi-file-earmark-pdf"></i>
                                         </a>
-                                        <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
+                                        <a href="<?= site_url('admin/certificate/pptx/' . $data['id']) ?>" target="_blank" rel="noopener" class="btn btn-warning btn-sm px-2 text-dark" title="Unduh Sertifikat (PPTX)">
                                             <i class="bi bi-file-earmark-ppt"></i>
                                         </a>
                                     <?php endif; ?>
