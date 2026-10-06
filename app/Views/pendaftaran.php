@@ -183,6 +183,7 @@
                                     <option value="Project Post Paid" <?= old('divisi_pilihan') == 'Project Post Paid' ? 'selected' : '' ?>>Project Post Paid</option>
                                     <option value="Capability Building" <?= old('divisi_pilihan') == 'Capability Building' ? 'selected' : '' ?>>Capability Building</option>
                                     <option value="SnD" <?= old('divisi_pilihan') == 'SnD' ? 'selected' : '' ?>>SnD</option>
+                                    <option value="Customer Service" <?= old('divisi_pilihan') == 'Customer Service' ? 'selected' : '' ?>>Customer Service</option>
                                 </select>
                                 <div class="form-text">
                                     Pilihlah salah satu spesifikasi divisi kerja yang paling sesuai dengan minat dan fokus keahlian akademik Anda.

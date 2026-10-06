@@ -307,6 +307,20 @@
                     <span class="divisi-tag">Channel</span>
                 </div>
             </div>
+
+            <!-- Divisi 12: Customer Service -->
+            <div class="divisi-card" data-aos="fade-up" data-aos-delay="650">
+                <div class="divisi-icon">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <h4 class="divisi-title">Customer Service (CS)</h4>
+                <p class="divisi-desc">Menangani layanan pelanggan, penyelesaian keluhan, serta memastikan kepuasan pelanggan melalui komunikasi yang efektif dan solusi yang tepat sasaran.</p>
+                <div class="divisi-tags">
+                    <span class="divisi-tag">Customer Support</span>
+                    <span class="divisi-tag">Service Excellence</span>
+                    <span class="divisi-tag">Communication</span>
+                </div>
+            </div>
         </div>
 
         <!-- Call to Action -->
@@ -352,7 +366,7 @@
                                 <div class="stat-label">Kepuasan</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-number">11</div>
+                                <div class="stat-number">12</div>
                                 <div class="stat-label">Divisi</div>
                             </div>
                             <div class="stat-item">

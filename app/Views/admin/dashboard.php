@@ -663,6 +663,7 @@
                                     <option value="Project Post Paid">Project Post Paid</option>
                                     <option value="Capability Building">Capability Building</option>
                                     <option value="SnD">SnD</option>
+                                    <option value="Customer Service">Customer Service</option>
                                 </select>
                             </div>
                         </div>

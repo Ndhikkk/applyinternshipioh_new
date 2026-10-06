@@ -37,7 +37,7 @@
                                 <span class="badge bg-primary ms-1" style="font-size:.65em;"><?= esc($divisi_filter) ?></span>
                             <?php endif; ?>
                             <?php if (!empty($jenis_filter)): ?>
-                                <span class="badge bg-info ms-1" style="font-size:.65em;"><?= esc($jenis_filter) ?></span>
+                                <span class="badge bg-info ms-1" style="font-size:.65em;"><?= esc($jenis_filter === 'Wajib' ? 'Magang Wajib' : $jenis_filter) ?></span>
                             <?php endif; ?>
                             <i class="bi bi-funnel<?= (!empty($divisi_filter) || !empty($jenis_filter)) ? '-fill text-primary' : '' ?> ms-1" style="font-size:.75em;"></i>
                         </span>
@@ -52,7 +52,7 @@
                                             $divisiList = [
                                                 'Direct Sales Executive', 'Markom', 'IT / Elang IT', 'Technical',
                                                 'Finance', 'B2B', 'Social Media 3ID & IM3', 'Daily Project',
-                                                'Project Post Paid', 'Capability Building', 'SnD'
+                                                'Project Post Paid', 'Capability Building', 'SnD', 'Customer Service'
                                             ];
                                             foreach ($divisiList as $div):
                                         ?>
@@ -71,9 +71,9 @@
                                             <span class="badge bg-info me-2">Wajib</span>
                                             <span>Magang Wajib</span>
                                         </a>
-                                        <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= ($jenis_filter ?? '') === 'Tidak Wajib' ? 'active fw-bold' : '' ?>" href="#" data-jenis="Tidak Wajib">
-                                            <span class="badge bg-secondary me-2">Tidak Wajib</span>
-                                            <span>Tidak Wajib</span>
+                                        <a class="dropdown-item small rounded py-2 px-2 d-flex align-items-center <?= ($jenis_filter ?? '') === 'Mandiri' ? 'active fw-bold' : '' ?>" href="#" data-jenis="Mandiri">
+                                            <span class="badge bg-secondary me-2">Mandiri</span>
+                                            <span>Mandiri</span>
                                         </a>
                                     </div>
                                 </div>
